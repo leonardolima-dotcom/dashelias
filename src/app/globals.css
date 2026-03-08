@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-slide-up: slide-up 0.5s ease-out both;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.65);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.9);
+  }
+}
+
+@keyframes animationIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes barEnter {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+.animate-bar-enter {
+  transform-origin: bottom;
+  animation: barEnter 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50%      { opacity: 0.40; transform: scale(1.06); }
+}
+
+/* Liquid Glass Card Style */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: clip;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover light sweep */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transition: 0.5s;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.glass-panel:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: rgba(255,255,255,0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.glass-panel:hover::before {
+  left: 100%;
+  transition: 0.7s ease-in-out;
+}
+
+
+
+/* Floating particles effect - vertical (bar charts) */
+@keyframes floating-points {
+  0% { transform: translateY(0); opacity: 1; }
+  85% { opacity: 0; }
+  100% { transform: translateY(-120px); opacity: 0; }
+}
+
+.particles-wrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.particles-wrapper .particle {
+  bottom: -4px;
+  position: absolute;
+  animation: floating-points infinite ease-in-out;
+  pointer-events: none;
+  width: 2px;
+  height: 2px;
+  background-color: #fef3c7;
+  border-radius: 9999px;
+  box-shadow: 0 0 6px #fef3c7;
+}
+
+.particles-wrapper .particle:nth-child(1) { left: 15%; animation-duration: 1.8s; animation-delay: 0.1s; }
+.particles-wrapper .particle:nth-child(2) { left: 40%; animation-duration: 3.2s; animation-delay: 0.9s; }
+.particles-wrapper .particle:nth-child(3) { left: 60%; animation-duration: 2.5s; animation-delay: 0.4s; }
+.particles-wrapper .particle:nth-child(4) { left: 80%; animation-duration: 3.8s; animation-delay: 1.6s; }
+.particles-wrapper .particle:nth-child(5) { left: 50%; animation-duration: 1.5s; animation-delay: 2.3s; }
+
+/* Progress bar particles (horizontal) */
+@keyframes floating-points-h {
+  0% { transform: translateX(0); opacity: 1; }
+  85% { opacity: 0; }
+  100% { transform: translateX(-40px); opacity: 0; }
+}
+
+.particles-wrapper-h {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.particles-wrapper-h .particle {
+  right: 0;
+  position: absolute;
+  animation: floating-points-h infinite ease-in-out;
+  pointer-events: none;
+  width: 1.5px;
+  height: 1.5px;
+  background-color: #fef3c7;
+  border-radius: 9999px;
+  box-shadow: 0 0 4px #fef3c7;
+}
+
+.particles-wrapper-h .particle:nth-child(1) { top: 15%; animation-duration: 1.6s; animation-delay: 0s; }
+.particles-wrapper-h .particle:nth-child(2) { top: 50%; animation-duration: 2.8s; animation-delay: 0.7s; }
+.particles-wrapper-h .particle:nth-child(3) { top: 85%; animation-duration: 3.4s; animation-delay: 1.5s; }
+
+html, body {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
