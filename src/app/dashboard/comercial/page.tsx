@@ -192,7 +192,7 @@ export default function ComercialPage() {
   const router = useRouter();
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-x-hidden overflow-y-auto">
       {/* Background layers – fixed */}
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
         <div className="h-[120vh] w-[120vh] rounded-full"
