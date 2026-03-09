@@ -34,11 +34,26 @@ const engagement = [
 
 const ads = [
   { name: "Black_Friday_Vid_01", type: "Video • 15s", status: "ATIVO", cpm: "R$ 15,40", cpc: "R$ 0,85", roas: "6.2x", roasGood: true,
-    views: "124.500", likes: "8.230", comments: "1.045", reach: "312.000", previewColor: "from-amber-700 to-amber-500", previewLabel: "Black Friday 2024 – 15s" },
+    views: "124.500", likes: "8.230", comments: "1.045", reach: "312.000", previewColor: "from-amber-700 to-amber-500", previewLabel: "Black Friday 2024 – 15s",
+    cover: "/reels 1.jpg" },
   { name: "Carousel_Lifestyle_Main", type: "Carousel • 5 cards", status: "ATIVO", cpm: "R$ 12,10", cpc: "R$ 1,05", roas: "4.8x", roasGood: true,
-    views: "98.200", likes: "5.610", comments: "743", reach: "245.800", previewColor: "from-emerald-700 to-emerald-500", previewLabel: "Lifestyle Collection – 5 Cards" },
+    views: "98.200", likes: "5.610", comments: "743", reach: "245.800", previewColor: "from-emerald-700 to-emerald-500", previewLabel: "Lifestyle Collection – 5 Cards",
+    cover: "/reels 2.jpg" },
   { name: "Banner_Retargeting_Static", type: "Static • 1080x1350", status: "PAUSADO", cpm: "R$ 18,90", cpc: "R$ 2,15", roas: "1.2x", roasGood: false,
-    views: "42.100", likes: "1.890", comments: "312", reach: "105.400", previewColor: "from-slate-700 to-slate-500", previewLabel: "Retargeting Banner – 1080×1350" },
+    views: "42.100", likes: "1.890", comments: "312", reach: "105.400", previewColor: "from-slate-700 to-slate-500", previewLabel: "Retargeting Banner – 1080×1350",
+    cover: "/reels 3.jpg" },
+  { name: "Promo_Verao_Reels", type: "Video • 30s", status: "ATIVO", cpm: "R$ 11,20", cpc: "R$ 0,72", roas: "5.8x", roasGood: true,
+    views: "156.300", likes: "12.450", comments: "2.180", reach: "398.000", previewColor: "from-amber-700 to-amber-500", previewLabel: "Promoção Verão – 30s",
+    cover: "/reels 4.jpg" },
+  { name: "Depoimento_Cliente_Real", type: "Video • 45s", status: "ATIVO", cpm: "R$ 9,80", cpc: "R$ 0,65", roas: "7.1x", roasGood: true,
+    views: "89.700", likes: "7.340", comments: "1.520", reach: "214.500", previewColor: "from-emerald-700 to-emerald-500", previewLabel: "Depoimento Cliente – 45s",
+    cover: "/reels 5.jpg" },
+  { name: "Lancamento_Colecao_Nova", type: "Carousel • 8 cards", status: "ATIVO", cpm: "R$ 13,50", cpc: "R$ 0,95", roas: "4.3x", roasGood: true,
+    views: "72.800", likes: "4.920", comments: "687", reach: "185.200", previewColor: "from-amber-700 to-amber-500", previewLabel: "Nova Coleção – 8 Cards",
+    cover: "/reels 6.jpg" },
+  { name: "Oferta_Relampago_Stories", type: "Video • 10s", status: "PAUSADO", cpm: "R$ 20,10", cpc: "R$ 2,40", roas: "1.5x", roasGood: false,
+    views: "34.500", likes: "1.230", comments: "198", reach: "87.600", previewColor: "from-slate-700 to-slate-500", previewLabel: "Oferta Relâmpago – 10s",
+    cover: "/reels 7.jpg" },
 ];
 
 const evolutionData = [
@@ -192,11 +207,193 @@ export default function MarketingPage() {
           ))}
         </div>
 
-        {/* ── Evolution Chart ── */}
+        {/* ── Melhores Anúncios – Horizontal Reels Carousel ── */}
         <div
-          className="glass-panel rounded-2xl p-6 pb-10"
-          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both" }}
+          className="glass-panel rounded-2xl p-6"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}
         >
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-5 relative z-10">
+            <span className="text-amber-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Melhores Anúncios</h3>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory">
+            {ads.map((ad) => (
+              <div
+                key={ad.name}
+                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer hover:border-amber-500/20 transition-all duration-300 group/reel snap-start"
+                style={{ background: "rgba(255,255,255,0.02)" }}
+                onClick={() => setSelectedAd(ad)}
+              >
+                {/* Cover image */}
+                <div className="relative h-72 overflow-hidden">
+                  <Image
+                    src={ad.cover}
+                    alt={ad.name}
+                    fill
+                    className="object-cover group-hover/reel:scale-105 transition-transform duration-500"
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {/* Status badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold backdrop-blur-sm ${
+                      ad.status === "ATIVO"
+                        ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
+                        : "bg-amber-500/20 border border-amber-500/30 text-amber-400"
+                    }`}>
+                      {ad.status}
+                    </span>
+                  </div>
+                  {/* Play icon for videos */}
+                  {ad.type.includes("Video") && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/reel:bg-white/20 transition-colors">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                      </div>
+                    </div>
+                  )}
+                  {/* Bottom metrics overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <p className="text-xs font-bold text-white truncate mb-1.5">{ad.name}</p>
+                    <p className="text-[10px] text-slate-400">{ad.type}</p>
+                  </div>
+                </div>
+                {/* Metrics */}
+                <div className="p-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span className="text-[10px] font-bold text-white">{ad.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{ad.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{ad.comments}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                      <span className="text-[10px] font-bold text-white">{ad.reach}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                    <span className={`text-xs font-bold ${ad.roasGood ? "text-emerald-400" : "text-slate-500"}`}>ROAS {ad.roas}</span>
+                    <span className="text-[10px] text-slate-500">CPC {ad.cpc}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Engajamento + Evolution Chart Row ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Engajamento por Público */}
+          <div
+            className="lg:col-span-4 glass-panel rounded-2xl p-6"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both" }}
+          >
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <span className="text-amber-400/60">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <h3 className="font-bold text-sm text-slate-300">Engajamento por Público</h3>
+            </div>
+            <div className="relative flex justify-center items-center py-4 z-10" onMouseLeave={() => setHoveredEngagement(null)}>
+              <svg className="size-40" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="engAmber" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="rgb(251,191,36)" stopOpacity="0.95" />
+                    <stop offset="100%" stopColor="rgb(245,158,11)" stopOpacity="0.75" />
+                  </linearGradient>
+                  <linearGradient id="engEmerald" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="rgb(52,211,153)" stopOpacity="0.85" />
+                    <stop offset="100%" stopColor="rgb(16,185,129)" stopOpacity="0.6" />
+                  </linearGradient>
+                  <filter id="engGlow">
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                  </filter>
+                </defs>
+                <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="18" />
+                {(() => {
+                  const r = 70;
+                  const circ = 2 * Math.PI * r;
+                  const gap = 8;
+                  const gradIds = ["url(#engAmber)", "url(#engEmerald)"];
+                  const usable = circ - gap * engagement.length;
+                  let off = -circ / 4;
+                  return engagement.map((e, idx) => {
+                    const len = (e.pct / 100) * usable;
+                    const dash = `${len} ${circ - len}`;
+                    const thisOff = off;
+                    off += len + gap;
+                    const isHov = hoveredEngagement === e.label;
+                    const isDim = hoveredEngagement && !isHov;
+                    const gradColor = gradIds[idx] || gradIds[gradIds.length - 1];
+                    return (
+                      <g key={e.label}>
+                        {isHov && (
+                          <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradColor} strokeWidth={24} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="round" opacity="0.2" filter="url(#engGlow)" />
+                        )}
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradColor} strokeWidth={isHov ? 22 : 16} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="round" style={{ transition: "all 0.3s cubic-bezier(.4,0,.2,1)", opacity: isDim ? 0.2 : 1 }} />
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke="transparent" strokeWidth="30" strokeDasharray={dash} strokeDashoffset={-thisOff} className="cursor-pointer" onMouseEnter={() => setHoveredEngagement(e.label)} />
+                      </g>
+                    );
+                  });
+                })()}
+              </svg>
+              {hoveredEngagement && (() => {
+                const e = engagement.find((x) => x.label === hoveredEngagement)!;
+                return (
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 pointer-events-none z-30">
+                    <div className="rounded-xl border border-white/10 px-4 py-3 whitespace-nowrap" style={{ background: "rgba(10,10,10,0.95)", backdropFilter: "blur(8px)", boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+                      <p className="text-xs font-bold text-white mb-2">{e.label}</p>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-5">
+                          <span className="text-[10px] text-slate-400">CTR</span>
+                          <span className="text-xs font-bold text-amber-400">{e.value}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-5">
+                          <span className="text-[10px] text-slate-400">Impressões</span>
+                          <span className="text-xs font-bold text-white">{e.impressoes}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-5">
+                          <span className="text-[10px] text-slate-400">Cliques</span>
+                          <span className="text-xs font-bold text-slate-300">{e.cliques}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-5">
+                          <span className="text-[10px] text-slate-400">Conversões</span>
+                          <span className="text-xs font-bold text-emerald-400">{e.conversoes}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4 relative z-10">
+              {engagement.map((e) => (
+                <div key={e.label} className="text-center cursor-default" onMouseEnter={() => setHoveredEngagement(e.label)} onMouseLeave={() => setHoveredEngagement(null)}>
+                  <p className="text-xs text-slate-400 mb-1">{e.label}</p>
+                  <p className="font-bold text-amber-400 text-base">{e.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Evolution Chart */}
+          <div
+            className="lg:col-span-8 glass-panel rounded-2xl p-6 pb-10"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.35s both" }}
+          >
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
           <div className="flex items-center justify-between mb-6 relative z-10">
             <div className="flex items-center gap-2">
@@ -347,6 +544,7 @@ export default function MarketingPage() {
               {evolutionData.map((d) => <span key={d.date}>{d.date}</span>)}
             </div>
           </div>
+        </div>
         </div>
 
         {/* ── Main Grid ── */}
@@ -628,181 +826,6 @@ export default function MarketingPage() {
           </div>
         </div>
 
-        {/* ── Bottom Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Engajamento por Público */}
-          <div
-            className="lg:col-span-4 glass-panel rounded-2xl p-6"
-            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.5s both" }}
-          >
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <span className="text-amber-400/60">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <h3 className="font-bold text-sm text-slate-300">Engajamento por Público</h3>
-            </div>
-            <div className="relative flex justify-center items-center py-4 z-10" onMouseLeave={() => setHoveredEngagement(null)}>
-              {/* Donut via arc paths with gaps */}
-              <svg className="size-40" viewBox="0 0 200 200">
-                <defs>
-                  <linearGradient id="engAmber" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgb(251,191,36)" stopOpacity="0.95" />
-                    <stop offset="100%" stopColor="rgb(245,158,11)" stopOpacity="0.75" />
-                  </linearGradient>
-                  <linearGradient id="engEmerald" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgb(52,211,153)" stopOpacity="0.85" />
-                    <stop offset="100%" stopColor="rgb(16,185,129)" stopOpacity="0.6" />
-                  </linearGradient>
-                  <linearGradient id="engSlate1" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgb(148,163,184)" stopOpacity="0.55" />
-                    <stop offset="100%" stopColor="rgb(100,116,139)" stopOpacity="0.35" />
-                  </linearGradient>
-                  <linearGradient id="engSlate2" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgb(71,85,105)" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="rgb(51,65,85)" stopOpacity="0.3" />
-                  </linearGradient>
-                  <filter id="engGlow">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
-                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                  </filter>
-                </defs>
-                <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="18" />
-                {(() => {
-                  const r = 70;
-                  const circ = 2 * Math.PI * r;
-                  const gap = 8;
-                  const gradIds = ["url(#engAmber)", "url(#engEmerald)", "url(#engSlate1)", "url(#engSlate2)"];
-                  const usable = circ - gap * engagement.length;
-                  let off = -circ / 4;
-                  return engagement.map((e, idx) => {
-                    const len = (e.pct / 100) * usable;
-                    const dash = `${len} ${circ - len}`;
-                    const thisOff = off;
-                    off += len + gap;
-                    const isHov = hoveredEngagement === e.label;
-                    const isDim = hoveredEngagement && !isHov;
-                    const gradColor = gradIds[idx] || gradIds[gradIds.length - 1];
-                    return (
-                      <g key={e.label}>
-                        {isHov && (
-                          <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradColor} strokeWidth={24} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="round" opacity="0.2" filter="url(#engGlow)" />
-                        )}
-                        <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradColor} strokeWidth={isHov ? 22 : 16} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="round" style={{ transition: "all 0.3s cubic-bezier(.4,0,.2,1)", opacity: isDim ? 0.2 : 1 }} />
-                        <circle cx="100" cy="100" r={r} fill="transparent" stroke="transparent" strokeWidth="30" strokeDasharray={dash} strokeDashoffset={-thisOff} className="cursor-pointer" onMouseEnter={() => setHoveredEngagement(e.label)} />
-                      </g>
-                    );
-                  });
-                })()}
-              </svg>
-              {/* Tooltip over donut */}
-              {hoveredEngagement && (() => {
-                const e = engagement.find((x) => x.label === hoveredEngagement)!;
-                return (
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 pointer-events-none z-30">
-                    <div className="rounded-xl border border-white/10 px-4 py-3 whitespace-nowrap" style={{ background: "rgba(10,10,10,0.95)", backdropFilter: "blur(8px)", boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
-                      <p className="text-xs font-bold text-white mb-2">{e.label}</p>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-5">
-                          <span className="text-[10px] text-slate-400">CTR</span>
-                          <span className="text-xs font-bold text-amber-400">{e.value}</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-5">
-                          <span className="text-[10px] text-slate-400">Impressões</span>
-                          <span className="text-xs font-bold text-white">{e.impressoes}</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-5">
-                          <span className="text-[10px] text-slate-400">Cliques</span>
-                          <span className="text-xs font-bold text-slate-300">{e.cliques}</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-5">
-                          <span className="text-[10px] text-slate-400">Conversões</span>
-                          <span className="text-xs font-bold text-emerald-400">{e.conversoes}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-4 relative z-10">
-              {engagement.map((e) => (
-                <div key={e.label} className="text-center cursor-default" onMouseEnter={() => setHoveredEngagement(e.label)} onMouseLeave={() => setHoveredEngagement(null)}>
-                  <p className="text-xs text-slate-400 mb-1">{e.label}</p>
-                  <p className="font-bold text-amber-400 text-base">{e.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Melhores Anúncios */}
-          <div
-            className="lg:col-span-8 glass-panel rounded-2xl p-0 overflow-clip"
-            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.55s both" }}
-          >
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
-            <div className="flex items-center justify-between p-6 border-b border-white/5 relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-amber-400/60">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-                </span>
-                <h3 className="font-bold text-sm text-slate-300">Melhores Anúncios</h3>
-              </div>
-            </div>
-            <div className="overflow-x-auto custom-scrollbar relative z-10">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    <th className="px-6 py-3 text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Criativo</th>
-                    <th className="px-6 py-3 text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-[10px] text-neutral-500 font-bold uppercase tracking-wider text-right">CPM</th>
-                    <th className="px-6 py-3 text-[10px] text-neutral-500 font-bold uppercase tracking-wider text-right">CPC</th>
-                    <th className="px-6 py-3 text-[10px] text-neutral-500 font-bold uppercase tracking-wider text-right">ROAS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ads.map((ad) => (
-                    <tr key={ad.name} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => setSelectedAd(ad)}>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="size-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60" strokeLinecap="round" strokeLinejoin="round">
-                              {ad.type.includes("Video") ? (
-                                <><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect width="14" height="12" rx="2" x="2" y="6"/></>
-                              ) : ad.type.includes("Carousel") ? (
-                                <><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></>
-                              ) : (
-                                <><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>
-                              )}
-                            </svg>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-white truncate">{ad.name}</p>
-                            <p className="text-[10px] text-slate-500">{ad.type}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          ad.status === "ATIVO"
-                            ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
-                            : "bg-amber-500/10 border border-amber-500/20 text-amber-400"
-                        }`}>
-                          {ad.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right text-xs font-medium text-slate-300">{ad.cpm}</td>
-                      <td className="px-6 py-4 text-right text-xs font-medium text-slate-300">{ad.cpc}</td>
-                      <td className="px-6 py-4 text-right">
-                        <span className={`font-bold text-xs ${ad.roasGood ? "text-emerald-400" : "text-slate-500"}`}>{ad.roas}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </main>
 
       {/* ── Footer Status – fixed bottom ── */}
@@ -829,47 +852,42 @@ export default function MarketingPage() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
-          {/* Modal */}
+          {/* Modal – horizontal layout */}
           <div
-            className="relative w-full max-w-md rounded-2xl border border-white/10 overflow-hidden"
+            className="relative w-full max-w-5xl max-h-[90vh] rounded-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row"
             style={{ ...glassStyle, background: "linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%)", animation: "animationIn 0.3s ease-out both" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
-            <button onClick={() => setSelectedAd(null)} className="absolute top-4 right-4 z-10 text-slate-400 hover:text-white transition-colors">
+            <button onClick={() => setSelectedAd(null)} className="absolute top-4 right-4 z-20 text-slate-400 hover:text-white transition-colors">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
               </svg>
             </button>
 
-            {/* Preview area */}
-            <div className={`relative h-44 bg-gradient-to-br ${selectedAd.previewColor} flex items-center justify-center`}>
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="relative z-10 text-center">
-                <div className="size-14 mx-auto mb-3 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white" strokeLinecap="round" strokeLinejoin="round">
-                    {selectedAd.type.includes("Video") ? (
-                      <><polygon points="6 3 20 12 6 21 6 3"/></>
-                    ) : selectedAd.type.includes("Carousel") ? (
-                      <><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></>
-                    ) : (
-                      <><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>
-                    )}
-                  </svg>
-                </div>
-                <p className="text-xs font-medium text-white/80">{selectedAd.previewLabel}</p>
+            {/* Left – Cover image (full, no crop) */}
+            <div className="relative md:w-[420px] shrink-0 bg-black flex items-center justify-center">
+              <div className="relative w-full aspect-[9/16]">
+                <Image src={selectedAd.cover} alt={selectedAd.name} fill className="object-contain" />
               </div>
+              {selectedAd.type.includes("Video") && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="size-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Info */}
-            <div className="p-6 space-y-5">
+            {/* Right – Info */}
+            <div className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[80vh]">
               {/* Title + status */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h4 className="text-sm font-bold text-white">{selectedAd.name}</h4>
-                  <p className="text-[10px] text-slate-500 mt-0.5">{selectedAd.type}</p>
+                  <h4 className="text-base font-bold text-white">{selectedAd.name}</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">{selectedAd.type}</p>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
                   selectedAd.status === "ATIVO"
                     ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
                     : "bg-amber-500/10 border border-amber-500/20 text-amber-400"
@@ -877,6 +895,65 @@ export default function MarketingPage() {
                   {selectedAd.status}
                 </span>
               </div>
+
+              <div className="pt-4" />
+
+              {/* Taxa de Engajamento – ring gauge */}
+              {(() => {
+                const viewsNum = parseInt(selectedAd.views.replace(/\./g, ""));
+                const likesNum = parseInt(selectedAd.likes.replace(/\./g, ""));
+                const commentsNum = parseInt(selectedAd.comments.replace(/\./g, ""));
+                const interNum = likesNum + commentsNum;
+                const rate = (interNum / viewsNum) * 100;
+                const r = 54;
+                const circ = 2 * Math.PI * r;
+                const filled = (rate / 100) * circ;
+                return (
+                  <div className="rounded-xl p-5 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-6">
+                      {/* Ring gauge */}
+                      <div className="relative shrink-0">
+                        <svg className="size-32" viewBox="0 0 120 120">
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(52,211,153,0.8)" strokeWidth="10" strokeDasharray={`${filled} ${circ - filled}`} strokeDashoffset={circ / 4} strokeLinecap="round" style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <p className="text-xl font-bold text-emerald-400">{rate.toFixed(1)}%</p>
+                          <p className="text-[8px] text-slate-500 uppercase font-bold tracking-wider">Engajamento</p>
+                        </div>
+                      </div>
+
+                      {/* Breakdown */}
+                      <div className="flex-1 space-y-3">
+                        <div className="space-y-2.5">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Curtidas</span>
+                              <span className="text-xs font-bold text-white">{selectedAd.likes}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div className="h-full bg-amber-400 rounded-full" style={{ width: `${(likesNum / interNum) * 100}%` }} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Comentários</span>
+                              <span className="text-xs font-bold text-white">{selectedAd.comments}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${(commentsNum / interNum) * 100}%` }} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-500">Total interações</span>
+                          <span className="text-sm font-bold text-white">{interNum.toLocaleString("pt-BR")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Metrics grid */}
               <div className="grid grid-cols-2 gap-3">
@@ -897,7 +974,7 @@ export default function MarketingPage() {
               </div>
 
               {/* Performance row */}
-              <div className="flex items-center gap-4 pt-2 border-t border-white/5">
+              <div className="flex items-center gap-4 pt-3 border-t border-white/5">
                 <div className="flex-1 text-center">
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">CPM</p>
                   <p className="text-sm font-bold text-slate-300 mt-1">{selectedAd.cpm}</p>
