@@ -207,11 +207,127 @@ export default function MarketingPage() {
           ))}
         </div>
 
-        {/* ── Melhores Anúncios – Horizontal Reels Carousel ── */}
-        <div
-          className="glass-panel rounded-2xl p-6"
-          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}
-        >
+        {/* ── Funil + Melhores Anúncios Row ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Funil de Conversão (col-span-5) */}
+          <div
+            className="lg:col-span-5 glass-panel rounded-2xl p-6"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}
+          >
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
+
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <span className="text-amber-400/60">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+              </span>
+              <h3 className="font-bold text-sm text-slate-300">Funil de Conversão</h3>
+            </div>
+
+            {/* Funnel stages – centered with side metrics */}
+            <div className="relative z-10">
+              {(() => {
+                const stages = [
+                  { label: "Impressões", count: "245.800", delta: "+18.3%", up: true, w: 72,
+                    after: [{ k: "CPC", v: "R$ 0,82", d: "+5.1%", up: true }, { k: "CTR", v: "4,8%", d: "+12.4%", up: true }] },
+                  { label: "Cliques", count: "11.800", delta: "+12.1%", up: true, w: 60,
+                    after: [{ k: "C/PageView", v: "R$ 1,05", d: "+3.7%", up: true }, { k: "Connect Rate", v: "86,2%", d: "-2.4%", up: false }] },
+                  { label: "PageViews", count: "10.170", delta: "-3.8%", up: false, w: 50,
+                    after: [{ k: "C/Checkout", v: "R$ 3,20", d: "+6.8%", up: true }, { k: "%Checkout", v: "7,6%", d: "+14.2%", up: true }] },
+                  { label: "Checkout", count: "775", delta: "+7.2%", up: true, w: 42,
+                    after: [{ k: "C/Compra", v: "R$ 10,04", d: "-5.1%", up: false }, { k: "%Compra", v: "32,1%", d: "+8.9%", up: true }] },
+                  { label: "Compras", count: "249", delta: "+5.6%", up: true, w: 34, highlight: true, after: [] },
+                ];
+                return stages.map((stage, i) => (
+                  <div key={stage.label}>
+                    {/* Row: left metric | funnel bar | right metric */}
+                    <div className="flex items-center">
+                      {/* Left metric */}
+                      <div className="flex-1 min-w-0 pr-3 text-right">
+                        {stage.after.length > 0 && (
+                          <div>
+                            <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{stage.after[0].k}</p>
+                            <p className="text-sm font-bold text-white leading-tight">{stage.after[0].v}</p>
+                            {stage.after[0].d !== "-" && (
+                              <p className={`text-[9px] font-bold flex items-center justify-end gap-0.5 ${stage.after[0].up ? "text-emerald-400" : "text-rose-400"}`}>
+                                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  {stage.after[0].up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                                </svg>
+                                {stage.after[0].d}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Funnel bar – centered */}
+                      <div
+                        className={`flex-shrink-0 flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-2.5 ${stage.highlight ? "border border-amber-400/30" : "border border-white/[0.06]"}`}
+                        style={{
+                          width: `${stage.w}%`,
+                          background: stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
+                          if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }}
+                      >
+                        <span className={`text-[10px] font-medium ${stage.highlight ? "text-amber-400" : "text-slate-400"}`}>{stage.label}</span>
+                        <span className="text-2xl font-bold text-white leading-tight">{stage.count}</span>
+                        <span className={`text-[10px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                          </svg>
+                          {stage.delta}
+                        </span>
+                      </div>
+
+                      {/* Right metric */}
+                      <div className="flex-1 min-w-0 pl-3">
+                        {stage.after.length > 1 && (
+                          <div>
+                            <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{stage.after[1].k}</p>
+                            <p className="text-sm font-bold text-white leading-tight">{stage.after[1].v}</p>
+                            {stage.after[1].d !== "-" && (
+                              <p className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.after[1].up ? "text-emerald-400" : "text-rose-400"}`}>
+                                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  {stage.after[1].up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                                </svg>
+                                {stage.after[1].d}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dotted connector between stages */}
+                    {i < stages.length - 1 && (
+                      <div className="flex justify-center py-0.5">
+                        <div className="w-px h-2 border-l border-dashed border-white/10" />
+                      </div>
+                    )}
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+
+          {/* ── Melhores Anúncios – Horizontal Reels Carousel (col-span-7) ── */}
+          <div
+            className="lg:col-span-7 glass-panel rounded-2xl p-6 flex flex-col"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both" }}
+          >
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
           <div className="flex items-center gap-2 mb-5 relative z-10">
             <span className="text-amber-400/60">
@@ -219,25 +335,23 @@ export default function MarketingPage() {
             </span>
             <h3 className="font-bold text-sm text-slate-300">Melhores Anúncios</h3>
           </div>
-          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory">
+          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory flex-1 min-h-0">
             {ads.map((ad) => (
               <div
                 key={ad.name}
-                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer hover:border-amber-500/20 transition-all duration-300 group/reel snap-start"
+                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer hover:border-amber-500/20 transition-all duration-300 group/reel snap-start flex flex-col"
                 style={{ background: "rgba(255,255,255,0.02)" }}
                 onClick={() => setSelectedAd(ad)}
               >
                 {/* Cover image */}
-                <div className="relative h-72 overflow-hidden">
+                <div className="relative flex-1 min-h-[200px] overflow-hidden">
                   <Image
                     src={ad.cover}
                     alt={ad.name}
                     fill
                     className="object-cover group-hover/reel:scale-105 transition-transform duration-500"
                   />
-                  {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  {/* Status badge */}
                   <div className="absolute top-3 left-3">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold backdrop-blur-sm ${
                       ad.status === "ATIVO"
@@ -247,7 +361,6 @@ export default function MarketingPage() {
                       {ad.status}
                     </span>
                   </div>
-                  {/* Play icon for videos */}
                   {ad.type.includes("Video") && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/reel:bg-white/20 transition-colors">
@@ -255,13 +368,11 @@ export default function MarketingPage() {
                       </div>
                     </div>
                   )}
-                  {/* Bottom metrics overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-xs font-bold text-white truncate mb-1.5">{ad.name}</p>
                     <p className="text-[10px] text-slate-400">{ad.type}</p>
                   </div>
                 </div>
-                {/* Metrics */}
                 <div className="p-3 space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-1.5">
@@ -288,6 +399,7 @@ export default function MarketingPage() {
                 </div>
               </div>
             ))}
+          </div>
           </div>
         </div>
 
