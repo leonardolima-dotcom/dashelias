@@ -284,6 +284,7 @@ export default function MarketingPage() {
   const [hoveredReach, setHoveredReach] = useState<string | null>(null);
   const [hoveredSentiment, setHoveredSentiment] = useState<string | null>(null);
   const [hoveredRetention, setHoveredRetention] = useState<number | null>(null);
+  const [hoveredOrgEvo, setHoveredOrgEvo] = useState<number | null>(null);
 
   // Gauge needle animation — resting at value 0 (angle PI, pointing left)
   const gaugeRestAngle = Math.PI - 0.05; // tiny offset so needle is visually distinct from arc edge
@@ -1710,7 +1711,7 @@ export default function MarketingPage() {
 
           {/* Organic Impressions Evolution */}
           <div
-            className="lg:col-span-8 glass-panel rounded-2xl pt-5 px-6 pb-0 flex flex-col overflow-hidden min-h-[320px]"
+            className="lg:col-span-8 glass-panel rounded-2xl pt-5 px-6 pb-0 flex flex-col overflow-visible min-h-[320px]"
             style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.45s both" }}
           >
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-[60px] pointer-events-none" />
@@ -1759,7 +1760,7 @@ export default function MarketingPage() {
                 const impLine = smoothLine(impPts);
                 const impArea = `${impLine} L${impPts[impPts.length - 1].x},${h} L${impPts[0].x},${h} Z`;
                 const clkLine = smoothLine(clkPts);
-                return (
+                return (<>
                   <svg className="w-full h-full" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
                     <defs>
                       <linearGradient id="orgAreaGrad" x1="0" x2="0" y1="0" y2="1">
@@ -1785,15 +1786,62 @@ export default function MarketingPage() {
                       <path d={impArea} fill="url(#orgAreaGrad)" />
                       <path d={impLine} fill="none" stroke="url(#orgLineGrad)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
                       <path d={clkLine} fill="none" stroke="rgba(148,163,184,0.4)" strokeDasharray="6,4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                      {impPts.map((p, i) => {
+                        const isHov = hoveredOrgEvo === i;
+                        return (
+                          <g key={`imp-${i}`}>
+                            {isHov && <line x1={p.x} y1={padTop} x2={p.x} y2={h - padBot} stroke="rgba(52,211,153,0.2)" strokeWidth="1" strokeDasharray="4 3" />}
+                            {isHov && <circle cx={p.x} cy={p.y} r="10" fill="rgba(52,211,153,0.12)" />}
+                            <circle cx={p.x} cy={p.y} r={isHov ? 6 : 4} fill="rgba(52,211,153,0.8)" stroke={isHov ? "rgba(52,211,153,0.6)" : "rgba(0,0,0,0.3)"} strokeWidth="1.5" />
+                          </g>
+                        );
+                      })}
+                      {clkPts.map((p, i) => {
+                        const isHov = hoveredOrgEvo === i;
+                        return (
+                          <g key={`clk-${i}`}>
+                            {isHov && <circle cx={p.x} cy={p.y} r="8" fill="rgba(148,163,184,0.1)" />}
+                            <circle cx={p.x} cy={p.y} r={isHov ? 5 : 3} fill="rgba(148,163,184,0.4)" stroke={isHov ? "rgba(148,163,184,0.5)" : "rgba(0,0,0,0.2)"} strokeWidth="1" />
+                          </g>
+                        );
+                      })}
+                      {/* Invisible hover areas per data point */}
                       {impPts.map((p, i) => (
-                        <circle key={`imp-${i}`} cx={p.x} cy={p.y} r="4" fill="rgba(52,211,153,0.8)" stroke="rgba(0,0,0,0.3)" strokeWidth="1.5" />
-                      ))}
-                      {clkPts.map((p, i) => (
-                        <circle key={`clk-${i}`} cx={p.x} cy={p.y} r="3" fill="rgba(148,163,184,0.4)" stroke="rgba(0,0,0,0.2)" strokeWidth="1" />
+                        <rect key={`hit-${i}`} x={i === 0 ? 0 : (impPts[i - 1].x + p.x) / 2} y={0} width={i === impPts.length - 1 ? w - (impPts[i - 1].x + p.x) / 2 : (i === 0 ? (p.x + impPts[1].x) / 2 : ((impPts[i + 1].x - impPts[i - 1].x) / 2))} height={h} fill="transparent" className="cursor-pointer" onMouseEnter={() => setHoveredOrgEvo(i)} onMouseLeave={() => setHoveredOrgEvo(null)} />
                       ))}
                     </g>
                   </svg>
-                );
+                  {/* Tooltip */}
+                  {hoveredOrgEvo !== null && (() => {
+                    const i = hoveredOrgEvo;
+                    const d = organicEvolution[i];
+                    const p = impPts[i];
+                    const leftPct = (p.x / w) * 100;
+                    const topPct = (p.y / h) * 100;
+                    // Adjust horizontal alignment near edges
+                    const isNearRight = leftPct > 80;
+                    const isNearLeft = leftPct < 20;
+                    const tx = isNearRight ? "-85%" : isNearLeft ? "-15%" : "-50%";
+                    return (
+                      <div className="absolute pointer-events-none z-40" style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: `translate(${tx}, -100%) translateY(-14px)` }}>
+                        <div style={{ background: "rgba(0,0,0,0.92)", border: "1px solid rgba(52,211,153,0.3)", borderRadius: "8px", padding: "8px 14px", textAlign: "center", backdropFilter: "blur(8px)", boxShadow: "0 0 12px rgba(52,211,153,0.15)", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: "10px", color: "#94a3b8", marginBottom: "4px", fontWeight: 600 }}>{d.month}</div>
+                          <div style={{ display: "flex", gap: "12px", alignItems: "center", justifyContent: "center" }}>
+                            <div>
+                              <div style={{ fontSize: "12px", fontWeight: 700, color: "#34d399" }}>{(d.impressoes / 1000).toFixed(0)}k</div>
+                              <div style={{ fontSize: "9px", color: "#64748b" }}>Impressões</div>
+                            </div>
+                            <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.1)" }} />
+                            <div>
+                              <div style={{ fontSize: "12px", fontWeight: 700, color: "#94a3b8" }}>{(d.cliques / 1000).toFixed(1)}k</div>
+                              <div style={{ fontSize: "9px", color: "#64748b" }}>Cliques</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>);
               })()}
             </div>
             <div className="flex justify-between -mx-6 px-6 py-2 border-t border-white/5 text-[10px] text-slate-400 font-bold tracking-widest uppercase relative z-10">
