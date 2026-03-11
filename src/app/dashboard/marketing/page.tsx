@@ -6,6 +6,185 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 /* ─────────────────────────────────────────────
+   CardDateFilter — custom calendar, BR format
+   ───────────────────────────────────────────── */
+const MONTHS_BR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const WEEKDAYS_BR = ["D", "S", "T", "Q", "Q", "S", "S"];
+const fmtBR = (iso: string) => { if (!iso) return ""; const [y, m, d] = iso.split("-"); return `${d}/${m}/${y}`; };
+
+function CardDateFilter({ mode, setMode, single, setSingle, from, setFrom, to, setTo }: {
+  mode: "single" | "range"; setMode: (m: "single" | "range") => void;
+  single: string; setSingle: (v: string) => void;
+  from: string; setFrom: (v: string) => void;
+  to: string; setTo: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
+  const [pickingStart, setPickingStart] = useState(true);
+  const [showYearGrid, setShowYearGrid] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const [dropPos, setDropPos] = useState({ top: 0, right: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // Update dropdown position when open
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (ref.current && !ref.current.contains(target) && dropRef.current && !dropRef.current.contains(target)) {
+        setOpen(false); setShowYearGrid(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+  const days: (number | null)[] = [...Array(firstDow).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+  const toISO = (d: number) => `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+  const isSelected = (d: number) => {
+    const iso = toISO(d);
+    if (mode === "single") return iso === single;
+    return iso === from || iso === to;
+  };
+  const isInRange = (d: number) => {
+    if (mode !== "range" || !from || !to) return false;
+    const iso = toISO(d);
+    return iso > from && iso < to;
+  };
+  const isToday = (d: number) => toISO(d) === new Date().toISOString().slice(0, 10);
+
+  const handleDayClick = (d: number) => {
+    const iso = toISO(d);
+    if (mode === "single") {
+      setSingle(iso);
+    } else {
+      if (pickingStart) {
+        setFrom(iso);
+        setTo("");
+        setPickingStart(false);
+      } else {
+        if (iso < from) { setFrom(iso); setTo(from); } else { setTo(iso); }
+        setPickingStart(true);
+      }
+    }
+  };
+
+  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
+  const yearRange = Array.from({ length: 12 }, (_, i) => viewYear - 5 + i);
+
+  const displayText = mode === "single"
+    ? (single ? fmtBR(single) : "Selecionar")
+    : (from && to ? `${fmtBR(from)} — ${fmtBR(to)}` : from ? `${fmtBR(from)} — ...` : "Selecionar");
+
+  return (
+    <div className="relative ml-auto z-30" ref={ref}>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-white/[0.03] border border-white/5">
+          <button onClick={() => { setMode("single"); setPickingStart(true); }} className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-all ${mode === "single" ? "bg-white/[0.08] text-slate-200 border border-white/10" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>Data</button>
+          <button onClick={() => { setMode("range"); setPickingStart(true); }} className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-all ${mode === "range" ? "bg-white/[0.08] text-slate-200 border border-white/10" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>Intervalo</button>
+        </div>
+        <button
+          ref={btnRef}
+          onClick={() => { setOpen(o => !o); setShowYearGrid(false); }}
+          className="flex items-center gap-1.5 text-[10px] bg-white/[0.04] border border-white/10 rounded-lg px-2.5 py-1.5 text-slate-300 hover:border-white/20 transition-colors"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {displayText}
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform ${open ? "rotate-180" : ""}`}><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      {open && mounted && createPortal(
+        <div
+          ref={dropRef}
+          className="fixed rounded-xl border border-white/10 p-3 select-none"
+          style={{ top: dropPos.top, right: dropPos.right, background: "rgba(8,10,18,0.97)", backdropFilter: "blur(16px)", boxShadow: "0 12px 40px rgba(0,0,0,0.6)", minWidth: 260, zIndex: 99999 }}
+        >
+          {/* Header: month/year nav */}
+          <div className="flex items-center justify-between mb-2">
+            <button onClick={prevMonth} className="p-1 rounded-md hover:bg-white/[0.06] text-slate-400 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button onClick={() => setShowYearGrid(g => !g)} className="text-xs font-bold text-slate-200 hover:text-white px-2 py-0.5 rounded-md hover:bg-white/[0.06] transition-colors">
+              {MONTHS_BR[viewMonth]} {viewYear}
+            </button>
+            <button onClick={nextMonth} className="p-1 rounded-md hover:bg-white/[0.06] text-slate-400 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          {showYearGrid ? (
+            <>
+              <div className="grid grid-cols-4 gap-1 mb-2">
+                {MONTHS_BR.map((m, i) => (
+                  <button key={m} onClick={() => { setViewMonth(i); setShowYearGrid(false); }} className={`text-[10px] py-1.5 rounded-md transition-all ${i === viewMonth ? "bg-amber-500/20 text-amber-400 font-bold" : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"}`}>{m}</button>
+                ))}
+              </div>
+              <div className="border-t border-white/5 pt-2 grid grid-cols-4 gap-1">
+                <button onClick={() => setViewYear(y => y - 12)} className="col-span-4 text-[10px] text-slate-500 hover:text-slate-300 py-0.5 transition-colors">&larr; anos anteriores</button>
+                {yearRange.map(y => (
+                  <button key={y} onClick={() => { setViewYear(y); }} className={`text-[10px] py-1.5 rounded-md transition-all ${y === viewYear ? "bg-amber-500/20 text-amber-400 font-bold" : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"}`}>{y}</button>
+                ))}
+                <button onClick={() => setViewYear(y => y + 12)} className="col-span-4 text-[10px] text-slate-500 hover:text-slate-300 py-0.5 transition-colors">anos seguintes &rarr;</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-7 mb-1">
+                {WEEKDAYS_BR.map((wd, i) => (
+                  <span key={i} className="text-[9px] font-bold text-slate-500 text-center py-0.5">{wd}</span>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-px">
+                {days.map((d, i) => d === null ? (
+                  <span key={`e${i}`} />
+                ) : (
+                  <button
+                    key={d}
+                    onClick={() => handleDayClick(d)}
+                    className={`text-[10px] h-7 rounded-md transition-all relative
+                      ${isSelected(d) ? "bg-amber-500/25 text-amber-300 font-bold ring-1 ring-amber-500/40" : ""}
+                      ${isInRange(d) ? "bg-amber-500/10 text-amber-200/80" : ""}
+                      ${!isSelected(d) && !isInRange(d) ? "text-slate-300 hover:bg-white/[0.06]" : ""}
+                      ${isToday(d) && !isSelected(d) ? "ring-1 ring-white/20" : ""}
+                    `}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+              {mode === "range" && (
+                <div className="mt-2 pt-2 border-t border-white/5 text-center">
+                  <p className="text-[9px] text-slate-500">
+                    {!from ? "Selecione a data inicial" : !to || !pickingStart ? "Selecione a data final" : `${fmtBR(from)} — ${fmtBR(to)}`}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    DATA  (extracted from instruções mkt.html)
    ───────────────────────────────────────────── */
 
@@ -166,6 +345,58 @@ const sentimentData = [
   { label: "Positivo", pct: 56, color: "bg-emerald-400" },
   { label: "Neutro/Dúvida", pct: 24, color: "bg-amber-400" },
   { label: "Negativo", pct: 20, color: "bg-rose-400" },
+];
+
+const ageRangeData = [
+  { label: "18-24", pct: 28, color: "bg-cyan-400" },
+  { label: "25-34", pct: 35, color: "bg-amber-400" },
+  { label: "35-44", pct: 20, color: "bg-pink-400" },
+  { label: "45-54", pct: 11, color: "bg-violet-400" },
+  { label: "55+", pct: 6, color: "bg-slate-400" },
+];
+
+const genderData = [
+  { label: "Feminino", pct: 58, color: "bg-pink-400" },
+  { label: "Masculino", pct: 38, color: "bg-cyan-400" },
+  { label: "Outros", pct: 4, color: "bg-amber-400" },
+];
+
+const liveStories = [
+  {
+    seq: 1, type: "Video • 15s", time: "Há 12min", cover: "/reels 1.jpg",
+    views: "3.240", likes: "412", reactions: "89", shares: "34", interaction: null,
+  },
+  {
+    seq: 2, type: "Enquete", time: "Há 28min", cover: "/reels 2.jpg",
+    views: "2.870", likes: "298", reactions: "156", shares: "21",
+    interaction: { type: "poll" as const, question: "Qual horário preferem?", options: [
+      { label: "Sábado 8h–12h", votes: 847, pct: 62 },
+      { label: "Sábado 14h–18h", votes: 521, pct: 38 },
+    ]},
+  },
+  {
+    seq: 3, type: "Video • 20s", time: "Há 45min", cover: "/reels 3.jpg",
+    views: "4.510", likes: "623", reactions: "201", shares: "87", interaction: null,
+  },
+  {
+    seq: 4, type: "Quiz", time: "Há 1h", cover: "/reels 4.jpg",
+    views: "2.130", likes: "187", reactions: "312", shares: "15",
+    interaction: { type: "quiz" as const, question: "Quantas vezes hidratar a barba?", options: [
+      { label: "1x por semana", votes: 234, pct: 18, correct: false },
+      { label: "2-3x por semana", votes: 812, pct: 62, correct: true },
+      { label: "Todo dia", votes: 267, pct: 20, correct: false },
+    ]},
+  },
+  {
+    seq: 5, type: "Slider", time: "Há 1h30", cover: "/reels 5.jpg",
+    views: "1.980", likes: "156", reactions: "98", shares: "12",
+    interaction: { type: "slider" as const, question: "Nota para o novo corte?", avg: 87, total: 643 },
+  },
+  {
+    seq: 6, type: "Countdown", time: "Há 3h", cover: "/reels 6.jpg",
+    views: "5.120", likes: "834", reactions: "267", shares: "143",
+    interaction: { type: "countdown" as const, label: "Black Friday Barbearia", reminders: 1247 },
+  },
 ];
 
 const paidVsOrganicConversions = [
@@ -814,6 +1045,9 @@ export default function MarketingPage() {
   const [hoveredHeat, setHoveredHeat] = useState<{ day: string; hour: number; val: number; x: number; y: number } | null>(null);
   const [hoveredReach, setHoveredReach] = useState<string | null>(null);
   const [hoveredSentiment, setHoveredSentiment] = useState<string | null>(null);
+  const [hoveredAge, setHoveredAge] = useState<string | null>(null);
+  const [hoveredGender, setHoveredGender] = useState<string | null>(null);
+  const [selectedStory, setSelectedStory] = useState<typeof liveStories[number] | null>(null);
   const [hoveredRetention, setHoveredRetention] = useState<number | null>(null);
   const [hoveredOrgEvo, setHoveredOrgEvo] = useState<number | null>(null);
   // Filter dropdowns
@@ -830,6 +1064,20 @@ export default function MarketingPage() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  // Date filters for cards
+  const [storiesDateMode, setStoriesDateMode] = useState<"single" | "range">("single");
+  const [storiesDate, setStoriesDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [storiesDateFrom, setStoriesDateFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10); });
+  const [storiesDateTo, setStoriesDateTo] = useState(() => new Date().toISOString().slice(0, 10));
+  const [sentimentDateMode, setSentimentDateMode] = useState<"single" | "range">("single");
+  const [sentimentDate, setSentimentDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [sentimentDateFrom, setSentimentDateFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10); });
+  const [sentimentDateTo, setSentimentDateTo] = useState(() => new Date().toISOString().slice(0, 10));
+  const [convDateMode, setConvDateMode] = useState<"single" | "range">("single");
+  const [convDate, setConvDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [convDateFrom, setConvDateFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10); });
+  const [convDateTo, setConvDateTo] = useState(() => new Date().toISOString().slice(0, 10));
 
   // Organic non-Instagram chart hover states (must be at top level for hooks rules)
   const [hovDonut, setHovDonut] = useState<string | null>(null);
@@ -896,6 +1144,9 @@ export default function MarketingPage() {
     "Crescimento Líquido de Seguidores": "Novos seguidores vs perdas (unfollows) por semana. Cálculo do crescimento líquido: Novos − Perdas. Barras verdes = ganho, vermelhas = perda. Fonte: Instagram Insights — Seguidores.",
     "Análise de Sentimento": "Classificação dos comentários e menções em Positivo, Neutro/Dúvida e Negativo. Inclui Taxa de Resposta e Tempo Médio de Resposta da equipe. Fonte: Análise de NLP sobre comentários do Instagram.",
     "Conversão Perfil → Follow": "Funil de conversão do perfil: Visitas ao Perfil → Novos Seguidores. Cálculo: Follows ÷ Visitas × 100. Taxa acima de 10% indica bio e conteúdo alinhados com o público-alvo. Fonte: Instagram Insights — Perfil.",
+    "Faixa Etária": "Distribuição demográfica por faixa etária do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
+    "Sexo": "Distribuição por gênero do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
+    "Stories em Tempo Real": "Monitoramento dos Stories ativos com métricas de visualizações, curtidas, reações e compartilhamentos. Inclui resultados de interações (enquetes, quizzes, sliders, countdowns). Fonte: Instagram Stories API — Tempo Real.",
   };
 
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
@@ -2902,6 +3153,7 @@ export default function MarketingPage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </span>
               <h3 className="font-bold text-sm text-slate-300">Funil de Stories — Sequência<InfoTip title="Funil de Stories — Sequência" /></h3>
+              <CardDateFilter mode={storiesDateMode} setMode={setStoriesDateMode} single={storiesDate} setSingle={setStoriesDate} from={storiesDateFrom} setFrom={setStoriesDateFrom} to={storiesDateTo} setTo={setStoriesDateTo} />
             </div>
             <div className="flex flex-col gap-3 relative z-10">
               {storiesFunnel.map((s, i) => (
@@ -3112,6 +3364,7 @@ export default function MarketingPage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
               </span>
               <h3 className="font-bold text-sm text-slate-300">Análise de Sentimento<InfoTip title="Análise de Sentimento" /></h3>
+              <CardDateFilter mode={sentimentDateMode} setMode={setSentimentDateMode} single={sentimentDate} setSingle={setSentimentDate} from={sentimentDateFrom} setFrom={setSentimentDateFrom} to={sentimentDateTo} setTo={setSentimentDateTo} />
             </div>
             <div className="relative flex justify-center items-center py-4 z-10" onMouseLeave={() => setHoveredSentiment(null)}>
               <svg className="size-36" viewBox="0 0 200 200">
@@ -3194,6 +3447,240 @@ export default function MarketingPage() {
           </div>
         </div>
 
+        {/* ── Age Range + Gender Donuts ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Faixa Etária */}
+          <div
+            className="lg:col-span-6 glass-panel rounded-2xl p-6"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.88s both" }}
+          >
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-[60px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <span className="text-cyan-400/60">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <h3 className="font-bold text-sm text-slate-300">Faixa Etária<InfoTip title="Faixa Etária" /></h3>
+            </div>
+            <div className="relative flex justify-center items-center py-2 z-10" onMouseLeave={() => setHoveredAge(null)}>
+              <svg className="size-40" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="agC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(34,211,238)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(6,182,212)" stopOpacity="0.7"/></linearGradient>
+                  <linearGradient id="agA" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(251,191,36)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(245,158,11)" stopOpacity="0.7"/></linearGradient>
+                  <linearGradient id="agP" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(244,114,182)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(236,72,153)" stopOpacity="0.7"/></linearGradient>
+                  <linearGradient id="agV" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(167,139,250)" stopOpacity="0.8"/><stop offset="100%" stopColor="rgb(139,92,246)" stopOpacity="0.6"/></linearGradient>
+                  <linearGradient id="agS" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(148,163,184)" stopOpacity="0.5"/><stop offset="100%" stopColor="rgb(100,116,139)" stopOpacity="0.4"/></linearGradient>
+                  <filter id="agGlow"><feGaussianBlur stdDeviation="2.5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                </defs>
+                <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="16" />
+                {(() => {
+                  const r = 70, circ = 2 * Math.PI * r;
+                  const gapAngle = 4;
+                  const gapLen = (gapAngle / 360) * circ;
+                  const totalGap = gapLen * ageRangeData.length;
+                  const usable = circ - totalGap;
+                  const gradIds = ["url(#agC)", "url(#agA)", "url(#agP)", "url(#agV)", "url(#agS)"];
+                  let off = -circ / 4;
+                  return ageRangeData.map((ch, idx) => {
+                    const len = (ch.pct / 100) * usable;
+                    const dash = `${len} ${circ - len}`;
+                    const thisOff = off;
+                    off += len + gapLen;
+                    const isHov = hoveredAge === ch.label;
+                    const isDim = hoveredAge && !isHov;
+                    return (
+                      <g key={ch.label}>
+                        {isHov && (
+                          <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradIds[idx]} strokeWidth={24} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="butt" opacity="0.2" filter="url(#agGlow)" />
+                        )}
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradIds[idx]} strokeWidth={isHov ? 22 : 16} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="butt" style={{ transition: "all 0.3s cubic-bezier(.4,0,.2,1)", opacity: isDim ? 0.2 : 1 }} />
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke="transparent" strokeWidth="30" strokeDasharray={dash} strokeDashoffset={-thisOff} className="cursor-pointer" onMouseEnter={() => setHoveredAge(ch.label)} />
+                      </g>
+                    );
+                  });
+                })()}
+              </svg>
+              <div className="absolute text-center pointer-events-none">
+                {hoveredAge ? (() => {
+                  const ch = ageRangeData.find((c) => c.label === hoveredAge)!;
+                  return (
+                    <>
+                      <p className="text-xl font-bold text-white">{ch.pct}%</p>
+                      <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter">{ch.label}</p>
+                    </>
+                  );
+                })() : (
+                  <>
+                    <p className="text-xl font-bold text-white">25-34</p>
+                    <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter">Maior Faixa</p>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 space-y-2.5 relative z-10">
+              {ageRangeData.map((ch) => (
+                <div key={ch.label} className="flex items-center justify-between text-sm cursor-default" onMouseEnter={() => setHoveredAge(ch.label)} onMouseLeave={() => setHoveredAge(null)}>
+                  <div className="flex items-center gap-2">
+                    <div className={`size-2.5 rounded-full ${ch.color}`} />
+                    <span className="text-slate-300 text-xs font-medium">{ch.label}</span>
+                  </div>
+                  <span className="font-bold text-white text-xs">{ch.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sexo */}
+          <div
+            className="lg:col-span-6 glass-panel rounded-2xl p-6"
+            style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.92s both" }}
+          >
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500/5 rounded-full blur-[60px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <span className="text-pink-400/60">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+              </span>
+              <h3 className="font-bold text-sm text-slate-300">Sexo<InfoTip title="Sexo" /></h3>
+            </div>
+            <div className="relative flex justify-center items-center py-2 z-10" onMouseLeave={() => setHoveredGender(null)}>
+              <svg className="size-40" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="gnP" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(244,114,182)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(236,72,153)" stopOpacity="0.7"/></linearGradient>
+                  <linearGradient id="gnC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(34,211,238)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(6,182,212)" stopOpacity="0.7"/></linearGradient>
+                  <linearGradient id="gnA" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgb(251,191,36)" stopOpacity="0.9"/><stop offset="100%" stopColor="rgb(245,158,11)" stopOpacity="0.7"/></linearGradient>
+                  <filter id="gnGlow"><feGaussianBlur stdDeviation="2.5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                </defs>
+                <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="16" />
+                {(() => {
+                  const r = 70, circ = 2 * Math.PI * r;
+                  const gapAngle = 5;
+                  const gapLen = (gapAngle / 360) * circ;
+                  const totalGap = gapLen * genderData.length;
+                  const usable = circ - totalGap;
+                  const gradIds = ["url(#gnP)", "url(#gnC)", "url(#gnA)"];
+                  let off = -circ / 4;
+                  return genderData.map((ch, idx) => {
+                    const len = (ch.pct / 100) * usable;
+                    const dash = `${len} ${circ - len}`;
+                    const thisOff = off;
+                    off += len + gapLen;
+                    const isHov = hoveredGender === ch.label;
+                    const isDim = hoveredGender && !isHov;
+                    return (
+                      <g key={ch.label}>
+                        {isHov && (
+                          <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradIds[idx]} strokeWidth={24} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="butt" opacity="0.2" filter="url(#gnGlow)" />
+                        )}
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke={gradIds[idx]} strokeWidth={isHov ? 22 : 16} strokeDasharray={dash} strokeDashoffset={-thisOff} strokeLinecap="butt" style={{ transition: "all 0.3s cubic-bezier(.4,0,.2,1)", opacity: isDim ? 0.2 : 1 }} />
+                        <circle cx="100" cy="100" r={r} fill="transparent" stroke="transparent" strokeWidth="30" strokeDasharray={dash} strokeDashoffset={-thisOff} className="cursor-pointer" onMouseEnter={() => setHoveredGender(ch.label)} />
+                      </g>
+                    );
+                  });
+                })()}
+              </svg>
+              <div className="absolute text-center pointer-events-none">
+                {hoveredGender ? (() => {
+                  const ch = genderData.find((c) => c.label === hoveredGender)!;
+                  return (
+                    <>
+                      <p className="text-xl font-bold text-white">{ch.pct}%</p>
+                      <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter">{ch.label}</p>
+                    </>
+                  );
+                })() : (
+                  <>
+                    <p className="text-xl font-bold text-white">58%</p>
+                    <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter">Feminino</p>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 space-y-2.5 relative z-10">
+              {genderData.map((ch) => (
+                <div key={ch.label} className="flex items-center justify-between text-sm cursor-default" onMouseEnter={() => setHoveredGender(ch.label)} onMouseLeave={() => setHoveredGender(null)}>
+                  <div className="flex items-center gap-2">
+                    <div className={`size-2.5 rounded-full ${ch.color}`} />
+                    <span className="text-slate-300 text-xs font-medium">{ch.label}</span>
+                  </div>
+                  <span className="font-bold text-white text-xs">{ch.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Stories em Tempo Real ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 flex flex-col"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.94s both" }}
+        >
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-rose-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-5 relative z-10">
+            <span className="text-rose-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Stories em Tempo Real<InfoTip title="Stories em Tempo Real" /></h3>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory flex-1 min-h-0">
+            {liveStories.map((st) => (
+              <div
+                key={st.seq}
+                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer transition-all duration-300 group/story snap-start flex flex-col hover:border-rose-500/20"
+                style={{ background: "rgba(255,255,255,0.02)" }}
+                onClick={() => setSelectedStory(st)}
+              >
+                {/* Cover image */}
+                <div className="relative h-[200px] overflow-hidden">
+                  <Image src={st.cover} alt={`Story ${st.seq}`} fill className="object-cover group-hover/story:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {st.type.includes("Video") && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/story:bg-white/20 transition-colors">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-bold text-white">Story {st.seq}</p>
+                      <span className="text-[10px] font-bold text-amber-400">{st.time}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300 font-medium">{st.type}</p>
+                  </div>
+                </div>
+
+                {/* Metrics */}
+                <div className="p-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.reactions}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.shares}</span>
+                    </div>
+                  </div>
+                  {st.interaction && (
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-[9px] text-rose-400 font-bold uppercase">{st.interaction.type === "poll" ? "Enquete" : st.interaction.type === "quiz" ? "Quiz" : st.interaction.type === "slider" ? "Slider" : "Countdown"}</span>
+                      <span className="text-[9px] text-slate-500">Clique para ver</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── Profile Conversion Funnel ── */}
         <div
           className="glass-panel rounded-2xl p-6"
@@ -3205,6 +3692,7 @@ export default function MarketingPage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
             </span>
             <h3 className="font-bold text-sm text-slate-300">Conversão Perfil → Follow<InfoTip title="Conversão Perfil → Follow" /></h3>
+            <CardDateFilter mode={convDateMode} setMode={setConvDateMode} single={convDate} setSingle={setConvDate} from={convDateFrom} setFrom={setConvDateFrom} to={convDateTo} setTo={setConvDateTo} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
             <div className="rounded-xl p-4 flex items-center justify-between" style={{ background: "rgba(244,114,182,0.06)", border: "1px solid rgba(244,114,182,0.15)" }}>
@@ -4045,6 +4533,179 @@ export default function MarketingPage() {
       </footer>
 
       {/* ── Ad Detail Modal ── */}
+      {/* ── Story Detail Modal ── */}
+      {selectedStory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedStory(null)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-5xl max-h-[90vh] rounded-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row"
+            style={{ ...glassStyle, background: "linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%)", animation: "animationIn 0.3s ease-out both" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => setSelectedStory(null)} className="absolute top-4 right-4 z-20 text-slate-400 hover:text-white transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            {/* Left — Story cover image */}
+            <div className="relative md:w-[420px] shrink-0 bg-black flex items-center justify-center">
+              <div className="relative w-full aspect-[9/16]">
+                <Image src={selectedStory.cover} alt={`Story ${selectedStory.seq}`} fill className="object-cover" />
+              </div>
+              {selectedStory.type.includes("Video") && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="size-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right — Info */}
+            <div className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[80vh]">
+              <div>
+                <h4 className="text-base font-bold text-white">Story {selectedStory.seq}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm font-semibold text-slate-300">{selectedStory.type}</span>
+                  <span className="text-sm font-bold text-amber-400">{selectedStory.time}</span>
+                </div>
+              </div>
+
+              {/* Engagement ring */}
+              {(() => {
+                const viewsNum = parseInt(selectedStory.views.replace(/\./g, ""));
+                const likesNum = parseInt(selectedStory.likes.replace(/\./g, ""));
+                const reactNum = parseInt(selectedStory.reactions.replace(/\./g, ""));
+                const sharesNum = parseInt(selectedStory.shares.replace(/\./g, ""));
+                const interNum = likesNum + reactNum + sharesNum;
+                const rate = (interNum / viewsNum) * 100;
+                const r = 54;
+                const circ = 2 * Math.PI * r;
+                const filled = (Math.min(rate, 100) / 100) * circ;
+                return (
+                  <div className="rounded-xl p-5 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-6">
+                      <div className="relative shrink-0">
+                        <svg className="size-32" viewBox="0 0 120 120">
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(251,113,133,0.8)" strokeWidth="10" strokeDasharray={`${filled} ${circ - filled}`} strokeDashoffset={circ / 4} strokeLinecap="round" style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <p className="text-xl font-bold text-rose-400">{rate.toFixed(1)}%</p>
+                          <p className="text-[8px] text-slate-500 uppercase font-bold tracking-wider">Engajamento</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2.5">
+                        {[
+                          { label: "Curtidas", val: selectedStory.likes, num: likesNum, color: "bg-rose-400" },
+                          { label: "Reações", val: selectedStory.reactions, num: reactNum, color: "bg-amber-400" },
+                          { label: "Shares", val: selectedStory.shares, num: sharesNum, color: "bg-cyan-400" },
+                        ].map(m => (
+                          <div key={m.label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{m.label}</span>
+                              <span className="text-xs font-bold text-white">{m.val}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div className={`h-full ${m.color} rounded-full`} style={{ width: `${(m.num / interNum) * 100}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-500">Total interações</span>
+                          <span className="text-sm font-bold text-white">{interNum.toLocaleString("pt-BR")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Metrics grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Views", value: selectedStory.views, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg> },
+                  { label: "Curtidas", value: selectedStory.likes, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> },
+                  { label: "Reações", value: selectedStory.reactions, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg> },
+                  { label: "Shares", value: selectedStory.shares, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> },
+                ].map((m) => (
+                  <div key={m.label} className="rounded-xl p-3 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="text-rose-400/60">{m.icon}</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">{m.label}</span>
+                    </div>
+                    <p className="text-lg font-bold text-white">{m.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Interaction results */}
+              {selectedStory.interaction && (
+                <div className="rounded-xl p-5 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                  <h5 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-4">Resultado da Interação</h5>
+                  {(selectedStory.interaction.type === "poll" || selectedStory.interaction.type === "quiz") && "options" in selectedStory.interaction && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-bold text-white mb-3">{selectedStory.interaction.question}</p>
+                      {selectedStory.interaction.options.map((opt) => {
+                        const isCorrect = "correct" in opt && opt.correct;
+                        return (
+                          <div key={opt.label} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className={`text-xs font-medium ${isCorrect ? "text-emerald-400" : "text-slate-300"}`}>
+                                {isCorrect && "✓ "}{opt.label}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-slate-500">{opt.votes} votos</span>
+                                <span className="text-xs font-bold text-white">{opt.pct}%</span>
+                              </div>
+                            </div>
+                            <div className="h-2.5 bg-white/[0.04] rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full animate-bar-enter"
+                                style={{
+                                  width: `${opt.pct}%`,
+                                  background: isCorrect
+                                    ? "linear-gradient(90deg, rgb(52,211,153), rgb(16,185,129))"
+                                    : selectedStory.interaction!.type === "poll"
+                                      ? "linear-gradient(90deg, rgb(244,114,182), rgb(236,72,153))"
+                                      : "linear-gradient(90deg, rgb(148,163,184), rgb(100,116,139))",
+                                  boxShadow: isCorrect ? "0 0 12px rgba(52,211,153,0.3)" : undefined,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {selectedStory.interaction.type === "slider" && "avg" in selectedStory.interaction && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-bold text-white">{selectedStory.interaction.question}</p>
+                      <div className="h-4 bg-white/[0.04] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full animate-bar-enter" style={{ width: `${selectedStory.interaction.avg}%`, background: "linear-gradient(90deg, rgb(251,191,36), rgb(245,158,11))", boxShadow: "0 0 12px rgba(251,191,36,0.3)" }} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-amber-400">{selectedStory.interaction.avg}%</span>
+                        <span className="text-xs text-slate-500">{selectedStory.interaction.total} respostas</span>
+                      </div>
+                    </div>
+                  )}
+                  {selectedStory.interaction.type === "countdown" && "reminders" in selectedStory.interaction && (
+                    <div className="text-center space-y-3">
+                      <p className="text-sm font-bold text-white">{selectedStory.interaction.label}</p>
+                      <div className="flex items-center justify-center gap-3">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-violet-400" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <span className="text-3xl font-bold text-violet-400">{selectedStory.interaction.reminders.toLocaleString("pt-BR")}</span>
+                      </div>
+                      <span className="text-xs text-slate-500">lembretes ativados</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {selectedAd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedAd(null)}>
           {/* Backdrop */}
