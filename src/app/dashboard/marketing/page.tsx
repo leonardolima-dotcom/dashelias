@@ -69,10 +69,10 @@ const evolutionData = [
    ───────────────────────────────────────────── */
 
 const organicKpis = [
-  { label: "Sessões Orgânicas", value: "18.420", delta: "+8.3%", up: true, icon: "chart" },
-  { label: "Posição Média", value: "12.4", delta: "-2.1 pos", up: true, icon: "price" },
-  { label: "CTR Orgânico", value: "3.8%", delta: "+0.6%", up: true, icon: "cart" },
-  { label: "Impressões GSC", value: "485.200", delta: "+15.2%", up: true, icon: "payments" },
+  { label: "Sessões Orgânicas", value: "18.420", delta: "+8.3%", up: true, icon: "chart", tooltip: "Sessões Orgânicas — Total de visitas originadas de busca orgânica (não paga) no período. Cálculo: soma de sessões com source/medium = google/organic, bing/organic etc. Fonte: Google Analytics. Crescimento indica maturidade do SEO e redução de dependência de ads." },
+  { label: "Posição Média", value: "12.4", delta: "-2.1 pos", up: true, icon: "price", tooltip: "Posição Média — Ranking médio das páginas nos resultados de busca do Google. Cálculo: média ponderada das posições de todas as queries no Google Search Console. Quanto menor, melhor. Abaixo de 10 = primeira página. Fonte: Google Search Console." },
+  { label: "CTR Orgânico", value: "3.8%", delta: "+0.6%", up: true, icon: "cart", tooltip: "CTR Orgânico — Taxa de cliques nos resultados orgânicos do Google. Cálculo: Cliques ÷ Impressões × 100. Indica qualidade dos títulos e meta descriptions nos SERPs. CTR > 3% é bom para posições médias. Fonte: Google Search Console." },
+  { label: "Impressões GSC", value: "485.200", delta: "+15.2%", up: true, icon: "payments", tooltip: "Impressões GSC — Número de vezes que páginas do site apareceram nos resultados do Google, sem custo. Cálculo: contagem total de exibições no Search Console. Complementa o tráfego pago e demonstra o valor real do SEO. Fonte: Google Search Console." },
 ];
 
 const topKeywords = [
@@ -179,11 +179,11 @@ const paidVsOrganicConversions = [
    ───────────────────────────────────────────── */
 
 const healthScore = [
-  { label: "Freq. Anúncio", value: "1.8x", status: "good" as const },
-  { label: "Quality Score", value: "8.2", status: "good" as const },
-  { label: "Budget Pace", value: "74%", status: "warn" as const },
-  { label: "ROAS vs Meta", value: "4.2x", status: "good" as const },
-  { label: "Bounce Rate", value: "68%", status: "bad" as const },
+  { label: "Freq. Anúncio", value: "1.8x", status: "good" as const, tooltip: "Frequência do Anúncio — Média de vezes que o mesmo usuário viu seu anúncio. Cálculo: Impressões ÷ Alcance. Acima de 3.5x indica fadiga criativa (CPC sobe, CTR cai). Fonte: Meta Ads Manager. Zona verde ≤ 2.5, amarela 2.5–3.5, vermelha > 3.5." },
+  { label: "Quality Score", value: "8.2", status: "good" as const, tooltip: "Quality Score — Nota de 1 a 10 atribuída pelo Google Ads com base na relevância do anúncio, CTR esperado e experiência na landing page. Cálculo: média ponderada de Ad Relevance + Expected CTR + Landing Page Experience. Acima de 7 = saudável." },
+  { label: "Budget Pace", value: "74%", status: "warn" as const, tooltip: "Budget Pace — Percentual do orçamento consumido em relação ao planejado para o período. Cálculo: Gasto Real ÷ Budget Planejado × 100. Detecta campanhas em overspend (> 100%) ou underspend (< 60%). Fonte: Soma dos gastos por campanha ativa." },
+  { label: "ROAS vs Meta", value: "4.2x", status: "good" as const, tooltip: "ROAS vs Meta — Retorno sobre investimento em anúncios comparado à meta definida. Cálculo: Receita Gerada ÷ Investimento em Ads. O break-even ROAS mínimo é 2.0x para ser lucrativo. Acima de 4x = excelente. Fonte: Meta Ads + Google Ads." },
+  { label: "Bounce Rate", value: "68%", status: "bad" as const, tooltip: "Taxa de Rejeição — Percentual de visitantes que saem sem interagir após o clique no anúncio. Cálculo: Sessões de página única ÷ Total de sessões × 100. Acima de 60% no tráfego pago indica landing page fora de sintonia com o criativo. Fonte: Google Analytics." },
 ];
 
 const budgetPace = [
@@ -404,7 +404,7 @@ export default function MarketingPage() {
         {/* ── Health Score ── */}
         <div
           className="glass-panel rounded-2xl p-6"
-          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.1s both" }}
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.1s both", overflow: "visible" }}
         >
           <div className="flex items-center gap-2 mb-5 relative z-10">
             <span className="text-amber-400/60">
@@ -412,18 +412,34 @@ export default function MarketingPage() {
             </span>
             <h3 className="font-bold text-sm text-slate-300">Score de Saúde da Conta</h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 relative z-10">
-            {healthScore.map((h) => {
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 relative z-10" style={{ overflow: "visible" }}>
+            {healthScore.map((h, hi) => {
               const color = h.status === "good" ? "emerald" : h.status === "warn" ? "amber" : "rose";
+              const isLeft = hi <= 1;
+              const isRight = hi >= 3;
               return (
                 <div
                   key={h.label}
-                  className={`text-center p-4 rounded-xl border transition-all hover:scale-[1.02]`}
+                  className={`text-center p-4 rounded-xl border transition-all hover:scale-[1.02] hover:z-50 relative group/health`}
                   style={{
                     background: `rgba(${color === "emerald" ? "45,230,160" : color === "amber" ? "245,166,35" : "255,92,122"},0.06)`,
                     borderColor: `rgba(${color === "emerald" ? "45,230,160" : color === "amber" ? "245,166,35" : "255,92,122"},0.15)`,
                   }}
                 >
+                  {/* Info icon */}
+                  <div className="absolute bottom-2.5 right-2.5 cursor-help group/tip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500/40 group-hover/tip:text-slate-300 transition-colors">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                    </svg>
+                    {/* Tooltip */}
+                    <div
+                      className={`absolute bottom-full mb-3 w-64 p-3 rounded-lg border border-white/10 text-left opacity-0 scale-95 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:scale-100 group-hover/tip:pointer-events-auto transition-all duration-200 origin-bottom z-[100] ${isRight ? "right-0" : isLeft ? "left-0" : "left-1/2 -translate-x-1/2"}`}
+                      style={{ background: "rgba(8,10,18,0.97)", backdropFilter: "blur(16px)", boxShadow: "0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)" }}
+                    >
+                      <p className="text-[11px] text-slate-300/90 leading-[1.6] font-normal normal-case tracking-normal">{h.tooltip}</p>
+                      <div className={`absolute -bottom-[5px] w-2.5 h-2.5 rotate-45 border-r border-b border-white/10 ${isRight ? "right-2" : isLeft ? "left-2" : "left-1/2 -translate-x-1/2"}`} style={{ background: "rgba(8,10,18,0.97)" }} />
+                    </div>
+                  </div>
                   <p className={`text-2xl font-bold ${color === "emerald" ? "text-emerald-400" : color === "amber" ? "text-amber-400" : "text-rose-400"}`}>{h.value}</p>
                   <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mt-1">{h.label}</p>
                   <div className={`size-2 rounded-full mx-auto mt-2 ${color === "emerald" ? "bg-emerald-400" : color === "amber" ? "bg-amber-400" : "bg-rose-400"}`} />
@@ -1478,12 +1494,27 @@ export default function MarketingPage() {
 
         {/* ── Organic KPIs ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {organicKpis.map((kpi, idx) => (
+          {organicKpis.map((kpi, idx) => {
+            const isRight = idx >= 2;
+            return (
             <div
               key={kpi.label}
-              className="glass-panel p-5 rounded-2xl cursor-default"
-              style={{ ...glassStyle, animation: `animationIn 0.8s ease-out ${0.2 + idx * 0.05}s both` }}
+              className="glass-panel p-5 rounded-2xl cursor-default relative hover:z-50"
+              style={{ ...glassStyle, animation: `animationIn 0.8s ease-out ${0.2 + idx * 0.05}s both`, overflow: "visible" }}
             >
+              {/* Info icon */}
+              <div className="absolute bottom-3 right-3 cursor-help group/tip z-20">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500/40 group-hover/tip:text-slate-300 transition-colors">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                </svg>
+                <div
+                  className={`absolute bottom-full mb-3 w-64 p-3 rounded-lg border border-white/10 text-left opacity-0 scale-95 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:scale-100 group-hover/tip:pointer-events-auto transition-all duration-200 origin-bottom z-[200] ${isRight ? "right-0" : "left-0"}`}
+                  style={{ background: "rgba(8,10,18,0.97)", backdropFilter: "blur(16px)", boxShadow: "0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)" }}
+                >
+                  <p className="text-[11px] text-slate-300/90 leading-[1.6] font-normal normal-case tracking-normal">{kpi.tooltip}</p>
+                  <div className={`absolute -bottom-[5px] w-2.5 h-2.5 rotate-45 border-r border-b border-white/10 ${isRight ? "right-2" : "left-2"}`} style={{ background: "rgba(8,10,18,0.97)" }} />
+                </div>
+              </div>
               <div className="flex items-center justify-between mb-1 relative z-10">
                 <p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{kpi.label}</p>
                 <div className="text-amber-400/60">{kpiIcons[kpi.icon]}</div>
@@ -1494,7 +1525,8 @@ export default function MarketingPage() {
                 {kpi.delta} vs mês ant.
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* ── Sessions by Channel (Stacked Bar) ── */}
@@ -2192,10 +2224,10 @@ export default function MarketingPage() {
             </div>
             <div className="grid grid-cols-4 gap-3 mt-5 relative z-10">
               {[
-                { icon: "⏩", label: "Forward Taps", value: "2.4k", bad: true },
-                { icon: "⏮", label: "Back Taps", value: "890", bad: false },
-                { icon: "🚪", label: "Exits", value: "1.1k", bad: true },
-                { icon: "🔗", label: "Link Taps", value: "340", bad: false },
+                { icon: "⏩", label: "Avançar", value: "2.4k", bad: true },
+                { icon: "⏮", label: "Voltar", value: "890", bad: false },
+                { icon: "🚪", label: "Saídas", value: "1.1k", bad: true },
+                { icon: "🔗", label: "Cliques no Link", value: "340", bad: false },
               ].map((m) => (
                 <div key={m.label} className="text-center p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
                   <div className="text-sm mb-1">{m.icon}</div>
