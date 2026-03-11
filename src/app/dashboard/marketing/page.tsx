@@ -2947,6 +2947,78 @@ export default function MarketingPage() {
           ))}
         </div>
 
+        {/* ── Stories em Tempo Real ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 flex flex-col"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.55s both" }}
+        >
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-rose-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-5 relative z-10">
+            <span className="text-rose-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Stories em Tempo Real<InfoTip title="Stories em Tempo Real" /></h3>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory flex-1 min-h-0">
+            {liveStories.map((st) => (
+              <div
+                key={st.seq}
+                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer transition-all duration-300 group/story snap-start flex flex-col hover:border-rose-500/20"
+                style={{ background: "rgba(255,255,255,0.02)" }}
+                onClick={() => setSelectedStory(st)}
+              >
+                {/* Cover image */}
+                <div className="relative h-[200px] overflow-hidden">
+                  <Image src={st.cover} alt={`Story ${st.seq}`} fill className="object-cover group-hover/story:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {st.type.includes("Video") && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/story:bg-white/20 transition-colors">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-bold text-white">Story {st.seq}</p>
+                      <span className="text-[10px] font-bold text-amber-400">{st.time}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300 font-medium">{st.type}</p>
+                  </div>
+                </div>
+
+                {/* Metrics */}
+                <div className="p-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.reactions}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                      <span className="text-[10px] font-bold text-white">{st.shares}</span>
+                    </div>
+                  </div>
+                  {st.interaction && (
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-[9px] text-rose-400 font-bold uppercase">{st.interaction.type === "poll" ? "Enquete" : st.interaction.type === "quiz" ? "Quiz" : st.interaction.type === "slider" ? "Slider" : "Countdown"}</span>
+                      <span className="text-[9px] text-slate-500">Clique para ver</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── Video Retention Curve + Share Rate ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -3606,78 +3678,6 @@ export default function MarketingPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* ── Stories em Tempo Real ── */}
-        <div
-          className="glass-panel rounded-2xl p-6 flex flex-col"
-          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.94s both" }}
-        >
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-rose-500/5 rounded-full blur-[60px] pointer-events-none" />
-          <div className="flex items-center gap-2 mb-5 relative z-10">
-            <span className="text-rose-400/60">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            </span>
-            <h3 className="font-bold text-sm text-slate-300">Stories em Tempo Real<InfoTip title="Stories em Tempo Real" /></h3>
-          </div>
-          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory flex-1 min-h-0">
-            {liveStories.map((st) => (
-              <div
-                key={st.seq}
-                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer transition-all duration-300 group/story snap-start flex flex-col hover:border-rose-500/20"
-                style={{ background: "rgba(255,255,255,0.02)" }}
-                onClick={() => setSelectedStory(st)}
-              >
-                {/* Cover image */}
-                <div className="relative h-[200px] overflow-hidden">
-                  <Image src={st.cover} alt={`Story ${st.seq}`} fill className="object-cover group-hover/story:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  {st.type.includes("Video") && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/story:bg-white/20 transition-colors">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                      </div>
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs font-bold text-white">Story {st.seq}</p>
-                      <span className="text-[10px] font-bold text-amber-400">{st.time}</span>
-                    </div>
-                    <p className="text-[10px] text-slate-300 font-medium">{st.type}</p>
-                  </div>
-                </div>
-
-                {/* Metrics */}
-                <div className="p-3 space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                      <span className="text-[10px] font-bold text-white">{st.views}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                      <span className="text-[10px] font-bold text-white">{st.likes}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
-                      <span className="text-[10px] font-bold text-white">{st.reactions}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                      <span className="text-[10px] font-bold text-white">{st.shares}</span>
-                    </div>
-                  </div>
-                  {st.interaction && (
-                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-                      <span className="text-[9px] text-rose-400 font-bold uppercase">{st.interaction.type === "poll" ? "Enquete" : st.interaction.type === "quiz" ? "Quiz" : st.interaction.type === "slider" ? "Slider" : "Countdown"}</span>
-                      <span className="text-[9px] text-slate-500">Clique para ver</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
