@@ -448,7 +448,7 @@ export default function ComercialPage() {
         </div>
 
         {/* ════════ VISÃO GERAL — Funil + Volume Semanal + Indicadores ════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
           {/* Funil de Vendas */}
           <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both" }}>
             <div className="flex items-center justify-between mb-5">
@@ -521,8 +521,10 @@ export default function ComercialPage() {
             </div>
           </div>
 
+          {/* Vol. Vendas + Faturamento stacked */}
+          <div className="flex flex-col gap-4">
           {/* Vol. Vendas (Dia) */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}>
+          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col h-[220px]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}>
             <div className="flex items-center gap-2 mb-4">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 6-6"/></svg>
               <h3 className="font-bold text-sm text-slate-300">Vol. Vendas (Dia)</h3>
@@ -552,7 +554,7 @@ export default function ComercialPage() {
           </div>
 
           {/* Vol. Faturamento (Dia) */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both" }}>
+          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col h-[220px]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both" }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -586,6 +588,7 @@ export default function ComercialPage() {
               );
             })()}
           </div>
+          </div>{/* end stacked wrapper */}
         </div>
 
         {/* Indicadores de Eficiência — Simples */}
