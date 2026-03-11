@@ -447,6 +447,145 @@ export default function ComercialPage() {
           })}
         </div>
 
+        {/* ════════ FUNIL SDR + CLOSER (B06) — Compact ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* SDR Funnel */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] relative" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both" }}>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-[60px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-3 relative z-10">
+              <div className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20">
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">SDR</span>
+              </div>
+              <h3 className="font-bold text-xs text-slate-300">Prospecção & Qualificação<InfoTip title="Funil SDR" /></h3>
+            </div>
+            <div className="relative z-10 flex flex-col items-center gap-1">
+              {sdrFunnel.stages.map((stage, i) => {
+                const prev = i > 0 ? sdrFunnel.between[i - 1] : null;
+                return (
+                  <div key={stage.label} className="flex items-center justify-center" style={{ width: "100%" }}>
+                    <div
+                      className={`flex flex-col items-center justify-center rounded-lg transition-all duration-300 cursor-default py-1 px-3 ${stage.highlight ? "border border-cyan-400/30" : "border border-white/[0.06]"}`}
+                      style={{
+                        width: `${stage.w}%`,
+                        background: stage.highlight
+                          ? "linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(6,182,212,0.25) 0%, rgba(6,182,212,0.10) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
+                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(6,182,212,0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      {prev && (
+                        <div className="flex items-center justify-center gap-3 mb-0.5">
+                          <span className="text-[7px] uppercase tracking-wider text-slate-500 font-bold">{prev.left.k} <span className="text-white">{prev.left.v}</span></span>
+                          <span className="text-[7px] text-white/10">|</span>
+                          <span className="text-[7px] uppercase tracking-wider text-slate-500 font-bold">{prev.right.k} <span className="text-white">{prev.right.v}</span></span>
+                        </div>
+                      )}
+                      <span className={`text-[9px] font-medium ${stage.highlight ? "text-cyan-400" : "text-slate-400"}`}>{stage.label}</span>
+                      <span className="text-lg font-bold text-white leading-tight">{stage.count}</span>
+                      <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                        </svg>
+                        {stage.delta}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/5 relative z-10">
+              <p className="text-[10px] font-bold text-cyan-400/60 uppercase tracking-widest mb-2">Métricas SDR</p>
+              <div className="grid grid-cols-5 gap-1.5">
+                {sdrMetrics.map(m => (
+                  <div key={m.label} className="bg-cyan-500/[0.04] border border-cyan-500/10 rounded-lg p-1.5 text-center">
+                    <p className="text-[11px] font-bold text-white">{m.value}</p>
+                    <p className="text-[9px] text-neutral-400 mt-0.5 leading-tight">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Closer Funnel */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] relative" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both" }}>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-3 relative z-10">
+              <div className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">CLOSER</span>
+              </div>
+              <h3 className="font-bold text-xs text-slate-300">Apresentação & Fechamento<InfoTip title="Funil Closer" /></h3>
+            </div>
+            <div className="relative z-10 flex flex-col items-center gap-1">
+              {closerFunnel.stages.map((stage, i) => {
+                const prev = i > 0 ? closerFunnel.between[i - 1] : null;
+                return (
+                  <div key={stage.label} className="flex items-center justify-center" style={{ width: "100%" }}>
+                    <div
+                      className={`flex flex-col items-center justify-center rounded-lg transition-all duration-300 cursor-default py-1 px-3 ${stage.highlight ? "border border-amber-400/30" : "border border-white/[0.06]"}`}
+                      style={{
+                        width: `${stage.w}%`,
+                        background: stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
+                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      {prev && (
+                        <div className="flex items-center justify-center gap-3 mb-0.5">
+                          <span className="text-[7px] uppercase tracking-wider text-slate-500 font-bold">{prev.left.k} <span className="text-white">{prev.left.v}</span></span>
+                          <span className="text-[7px] text-white/10">|</span>
+                          <span className="text-[7px] uppercase tracking-wider text-slate-500 font-bold">{prev.right.k} <span className="text-white">{prev.right.v}</span></span>
+                        </div>
+                      )}
+                      <span className={`text-[9px] font-medium ${stage.highlight ? "text-amber-400" : "text-slate-400"}`}>{stage.label}</span>
+                      <span className="text-lg font-bold text-white leading-tight">{stage.count}</span>
+                      <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                        </svg>
+                        {stage.delta}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/5 relative z-10">
+              <p className="text-[10px] font-bold text-amber-400/60 uppercase tracking-widest mb-2">Métricas Closer</p>
+              <div className="grid grid-cols-5 gap-1.5">
+                {closerMetrics.map(m => (
+                  <div key={m.label} className="bg-amber-500/[0.04] border border-amber-500/10 rounded-lg p-1.5 text-center">
+                    <p className="text-[11px] font-bold text-white">{m.value}</p>
+                    <p className="text-[9px] text-neutral-400 mt-0.5 leading-tight">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ════════ VISÃO GERAL — Funil + Volume Semanal + Indicadores ════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
           {/* Funil de Vendas */}
@@ -651,148 +790,6 @@ export default function ComercialPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* ════════ FUNIL SDR + CLOSER (B06) — Marketing style ════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* SDR Funnel */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] relative" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.35s both" }}>
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-[60px] pointer-events-none" />
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <div className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20">
-                <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider">SDR</span>
-              </div>
-              <h3 className="font-bold text-sm text-slate-300">Prospecção & Qualificação<InfoTip title="Funil SDR" /></h3>
-            </div>
-            <div className="relative z-10 flex flex-col items-center gap-1.5">
-              {sdrFunnel.stages.map((stage, i) => {
-                const prev = i > 0 ? sdrFunnel.between[i - 1] : null;
-                return (
-                  <div key={stage.label} className="flex items-center justify-center" style={{ width: "100%" }}>
-                    <div
-                      className={`flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-2 px-4 ${stage.highlight ? "border border-cyan-400/30" : "border border-white/[0.06]"}`}
-                      style={{
-                        width: `${stage.w}%`,
-                        background: stage.highlight
-                          ? "linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(6,182,212,0.25) 0%, rgba(6,182,212,0.10) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
-                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(6,182,212,0.15)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }}
-                    >
-                      {/* Conversion metrics from previous stage */}
-                      {prev && (
-                        <div className="flex items-center justify-center gap-4 mb-1">
-                          <span className="text-[8px] uppercase tracking-wider text-slate-500 font-bold">{prev.left.k} <span className="text-white">{prev.left.v}</span></span>
-                          <span className="text-[8px] text-white/10">|</span>
-                          <span className="text-[8px] uppercase tracking-wider text-slate-500 font-bold">{prev.right.k} <span className="text-white">{prev.right.v}</span></span>
-                        </div>
-                      )}
-                      <span className={`text-[10px] font-medium ${stage.highlight ? "text-cyan-400" : "text-slate-400"}`}>{stage.label}</span>
-                      <span className="text-2xl font-bold text-white leading-tight">{stage.count}</span>
-                      <span className={`text-[10px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
-                        </svg>
-                        {stage.delta}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            {/* SDR Metrics */}
-            <div className="mt-5 pt-4 border-t border-white/5 relative z-10">
-              <p className="text-[11px] font-bold text-cyan-400/60 uppercase tracking-widest mb-3">Métricas SDR</p>
-              <div className="grid grid-cols-5 gap-2">
-                {sdrMetrics.map(m => (
-                  <div key={m.label} className="bg-cyan-500/[0.04] border border-cyan-500/10 rounded-lg p-2 text-center">
-                    <p className="text-xs font-bold text-white">{m.value}</p>
-                    <p className="text-[10px] text-neutral-400 mt-0.5 leading-tight">{m.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Closer Funnel — Marketing style */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] relative" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.4s both" }}>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <div className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
-                <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">CLOSER</span>
-              </div>
-              <h3 className="font-bold text-sm text-slate-300">Apresentação & Fechamento<InfoTip title="Funil Closer" /></h3>
-            </div>
-            <div className="relative z-10 flex flex-col items-center gap-1.5">
-              {closerFunnel.stages.map((stage, i) => {
-                const prev = i > 0 ? closerFunnel.between[i - 1] : null;
-                return (
-                  <div key={stage.label} className="flex items-center justify-center" style={{ width: "100%" }}>
-                    <div
-                      className={`flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-2 px-4 ${stage.highlight ? "border border-amber-400/30" : "border border-white/[0.06]"}`}
-                      style={{
-                        width: `${stage.w}%`,
-                        background: stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
-                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }}
-                    >
-                      {prev && (
-                        <div className="flex items-center justify-center gap-4 mb-1">
-                          <span className="text-[8px] uppercase tracking-wider text-slate-500 font-bold">{prev.left.k} <span className="text-white">{prev.left.v}</span></span>
-                          <span className="text-[8px] text-white/10">|</span>
-                          <span className="text-[8px] uppercase tracking-wider text-slate-500 font-bold">{prev.right.k} <span className="text-white">{prev.right.v}</span></span>
-                        </div>
-                      )}
-                      <span className={`text-[10px] font-medium ${stage.highlight ? "text-amber-400" : "text-slate-400"}`}>{stage.label}</span>
-                      <span className="text-2xl font-bold text-white leading-tight">{stage.count}</span>
-                      <span className={`text-[10px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
-                        </svg>
-                        {stage.delta}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            {/* Closer Metrics */}
-            <div className="mt-5 pt-4 border-t border-white/5 relative z-10">
-              <p className="text-[11px] font-bold text-amber-400/60 uppercase tracking-widest mb-3">Métricas Closer</p>
-              <div className="grid grid-cols-5 gap-2">
-                {closerMetrics.map(m => (
-                  <div key={m.label} className="bg-amber-500/[0.04] border border-amber-500/10 rounded-lg p-2 text-center">
-                    <p className="text-xs font-bold text-white">{m.value}</p>
-                    <p className="text-[10px] text-neutral-400 mt-0.5 leading-tight">{m.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
