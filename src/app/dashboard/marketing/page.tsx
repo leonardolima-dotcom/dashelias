@@ -1245,7 +1245,7 @@ export default function MarketingPage() {
         </div>
         <div className="flex items-center gap-4">
           {/* Filter dropdowns */}
-          <div className="flex items-center gap-0 bg-black border border-white/5 rounded-lg overflow-visible">
+          {mainTab === "pago" && (<div className="flex items-center gap-0 bg-black border border-white/5 rounded-lg overflow-visible">
             {/* Estratégia */}
             <div ref={estrategiaRef} className="relative">
               <button
@@ -1274,7 +1274,7 @@ export default function MarketingPage() {
                 </div>
               )}
             </div>
-          </div>
+          </div>)}
           <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5">
             <button
               onClick={() => setMainTab("pago")}
