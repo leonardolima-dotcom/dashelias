@@ -499,7 +499,7 @@ export default function ComercialPage() {
               ))}
             </div>
             {/* Bottom KPI cards */}
-            <div className="grid grid-cols-2 gap-3 mt-5 pt-4 border-t border-white/5">
+            <div className="grid grid-cols-2 gap-3 mt-5 pt-4">
               <div className="bg-black/40 border border-white/5 rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Tx. MQL para SQL</p>
