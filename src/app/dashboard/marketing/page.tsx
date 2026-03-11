@@ -1314,29 +1314,6 @@ export default function MarketingPage() {
         {/* ════════════════ TRÁFEGO PAGO ════════════════ */}
         {mainTab === "pago" && (<>
 
-        {/* ── Social Network Selector ── */}
-        <div className="flex items-center gap-2" style={{ animation: "animationIn 0.8s ease-out 0.05s both" }}>
-          {(["instagram", "tiktok", "youtube", "facebook"] as SocialNetwork[]).map((sn) => {
-            const isActive = socialNetwork === sn;
-            const color = socialNetworkColors[sn];
-            return (
-              <button
-                key={sn}
-                onClick={() => setSocialNetwork(sn)}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all duration-200"
-                style={{
-                  background: isActive ? `${color}15` : "rgba(255,255,255,0.02)",
-                  border: `1px solid ${isActive ? `${color}40` : "rgba(255,255,255,0.05)"}`,
-                  color: isActive ? color : "rgb(100,116,139)",
-                }}
-              >
-                <span style={{ color: isActive ? color : "rgb(100,116,139)" }}>{socialNetworkIcons[sn]}</span>
-                {socialNetworkLabels[sn]}
-              </button>
-            );
-          })}
-        </div>
-
         {(() => {
           const net = networkData[socialNetwork];
           return (<>
