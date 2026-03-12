@@ -125,17 +125,17 @@ const rankingTabLabels: Record<RankingTab, string> = {
 type SellerTab = "sdr" | "closer" | "todos";
 
 const sdrRanking = [
-  { name: "Ana Lima", value: "312 SQLs", subMetrics: "Tx.Qual: 82% · Show: 91% · Tempo: 4.2d", pct: 90 },
-  { name: "Carlos M.", value: "251 SQLs", subMetrics: "Tx.Qual: 76% · Show: 87% · Tempo: 5.5d", pct: 72 },
-  { name: "Fernanda R.", value: "194 SQLs", subMetrics: "Tx.Qual: 71% · Show: 82% · Tempo: 6.1d", pct: 55 },
-  { name: "Pedro S.", value: "173 SQLs", subMetrics: "Tx.Qual: 68% · Show: 80% · Tempo: 6.8d", pct: 50 },
+  { name: "Ana Lima", value: "312 SQLs", subMetrics: "Tx.Qual: 82% · Show: 91% · Tempo: 4.2d", pct: 90, initials: "AL", color: "from-cyan-500 to-cyan-400" },
+  { name: "Carlos M.", value: "251 SQLs", subMetrics: "Tx.Qual: 76% · Show: 87% · Tempo: 5.5d", pct: 72, initials: "CM", color: "from-sky-500 to-sky-400" },
+  { name: "Fernanda R.", value: "194 SQLs", subMetrics: "Tx.Qual: 71% · Show: 82% · Tempo: 6.1d", pct: 55, initials: "FR", color: "from-teal-500 to-teal-400" },
+  { name: "Pedro S.", value: "173 SQLs", subMetrics: "Tx.Qual: 68% · Show: 80% · Tempo: 6.8d", pct: 50, initials: "PS", color: "from-emerald-500 to-emerald-400" },
 ];
 
 const closerRanking = [
-  { name: "Rafael S.", value: "R$ 198k", subMetrics: "Win: 31% · Ticket: R$4.2k · Ciclo: 11d", pct: 90 },
-  { name: "Juliana P.", value: "R$ 142k", subMetrics: "Win: 26% · Ticket: R$3.8k · Ciclo: 14d", pct: 65 },
-  { name: "Marcos T.", value: "R$ 97k", subMetrics: "Win: 19% · Ticket: R$3.2k · Ciclo: 16d", pct: 44 },
-  { name: "Beatriz C.", value: "R$ 83k", subMetrics: "Win: 17% · Ticket: R$2.9k · Ciclo: 18d", pct: 38 },
+  { name: "Rafael S.", value: "R$ 198k", subMetrics: "Win: 31% · Ticket: R$4.2k · Ciclo: 11d", pct: 90, initials: "RS", color: "from-amber-500 to-amber-400" },
+  { name: "Juliana P.", value: "R$ 142k", subMetrics: "Win: 26% · Ticket: R$3.8k · Ciclo: 14d", pct: 65, initials: "JP", color: "from-orange-500 to-orange-400" },
+  { name: "Marcos T.", value: "R$ 97k", subMetrics: "Win: 19% · Ticket: R$3.2k · Ciclo: 16d", pct: 44, initials: "MT", color: "from-yellow-600 to-yellow-500" },
+  { name: "Beatriz C.", value: "R$ 83k", subMetrics: "Win: 17% · Ticket: R$2.9k · Ciclo: 18d", pct: 38, initials: "BC", color: "from-rose-500 to-rose-400" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -447,8 +447,162 @@ export default function ComercialPage() {
           })}
         </div>
 
-        {/* ════════ FUNIL SDR + CLOSER (B06) — Compact ════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* ════════ FUNIL DE VENDAS — Full width ════════ */}
+        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col relative z-10" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both", isolation: "isolate" }}>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+              <h3 className="font-bold text-sm text-slate-300">Funil de Vendas</h3>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">MQL → SQL</span>
+                <span className="text-xs font-bold text-emerald-400">75,0%</span>
+              </div>
+              <div className="w-px h-3 bg-white/10" />
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">SQL → Venda</span>
+                <span className="text-xs font-bold text-emerald-400">22,5%</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            {funnelOverview.map((stage, i) => {
+              const convRate = i > 0 ? ((parseFloat(funnelOverview[i].count.replace(".", "")) / parseFloat(funnelOverview[i - 1].count.replace(".", ""))) * 100).toFixed(0) + "%" : null;
+              return (
+                <div key={stage.label} className="w-full">
+                  {i > 0 && (
+                    <div className="flex items-center justify-center gap-2 py-0.5">
+                      <div className="w-px h-2 border-l border-dashed border-white/10" />
+                      <span className="text-[9px] font-bold text-amber-400/60">{convRate}</span>
+                      <div className="w-px h-2 border-l border-dashed border-white/10" />
+                    </div>
+                  )}
+                  <div className="flex items-center justify-center">
+                    <div
+                      className={`flex-shrink-0 flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-2 ${stage.highlight ? "border border-amber-400/30 shadow-[0_0_20px_rgba(251,191,36,0.1)]" : "border border-white/[0.06]"}`}
+                      style={{
+                        width: `${stage.w}%`,
+                        background: stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
+                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = stage.highlight
+                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${stage.highlight ? "text-amber-400" : "text-slate-500"}`}>{stage.label}</span>
+                      <span className={`text-xl font-bold leading-tight ${stage.highlight ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" : "text-white"}`}>{stage.count}</span>
+                      <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                        </svg>
+                        {stage.delta}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ════════ Rankings + FUNIL SDR + CLOSER ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Col 1 — Rankings empilhados */}
+          <div className="flex flex-col gap-4 h-full">
+          {/* Ranking Vendedores */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] flex-1 flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.5s both" }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h3 className="font-bold text-xs text-slate-300">Ranking de Vendedores</h3>
+                <InfoTip title="Ranking de Vendedores" />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5 mb-4">
+              {([["sdr", "SDR"], ["closer", "Closer"], ["todos", "Todos"]] as [SellerTab, string][]).map(([t, label]) => (
+                <button key={t} onClick={() => { setSellerTab(t); setExpandedSeller(null); }} className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-all ${sellerTab === t ? (t === "sdr" ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20" : "bg-amber-500/15 text-amber-400 border border-amber-500/20") : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+              {(sellerTab === "sdr" ? sdrRanking : sellerTab === "closer" ? closerRanking : [...sdrRanking.slice(0, 2), ...closerRanking.slice(0, 2)]).map((s, i) => {
+                const posColors = ["text-amber-400", "text-slate-400", "text-amber-700", "text-neutral-600"];
+                const barColor = sellerTab === "sdr" ? "rgba(34,211,238,0.3)" : sellerTab === "closer" ? "rgba(251,191,36,0.3)" : i < 2 ? "rgba(34,211,238,0.3)" : "rgba(251,191,36,0.3)";
+                const isExpanded = expandedSeller === i;
+                return (
+                  <div key={s.name + i} className="cursor-pointer group/r" onClick={() => setExpandedSeller(isExpanded ? null : i)}>
+                    <div className="flex items-center gap-2.5">
+                      <span className={`text-[10px] font-bold w-4 text-center shrink-0 ${posColors[i] || "text-neutral-600"}`}>{i + 1}°</span>
+                      <div className={`size-8 rounded-full bg-gradient-to-br ${s.color} shrink-0 flex items-center justify-center shadow-lg`}>
+                        <span className="text-[10px] font-bold text-white">{s.initials}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="text-xs font-bold text-white truncate">{s.name}</span>
+                          <span className="text-xs font-bold text-white shrink-0 ml-2">{s.value}</span>
+                        </div>
+                        <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500 group-hover/r:brightness-125" style={{ width: `${s.pct}%`, background: `linear-gradient(90deg, ${barColor}, transparent)` }} />
+                        </div>
+                      </div>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`text-neutral-500 transition-transform shrink-0 ${isExpanded ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    {isExpanded && (
+                      <div className="ml-[3.25rem] mt-1 mb-1 p-1.5 rounded-lg bg-white/[0.02] border border-white/5">
+                        <p className="text-[10px] text-neutral-400">{s.subMetrics}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Ranking Canais */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] flex-1 flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.45s both" }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/><path d="M15 7A3 3 0 1 0 9 7"/><path d="M12 2v1"/><path d="m4.6 4.6.7.7"/><path d="M20.1 4.6l-.7.7"/></svg>
+                <h3 className="font-bold text-xs text-slate-300">Ranking de Canais</h3>
+                <InfoTip title="Ranking de Canais" />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5 mb-4">
+              {(["volume", "faturamento", "conversao", "ciclo"] as RankingTab[]).map(t => (
+                <button key={t} onClick={() => setRankTab(t)} className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-all ${rankTab === t ? "bg-amber-500/15 text-amber-400 border border-amber-500/20" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>
+                  {rankingTabLabels[t]}
+                </button>
+              ))}
+            </div>
+            <div className="space-y-2">
+              {rankingCanaisData[rankTab].entries.map((e, i) => {
+                const posColors = ["text-amber-400", "text-slate-400", "text-amber-700", "text-neutral-600"];
+                return (
+                  <div key={e.name} className="flex items-center gap-2 group/r cursor-pointer">
+                    <span className={`text-[10px] font-bold w-4 text-center ${posColors[i] || "text-neutral-600"}`}>{i + 1}°</span>
+                    <div className="flex-1 h-6 bg-white/[0.02] rounded overflow-hidden border border-white/[0.04]">
+                      <div className="h-full rounded flex items-center px-2 transition-all duration-500 group-hover/r:brightness-125" style={{ width: `${e.pct}%`, background: `linear-gradient(90deg, ${e.color}, transparent)` }}>
+                        <span className="text-[10px] font-bold text-white/90 truncate">{e.name}</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-white min-w-[50px] text-right">{e.value}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          </div>
           {/* SDR Funnel */}
           <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] relative" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both" }}>
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-[60px] pointer-events-none" />
@@ -586,84 +740,10 @@ export default function ComercialPage() {
           </div>
         </div>
 
-        {/* ════════ VISÃO GERAL — Funil + Volume Semanal + Indicadores ════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
-          {/* Funil de Vendas */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col relative z-10" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both", isolation: "isolate" }}>
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-sm text-slate-300">Funil de Vendas</h3>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/50"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-            </div>
-            <div className="flex-1 flex flex-col justify-center gap-1.5">
-              {funnelOverview.map((stage, i) => (
-                <div key={stage.label}>
-                  <div className="flex items-center justify-center">
-                    <div
-                      className={`flex-shrink-0 flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-1 ${stage.highlight ? "border border-amber-400/30" : "border border-white/[0.06]"}`}
-                      style={{
-                        width: `${stage.w}%`,
-                        background: stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
-                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }}
-                    >
-                      <span className={`text-[9px] font-medium ${stage.highlight ? "text-amber-400" : "text-slate-400"}`}>{stage.label}</span>
-                      <span className="text-lg font-bold text-white leading-tight">{stage.count}</span>
-                      <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
-                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
-                        </svg>
-                        {stage.delta}
-                      </span>
-                    </div>
-                  </div>
-                  {i < funnelOverview.length - 1 && (
-                    <div className="flex justify-center">
-                      <div className="w-px h-1 border-l border-dashed border-white/10" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            {/* Bottom KPI cards */}
-            <div className="grid grid-cols-2 gap-3 mt-5 pt-4">
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Tx. MQL para SQL</p>
-                  <div className="size-5 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-400"><path d="M20 6 9 17l-5-5"/></svg>
-                  </div>
-                </div>
-                <p className="text-xl font-bold text-white">75,0%</p>
-              </div>
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Tx. SQL para Venda</p>
-                  <div className="size-5 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-400"><path d="M20 6 9 17l-5-5"/></svg>
-                  </div>
-                </div>
-                <p className="text-xl font-bold text-white">22,5%</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Vol. Vendas + Faturamento stacked */}
-          <div className="flex flex-col gap-4">
+        {/* ════════ Volume Semanal ════════ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Vol. Vendas (Dia) */}
-          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col flex-1 min-h-0 overflow-hidden" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both", isolation: "isolate" }}>
+          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col overflow-hidden" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.25s both", isolation: "isolate" }}>
             <div className="flex items-center gap-2 mb-4">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 6-6"/></svg>
               <h3 className="font-bold text-sm text-slate-300">Vol. Vendas (Dia)</h3>
@@ -671,7 +751,7 @@ export default function ComercialPage() {
             {(() => {
               const maxV = Math.max(...volumeSemanal.map(d => d.vendas));
               return (
-                <div className="flex-1 flex gap-3">
+                <div className="flex-1 flex gap-3 min-h-[200px]">
                   {volumeSemanal.map((d, i) => {
                     const h = (d.vendas / maxV) * 100;
                     const isToday = d.day === "DOM";
@@ -693,7 +773,7 @@ export default function ComercialPage() {
           </div>
 
           {/* Vol. Faturamento (Dia) */}
-          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col flex-1 min-h-0 overflow-hidden" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both", isolation: "isolate" }}>
+          <div className="glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col overflow-hidden" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.3s both", isolation: "isolate" }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -707,7 +787,7 @@ export default function ComercialPage() {
             {(() => {
               const maxF = Math.max(...volumeSemanal.map(d => d.fat));
               return (
-                <div className="flex-1 flex gap-3">
+                <div className="flex-1 flex gap-3 min-h-[200px]">
                   {volumeSemanal.map((d, i) => {
                     const h = (d.fat / maxF) * 100;
                     const isToday = d.day === "DOM";
@@ -727,8 +807,7 @@ export default function ComercialPage() {
               );
             })()}
           </div>
-          </div>{/* end stacked wrapper */}
-        </div>
+          </div>
 
         {/* Indicadores de Eficiência — Simples */}
         <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.35s both" }}>
@@ -790,98 +869,6 @@ export default function ComercialPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* ════════ B07 — Ranking de Canais + B08 — Ranking Vendedores ════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Ranking Canais */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.45s both" }}>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/><path d="M15 7A3 3 0 1 0 9 7"/><path d="M12 2v1"/><path d="m4.6 4.6.7.7"/><path d="M20.1 4.6l-.7.7"/></svg>
-                <h3 className="font-bold text-sm text-slate-300">Ranking de Canais</h3>
-                <InfoTip title="Ranking de Canais" />
-              </div>
-            </div>
-            {/* Tabs */}
-            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5 mb-5">
-              {(["volume", "faturamento", "conversao", "ciclo"] as RankingTab[]).map(t => (
-                <button key={t} onClick={() => setRankTab(t)} className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all ${rankTab === t ? "bg-amber-500/15 text-amber-400 border border-amber-500/20" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>
-                  {rankingTabLabels[t]}
-                </button>
-              ))}
-            </div>
-            {/* Ranking Rows */}
-            <div className="space-y-2.5">
-              {rankingCanaisData[rankTab].entries.map((e, i) => {
-                const posColors = ["text-amber-400", "text-slate-400", "text-amber-700", "text-neutral-600"];
-                return (
-                  <div key={e.name} className="flex items-center gap-3 group/r cursor-pointer">
-                    <span className={`text-xs font-bold w-5 text-center ${posColors[i] || "text-neutral-600"}`}>{i + 1}°</span>
-                    <div className="flex-1 h-7 bg-white/[0.02] rounded overflow-hidden border border-white/[0.04]">
-                      <div className="h-full rounded flex items-center px-2.5 transition-all duration-500 group-hover/r:brightness-125" style={{ width: `${e.pct}%`, background: `linear-gradient(90deg, ${e.color}, transparent)` }}>
-                        <span className="text-xs font-bold text-white/90">{e.name}</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-white min-w-[60px] text-right">{e.value}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Ranking Vendedores */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.5s both" }}>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <h3 className="font-bold text-sm text-slate-300">Ranking de Vendedores</h3>
-                <InfoTip title="Ranking de Vendedores" />
-              </div>
-            </div>
-            {/* Tabs */}
-            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5 mb-5">
-              {([["sdr", "SDR"], ["closer", "Closer"], ["todos", "Todos"]] as [SellerTab, string][]).map(([t, label]) => (
-                <button key={t} onClick={() => { setSellerTab(t); setExpandedSeller(null); }} className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all ${sellerTab === t ? (t === "sdr" ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20" : "bg-amber-500/15 text-amber-400 border border-amber-500/20") : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>
-                  {label}
-                </button>
-              ))}
-            </div>
-            {/* Rows */}
-            <div className="space-y-2">
-              {(sellerTab === "sdr" ? sdrRanking : sellerTab === "closer" ? closerRanking : [...sdrRanking.slice(0, 2), ...closerRanking.slice(0, 2)]).map((s, i) => {
-                const posColors = ["text-amber-400", "text-slate-400", "text-amber-700", "text-neutral-600"];
-                const barColor = sellerTab === "sdr" ? "rgba(34,211,238,0.3)" : sellerTab === "closer" ? "rgba(251,191,36,0.3)" : i < 2 ? "rgba(34,211,238,0.3)" : "rgba(251,191,36,0.3)";
-                const isExpanded = expandedSeller === i;
-                return (
-                  <div key={s.name + i}>
-                    <div className="flex items-center gap-3 cursor-pointer group/r" onClick={() => setExpandedSeller(isExpanded ? null : i)}>
-                      <span className={`text-xs font-bold w-5 text-center ${posColors[i] || "text-neutral-600"}`}>{i + 1}°</span>
-                      <div className="flex-1 h-7 bg-white/[0.02] rounded overflow-hidden border border-white/[0.04]">
-                        <div className="h-full rounded flex items-center px-2.5 transition-all duration-500 group-hover/r:brightness-125" style={{ width: `${s.pct}%`, background: `linear-gradient(90deg, ${barColor}, transparent)` }}>
-                          <span className="text-xs font-bold text-white/90">{s.name}</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-white min-w-[60px] text-right">{s.value}</span>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`text-neutral-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
-                    </div>
-                    {isExpanded && (
-                      <div className="ml-8 mt-1 mb-2 p-2 rounded-lg bg-white/[0.02] border border-white/5">
-                        <p className="text-xs text-neutral-400">{s.subMetrics}</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            {/* Top performer badge */}
-            {sellerTab !== "todos" && (
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2">
-                <div className="size-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
-                <span className="text-[11px] font-bold text-amber-400">TOP PERFORMER: {sellerTab === "sdr" ? sdrRanking[0].name : closerRanking[0].name}</span>
-              </div>
-            )}
           </div>
         </div>
 
