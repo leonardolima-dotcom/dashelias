@@ -1147,6 +1147,10 @@ export default function MarketingPage() {
     "Faixa Etária": "Distribuição demográfica por faixa etária do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
     "Sexo": "Distribuição por gênero do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
     "Stories em Tempo Real": "Monitoramento dos Stories ativos com métricas de visualizações, curtidas, reações e compartilhamentos. Inclui resultados de interações (enquetes, quizzes, sliders, countdowns). Fonte: Instagram Stories API — Tempo Real.",
+    "Métricas de Conversão": "Anéis de conversão mostrando as taxas em cada etapa do funil: Página → Checkout, Checkout → Compra e Página → Compra. Benchmarks baseados em médias de e-commerce brasileiro. Fonte: Google Analytics + Plataforma de checkout.",
+    "Performance por Página de Destino": "Ranking das landing pages com melhor e pior taxa de conversão. Permite identificar páginas que precisam de otimização e as que podem receber mais tráfego. Fonte: Google Analytics — Landing Pages.",
+    "Performance por Checkout": "Comparação de performance entre diferentes checkouts utilizados. Métricas: Receita, Vendas, Taxa de Conversão, Ticket Médio e CPA. Fonte: Plataformas de checkout + Google Analytics.",
+    "Performance por UTM": "Tabela detalhada de performance por parâmetros UTM (Source, Medium, Campaign, Content). Permite análise granular de cada combinação de tags. Fonte: Google Analytics — Campanhas.",
   };
 
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
@@ -2389,6 +2393,236 @@ export default function MarketingPage() {
                 <span className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">alto</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* ── B13 — Métricas de Conversão (3 SVG rings) ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 border border-white/[0.04]"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.65s both" }}
+        >
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-6 relative z-10">
+            <span className="text-cyan-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Métricas de Conversão<InfoTip title="Métricas de Conversão" /></h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+            {/* Ring 1: Página → Checkout */}
+            {(() => {
+              const rings = [
+                { label: "Página → Checkout", rate: 8.0, benchMin: 5, benchMax: 12, status: "Dentro", color: "rgb(34,211,238)", colorFaded: "rgba(34,211,238,0.15)", from: "10.170 PVs", to: "775 checkouts", alert: null },
+                { label: "Checkout → Compra", rate: 32.1, benchMin: 35, benchMax: 55, status: "Abaixo", color: "rgb(251,113,133)", colorFaded: "rgba(251,113,133,0.15)", from: "775 checkouts", to: "249 compras", alert: "67.8% abandono" },
+                { label: "Página → Compra", rate: 2.6, benchMin: 1.5, benchMax: 4, status: "Na média", color: "rgb(251,191,36)", colorFaded: "rgba(251,191,36,0.15)", from: "10.170 PVs", to: "249 compras", alert: null },
+              ];
+              return rings.map((ring, i) => {
+                const circumference = 2 * Math.PI * 54;
+                const dashLen = (ring.rate / 100) * circumference;
+                const statusColors: Record<string, string> = { "Dentro": "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", "Abaixo": "text-rose-400 bg-rose-400/10 border-rose-400/20", "Na média": "text-amber-400 bg-amber-400/10 border-amber-400/20" };
+                return (
+                  <div key={i} className="rounded-xl p-5 border border-white/[0.04]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <p className="text-xs font-bold text-slate-300 mb-4 text-center">{ring.label}</p>
+                    <div className="flex justify-center mb-4">
+                      <svg width="128" height="128" viewBox="0 0 128 128">
+                        <circle cx="64" cy="64" r="54" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="8" />
+                        <circle
+                          cx="64" cy="64" r="54" fill="none"
+                          stroke={ring.color} strokeWidth="8" strokeLinecap="round"
+                          strokeDasharray={`${dashLen} ${circumference - dashLen}`}
+                          strokeDashoffset={circumference * 0.25}
+                          style={{ transition: "stroke-dasharray 1.5s ease-out", filter: `drop-shadow(0 0 6px ${ring.color})` }}
+                        />
+                        <text x="64" y="58" textAnchor="middle" fill="white" fontSize="22" fontWeight="bold" fontFamily="system-ui">{ring.rate}%</text>
+                        <text x="64" y="76" textAnchor="middle" fill="rgba(148,163,184,0.7)" fontSize="9" fontFamily="system-ui">conv. rate</text>
+                      </svg>
+                    </div>
+                    <div className="text-center space-y-2">
+                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColors[ring.status]}`}>{ring.status}</span>
+                      <p className="text-[10px] text-slate-500">Benchmark: {ring.benchMin}% – {ring.benchMax}%</p>
+                      <p className="text-[10px] text-slate-400">{ring.from} → {ring.to}</p>
+                      {ring.alert && <p className="text-[10px] text-rose-400 font-semibold">⚠ {ring.alert}</p>}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </div>
+
+        {/* ── B14 — Performance por Página de Destino ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 border border-white/[0.04]"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.7s both" }}
+        >
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-6 relative z-10">
+            <span className="text-emerald-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Performance por Página de Destino<InfoTip title="Performance por Página de Destino" /></h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+            {/* Top converting */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="size-2 rounded-full bg-emerald-400" />
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Mais convertem</span>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { page: "/lp-black-friday-v3", rate: 18.4, delta: "+3.1%" },
+                  { page: "/lp-promo-verao", rate: 14.7, delta: "+1.8%" },
+                  { page: "/lp-depoimento-v2", rate: 11.2, delta: "+0.6%" },
+                  { page: "/lp-lancamento-colecao", rate: 8.1, delta: "= 0%" },
+                  { page: "/produto/colecao-inverno", rate: 5.7, delta: "-0.4%" },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-3 group">
+                    <span className="text-[10px] font-bold text-slate-500 w-4 text-right">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-slate-300 truncate font-mono">{row.page}</span>
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="text-xs font-bold text-white">{row.rate}%</span>
+                          <span className={`text-[10px] font-bold ${row.delta.startsWith("+") ? "text-emerald-400" : row.delta.startsWith("-") ? "text-rose-400" : "text-slate-500"}`}>▲{row.delta.replace("+","")}</span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${(row.rate / 18.4) * 100}%`, background: "linear-gradient(90deg, rgb(6,120,80), rgb(52,211,153))", boxShadow: "0 0 8px rgba(52,211,153,0.3)", transition: "width 1s ease-out" }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Bottom converting */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="size-2 rounded-full bg-rose-400" />
+                <span className="text-xs font-bold text-rose-400 uppercase tracking-wider">Menos convertem</span>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { page: "/lp-retargeting-static", rate: 1.2, delta: "-2.1%" },
+                  { page: "/lp-oferta-relampago", rate: 2.0, delta: "-1.3%" },
+                  { page: "/home", rate: 2.8, delta: "-0.5%" },
+                  { page: "/lp-carousel-lifestyle", rate: 3.5, delta: "-0.2%" },
+                  { page: "/categoria/moda", rate: 4.2, delta: "-0.1%" },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-3 group">
+                    <span className="text-[10px] font-bold text-slate-500 w-4 text-right">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-slate-300 truncate font-mono">{row.page}</span>
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="text-xs font-bold text-white">{row.rate}%</span>
+                          <span className="text-[10px] font-bold text-rose-400">▼{row.delta.replace("-","")}</span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${(row.rate / 4.2) * 100}%`, background: "linear-gradient(90deg, rgb(180,40,60), rgb(251,113,133))", boxShadow: "0 0 8px rgba(251,113,133,0.3)", transition: "width 1s ease-out" }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── B15 — Performance por Checkout ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 border border-white/[0.04]"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.75s both" }}
+        >
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-6 relative z-10">
+            <span className="text-amber-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Performance por Checkout<InfoTip title="Performance por Checkout" /></h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+            {[
+              { name: "Checkout Principal", revenue: 198400, sales: 142, convRate: 44.2, ticket: 1397, cpa: 318, color: "rgb(52,211,153)", colorFaded: "rgba(52,211,153,0.15)", glowColor: "rgba(52,211,153,0.3)", gradient: "linear-gradient(90deg, rgb(6,120,80), rgb(52,211,153))" },
+              { name: "Checkout Upsell", revenue: 87200, sales: 61, convRate: 28.7, ticket: 1429, cpa: 412, color: "rgb(251,191,36)", colorFaded: "rgba(251,191,36,0.15)", glowColor: "rgba(251,191,36,0.3)", gradient: "linear-gradient(90deg, rgb(180,130,20), rgb(251,191,36))" },
+              { name: "Checkout Hotmart", revenue: 44600, sales: 46, convRate: 19.1, ticket: 969, cpa: 687, color: "rgb(251,113,133)", colorFaded: "rgba(251,113,133,0.15)", glowColor: "rgba(251,113,133,0.3)", gradient: "linear-gradient(90deg, rgb(180,40,60), rgb(251,113,133))" },
+            ].map((ck, i) => (
+              <div key={i} className="rounded-xl p-5 border border-white/[0.04]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="size-2.5 rounded-full" style={{ background: ck.color, boxShadow: `0 0 6px ${ck.glowColor}` }} />
+                  <span className="text-xs font-bold text-slate-300">{ck.name}</span>
+                </div>
+                <p className="text-2xl font-black text-white mb-1">R$ {(ck.revenue / 1000).toFixed(1).replace(".", ",")}k</p>
+                <p className="text-[10px] text-slate-500 mb-4">{ck.sales} vendas realizadas</p>
+                <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden mb-5">
+                  <div className="h-full rounded-full" style={{ width: `${(ck.revenue / 198400) * 100}%`, background: ck.gradient, boxShadow: `0 0 10px ${ck.glowColor}`, transition: "width 1s ease-out" }} />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Conv Rate", value: `${ck.convRate}%` },
+                    { label: "Ticket", value: `R$ ${ck.ticket.toLocaleString("pt-BR")}` },
+                    { label: "CPA", value: `R$ ${ck.cpa}` },
+                  ].map((stat, si) => (
+                    <div key={si} className="text-center">
+                      <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider mb-0.5">{stat.label}</p>
+                      <p className="text-xs font-bold text-slate-300">{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── B16 — Performance por UTM ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 border border-white/[0.04]"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.8s both" }}
+        >
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-6 relative z-10">
+            <span className="text-violet-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Performance por UTM<InfoTip title="Performance por UTM" /></h3>
+          </div>
+          <div className="overflow-x-auto relative z-10">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/[0.06]">
+                  {["Source", "Medium", "Campaign", "Content", "Sessões", "Conversões", "Conv. Rate", "Receita", "ROAS", "CPA"].map((col) => (
+                    <th key={col} className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider pb-3 pr-4 whitespace-nowrap">{col}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { source: "instagram", medium: "cpc", campaign: "bf-2024", content: "video-15s", sessions: "3.420", conversions: "312", convRate: "9.1%", revenue: "R$ 52.800", roas: 6.2, cpa: "R$ 0,85" },
+                  { source: "instagram", medium: "cpc", campaign: "remarketing", content: "carousel-5", sessions: "2.180", conversions: "245", convRate: "11.2%", revenue: "R$ 41.200", roas: 7.5, cpa: "R$ 1,05" },
+                  { source: "google", medium: "cpc", campaign: "search-branded", content: "text-ad-v2", sessions: "1.890", conversions: "198", convRate: "10.5%", revenue: "R$ 33.600", roas: 8.2, cpa: "R$ 0,72" },
+                  { source: "instagram", medium: "cpc", campaign: "prospeccao-topo", content: "static-banner", sessions: "4.210", conversions: "87", convRate: "2.1%", revenue: "R$ 14.700", roas: 1.2, cpa: "R$ 2,15" },
+                  { source: "tiktok", medium: "cpc", campaign: "verao-2026", content: "reels-30s", sessions: "5.640", conversions: "312", convRate: "5.5%", revenue: "R$ 52.800", roas: 5.8, cpa: "R$ 0,72" },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 pr-4"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">{row.source}</span></td>
+                    <td className="py-3 pr-4"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-400/10 text-violet-400 border border-violet-400/20">{row.medium}</span></td>
+                    <td className="py-3 pr-4"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20">{row.campaign}</span></td>
+                    <td className="py-3 pr-4"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-400 border border-emerald-400/20">{row.content}</span></td>
+                    <td className="py-3 pr-4 text-xs text-slate-300 font-mono font-bold">{row.sessions}</td>
+                    <td className="py-3 pr-4 text-xs text-slate-300 font-mono font-bold">{row.conversions}</td>
+                    <td className="py-3 pr-4 text-xs text-white font-bold">{row.convRate}</td>
+                    <td className="py-3 pr-4 text-xs text-slate-300 font-mono font-bold">{row.revenue}</td>
+                    <td className="py-3 pr-4">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${row.roas >= 3 ? "bg-emerald-400/10 text-emerald-400 border-emerald-400/20" : row.roas < 2 ? "bg-rose-400/10 text-rose-400 border-rose-400/20" : "bg-amber-400/10 text-amber-400 border-amber-400/20"}`}>
+                        {row.roas.toFixed(1)}x
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-xs text-slate-400 font-mono">{row.cpa}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
