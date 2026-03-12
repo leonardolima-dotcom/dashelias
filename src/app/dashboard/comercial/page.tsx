@@ -447,75 +447,6 @@ export default function ComercialPage() {
           })}
         </div>
 
-        {/* ════════ FUNIL DE VENDAS — Full width ════════ */}
-        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col relative z-10" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both", isolation: "isolate" }}>
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-              <h3 className="font-bold text-sm text-slate-300">Funil de Vendas</h3>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">MQL → SQL</span>
-                <span className="text-xs font-bold text-emerald-400">75,0%</span>
-              </div>
-              <div className="w-px h-3 bg-white/10" />
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">SQL → Venda</span>
-                <span className="text-xs font-bold text-emerald-400">22,5%</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            {funnelOverview.map((stage, i) => {
-              const convRate = i > 0 ? ((parseFloat(funnelOverview[i].count.replace(".", "")) / parseFloat(funnelOverview[i - 1].count.replace(".", ""))) * 100).toFixed(0) + "%" : null;
-              return (
-                <div key={stage.label} className="w-full">
-                  {i > 0 && (
-                    <div className="flex items-center justify-center gap-2 py-0.5">
-                      <div className="w-px h-2 border-l border-dashed border-white/10" />
-                      <span className="text-[9px] font-bold text-amber-400/60">{convRate}</span>
-                      <div className="w-px h-2 border-l border-dashed border-white/10" />
-                    </div>
-                  )}
-                  <div className="flex items-center justify-center">
-                    <div
-                      className={`flex-shrink-0 flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-2 ${stage.highlight ? "border border-amber-400/30 shadow-[0_0_20px_rgba(251,191,36,0.1)]" : "border border-white/[0.06]"}`}
-                      style={{
-                        width: `${stage.w}%`,
-                        background: stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
-                        if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = stage.highlight
-                          ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
-                          : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }}
-                    >
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${stage.highlight ? "text-amber-400" : "text-slate-500"}`}>{stage.label}</span>
-                      <span className={`text-xl font-bold leading-tight ${stage.highlight ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" : "text-white"}`}>{stage.count}</span>
-                      <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
-                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
-                        </svg>
-                        {stage.delta}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* ════════ Rankings + FUNIL SDR + CLOSER ════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Col 1 — Rankings empilhados */}
@@ -740,6 +671,116 @@ export default function ComercialPage() {
           </div>
         </div>
 
+        {/* ════════ FUNIL DE VENDAS — alinhado às colunas 2+3 ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Meta vs Realizado — vertical */}
+          <div className="glass-panel rounded-2xl p-4 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.4s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+              <h3 className="font-bold text-xs text-slate-300">Meta vs Realizado</h3>
+              <InfoTip title="Meta vs Realizado" />
+            </div>
+            <div className="flex-1 flex flex-col gap-3">
+              {metaCards.map((m) => {
+                const pct = Math.min((m.realizado / m.meta) * 100, 100);
+                const diasPassados = new Date().getDate();
+                const diasNoMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                const projecao = (m.realizado / diasPassados) * diasNoMes;
+                const pctColor = pct >= 80 ? "from-emerald-600 to-emerald-400" : pct >= 60 ? "from-amber-600 to-amber-400" : "from-rose-600 to-rose-400";
+                const projColor = projecao >= m.meta ? "text-emerald-400" : "text-amber-400";
+                return (
+                  <div key={m.label} className="bg-black/30 border border-white/5 rounded-xl p-3 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{m.label}</span>
+                      <span className="text-[10px] font-bold text-white">{pct.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex items-end gap-2 mb-2">
+                      <span className="text-lg font-bold text-white leading-tight">{m.format(m.realizado)}</span>
+                      <span className="text-[10px] text-neutral-500 mb-0.5">/ {m.format(m.meta)}</span>
+                    </div>
+                    <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden ring-1 ring-white/5 mb-1.5 relative">
+                      <div className={`h-full bg-gradient-to-r ${pctColor} rounded-full relative overflow-hidden animate-bar-enter`} style={{ width: `${pct}%`, boxShadow: "0 0 12px rgba(251,191,36,0.2)" }}>
+                        {rndParticles(2, true)}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-neutral-500">Restam {diasNoMes - diasPassados}d</span>
+                      <span className={`text-[10px] font-bold ${projColor}`}>Proj: {m.format(Math.round(projecao))}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-white/[0.04] flex flex-col relative z-10" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.2s both", isolation: "isolate" }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                <h3 className="font-bold text-sm text-slate-300">Funil de Vendas</h3>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">MQL → SQL</span>
+                  <span className="text-xs font-bold text-emerald-400">75,0%</span>
+                </div>
+                <div className="w-px h-3 bg-white/10" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">SQL → Venda</span>
+                  <span className="text-xs font-bold text-emerald-400">22,5%</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              {funnelOverview.map((stage, i) => {
+                const convRate = i > 0 ? ((parseFloat(funnelOverview[i].count.replace(".", "")) / parseFloat(funnelOverview[i - 1].count.replace(".", ""))) * 100).toFixed(0) + "%" : null;
+                return (
+                  <div key={stage.label} className="w-full">
+                    {i > 0 && (
+                      <div className="flex items-center justify-center gap-2 py-0.5">
+                        <div className="w-px h-1.5 border-l border-dashed border-white/10" />
+                        <span className="text-[9px] font-bold text-amber-400/60">{convRate}</span>
+                        <div className="w-px h-1.5 border-l border-dashed border-white/10" />
+                      </div>
+                    )}
+                    <div className="flex items-center justify-center">
+                      <div
+                        className={`flex-shrink-0 flex flex-col items-center justify-center rounded-xl transition-all duration-300 cursor-default py-1.5 ${stage.highlight ? "border border-amber-400/30 shadow-[0_0_20px_rgba(251,191,36,0.1)]" : "border border-white/[0.06]"}`}
+                        style={{
+                          width: `${stage.w}%`,
+                          background: stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.10) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)";
+                          if (stage.highlight) e.currentTarget.style.boxShadow = "0 0 20px rgba(251,191,36,0.15)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = stage.highlight
+                            ? "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)"
+                            : "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }}
+                      >
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${stage.highlight ? "text-amber-400" : "text-slate-500"}`}>{stage.label}</span>
+                        <span className={`text-lg font-bold leading-tight ${stage.highlight ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" : "text-white"}`}>{stage.count}</span>
+                        <span className={`text-[9px] font-bold flex items-center gap-0.5 ${stage.up ? "text-emerald-400" : "text-rose-400"}`}>
+                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            {stage.up ? <><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></> : <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>}
+                          </svg>
+                          {stage.delta}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         {/* ════════ Volume Semanal ════════ */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Vol. Vendas (Dia) */}
@@ -829,46 +870,6 @@ export default function ComercialPage() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* ════════ B09 — Meta vs Realizado ════════ */}
-        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.4s both" }}>
-          <div className="flex items-center gap-2 mb-5">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
-            <h3 className="font-bold text-sm text-slate-300">Meta vs Realizado — Mês Atual</h3>
-            <InfoTip title="Meta vs Realizado" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {metaCards.map((m) => {
-              const pct = Math.min((m.realizado / m.meta) * 100, 100);
-              const diasPassados = new Date().getDate();
-              const diasNoMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-              const projecao = (m.realizado / diasPassados) * diasNoMes;
-              const pctColor = pct >= 80 ? "from-emerald-600 to-emerald-400" : pct >= 60 ? "from-amber-600 to-amber-400" : "from-rose-600 to-rose-400";
-              const projColor = projecao >= m.meta ? "text-emerald-400" : "text-amber-400";
-              return (
-                <div key={m.label} className="bg-black/30 border border-white/5 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{m.label}</span>
-                    <span className="text-xs font-bold text-white">{pct.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex items-end gap-3 mb-3">
-                    <span className="text-2xl font-bold text-white">{m.format(m.realizado)}</span>
-                    <span className="text-xs text-neutral-500 mb-1">/ {m.format(m.meta)}</span>
-                  </div>
-                  <div className="h-3 bg-white/[0.04] rounded-full overflow-hidden ring-1 ring-white/5 mb-2 relative">
-                    <div className={`h-full bg-gradient-to-r ${pctColor} rounded-full relative overflow-hidden animate-bar-enter`} style={{ width: `${pct}%`, boxShadow: "0 0 12px rgba(251,191,36,0.2)" }}>
-                      {rndParticles(3, true)}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-neutral-400">Dias restantes: {diasNoMes - diasPassados}</span>
-                    <span className={`text-xs font-bold ${projColor}`}>Projeção: {m.format(Math.round(projecao))}</span>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
 
