@@ -78,6 +78,11 @@
   50%      { opacity: 0.40; transform: scale(1.06); }
 }
 
+@keyframes insightPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.85); }
+}
+
 /* Liquid Glass Card Style */
 .glass-panel {
   background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);

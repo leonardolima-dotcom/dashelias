@@ -9,13 +9,19 @@ import Image from "next/image";
    DATA — KPIs de Topo (B01 expandido)
    ───────────────────────────────────────────── */
 
-const kpis = [
+const kpis: { label: string; value: string; delta: string; up: boolean; icon: string; meta: number; realizado: number; inverse?: boolean }[] = [
+  { label: "Faturamento", value: "R$ 520k", delta: "+12%", up: true, icon: "dollar", meta: 600000, realizado: 520000 },
+  { label: "Novas Vendas", value: "142", delta: "+8.1%", up: true, icon: "cart", meta: 180, realizado: 142 },
   { label: "Ticket Médio", value: "R$ 3.6k", delta: "-2%", up: false, icon: "receipt", meta: 4000, realizado: 3600 },
   { label: "Win Rate", value: "22.5%", delta: "+3.1%", up: true, icon: "trophy", meta: 30, realizado: 22.5 },
   { label: "Pipeline Ativo", value: "R$ 890k", delta: "+18%", up: true, icon: "pipeline", meta: 1000000, realizado: 890000 },
   { label: "CAC", value: "R$ 1.2k", delta: "-8%", up: true, icon: "target", meta: 1500, realizado: 1200 },
   { label: "Ciclo Venda", value: "14d", delta: "-10%", up: true, icon: "clock", meta: 18, realizado: 14 },
   { label: "MQL→SQL", value: "75%", delta: "+2%", up: true, icon: "zap", meta: 80, realizado: 75 },
+  { label: "Score SPIN", value: "7.5", delta: "+4.2%", up: true, icon: "brain", meta: 10, realizado: 7.5 },
+  { label: "MRR Acum.", value: "R$ 93k", delta: "+18%", up: true, icon: "dollar", meta: 120000, realizado: 93000 },
+  { label: "Taxa BANT+", value: "64%", delta: "+2.3%", up: true, icon: "target", meta: 80, realizado: 64 },
+  { label: "Tempo 1º Atend.", value: "3.8h", delta: "-12%", up: true, icon: "clock", meta: 4, realizado: 3.8, inverse: true },
 ];
 
 /* ─────────────────────────────────────────────
@@ -132,10 +138,10 @@ const sdrRanking = [
 ];
 
 const closerRanking = [
-  { name: "Rafael S.", value: "R$ 198k", subMetrics: "Win: 31% · Ticket: R$4.2k · Ciclo: 11d", pct: 90, initials: "RS", color: "from-amber-500 to-amber-400" },
-  { name: "Juliana P.", value: "R$ 142k", subMetrics: "Win: 26% · Ticket: R$3.8k · Ciclo: 14d", pct: 65, initials: "JP", color: "from-orange-500 to-orange-400" },
-  { name: "Marcos T.", value: "R$ 97k", subMetrics: "Win: 19% · Ticket: R$3.2k · Ciclo: 16d", pct: 44, initials: "MT", color: "from-yellow-600 to-yellow-500" },
-  { name: "Beatriz C.", value: "R$ 83k", subMetrics: "Win: 17% · Ticket: R$2.9k · Ciclo: 18d", pct: 38, initials: "BC", color: "from-rose-500 to-rose-400" },
+  { name: "Rafael S.", value: "R$ 198k", subMetrics: "Win: 31% · Ticket: R$4.2k · Ciclo: 11d · SPIN: 8.4", pct: 90, initials: "RS", color: "from-amber-500 to-amber-400" },
+  { name: "Juliana P.", value: "R$ 142k", subMetrics: "Win: 26% · Ticket: R$3.8k · Ciclo: 14d · SPIN: 7.8", pct: 65, initials: "JP", color: "from-orange-500 to-orange-400" },
+  { name: "Marcos T.", value: "R$ 97k", subMetrics: "Win: 19% · Ticket: R$3.2k · Ciclo: 16d · SPIN: 7.1", pct: 44, initials: "MT", color: "from-yellow-600 to-yellow-500" },
+  { name: "Beatriz C.", value: "R$ 83k", subMetrics: "Win: 17% · Ticket: R$2.9k · Ciclo: 18d · SPIN: 6.5", pct: 38, initials: "BC", color: "from-rose-500 to-rose-400" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -166,12 +172,12 @@ const pipelineItems = [
    ───────────────────────────────────────────── */
 
 const lossReasons = [
-  { reason: "Preço alto", pct: 32, color: "#fb7185" },
-  { reason: "Sem orçamento", pct: 22, color: "#fbbf24" },
-  { reason: "Concorrente", pct: 18, color: "#a78bfa" },
-  { reason: "Timing", pct: 14, color: "#22d3ee" },
-  { reason: "Sem interesse", pct: 8, color: "#6ee7b7" },
-  { reason: "Perfil errado", pct: 6, color: "#94a3b8" },
+  { reason: "Preço alto", pct: 32, color: "#fb7185", neutralizacao: 65 },
+  { reason: "Sem orçamento", pct: 22, color: "#fbbf24", neutralizacao: 58 },
+  { reason: "Concorrente", pct: 18, color: "#a78bfa", neutralizacao: 72 },
+  { reason: "Timing", pct: 14, color: "#22d3ee", neutralizacao: 80 },
+  { reason: "Sem interesse", pct: 8, color: "#6ee7b7", neutralizacao: 75 },
+  { reason: "Perfil errado", pct: 6, color: "#94a3b8", neutralizacao: 45 },
 ];
 
 /* ─────────────────────────────────────────────
@@ -179,18 +185,18 @@ const lossReasons = [
    ───────────────────────────────────────────── */
 
 const evolution12m = [
-  { month: "Abr", vendas: 98, conversao: 1.2, ticket: 3200 },
-  { month: "Mai", vendas: 112, conversao: 1.4, ticket: 3350 },
-  { month: "Jun", vendas: 105, conversao: 1.3, ticket: 3100 },
-  { month: "Jul", vendas: 118, conversao: 1.5, ticket: 3400 },
-  { month: "Ago", vendas: 125, conversao: 1.6, ticket: 3500 },
-  { month: "Set", vendas: 130, conversao: 1.7, ticket: 3550 },
-  { month: "Out", vendas: 119, conversao: 1.5, ticket: 3300 },
-  { month: "Nov", vendas: 138, conversao: 1.8, ticket: 3600 },
-  { month: "Dez", vendas: 155, conversao: 2.0, ticket: 3800 },
-  { month: "Jan", vendas: 128, conversao: 1.6, ticket: 3450 },
-  { month: "Fev", vendas: 135, conversao: 1.7, ticket: 3550 },
-  { month: "Mar", vendas: 142, conversao: 1.7, ticket: 3600 },
+  { month: "Abr", vendas: 98, conversao: 1.2, ticket: 3200, mrr: 62000 },
+  { month: "Mai", vendas: 112, conversao: 1.4, ticket: 3350, mrr: 71000 },
+  { month: "Jun", vendas: 105, conversao: 1.3, ticket: 3100, mrr: 68000 },
+  { month: "Jul", vendas: 118, conversao: 1.5, ticket: 3400, mrr: 75000 },
+  { month: "Ago", vendas: 125, conversao: 1.6, ticket: 3500, mrr: 79000 },
+  { month: "Set", vendas: 130, conversao: 1.7, ticket: 3550, mrr: 82000 },
+  { month: "Out", vendas: 119, conversao: 1.5, ticket: 3300, mrr: 76000 },
+  { month: "Nov", vendas: 138, conversao: 1.8, ticket: 3600, mrr: 85000 },
+  { month: "Dez", vendas: 155, conversao: 2.0, ticket: 3800, mrr: 95000 },
+  { month: "Jan", vendas: 128, conversao: 1.6, ticket: 3450, mrr: 80000 },
+  { month: "Fev", vendas: 135, conversao: 1.7, ticket: 3550, mrr: 84000 },
+  { month: "Mar", vendas: 142, conversao: 1.7, ticket: 3600, mrr: 93000 },
 ];
 
 /* ─────────────────────────────────────────────
@@ -222,6 +228,8 @@ const efficiencySDR = [
   { label: "Tempo MQL→SQL", value: "5.1d", pct: 64 },
   { label: "Tentativas até Contato", value: "3.4x", pct: 43 },
   { label: "Show Rate", value: "85%", pct: 85 },
+  { label: "Ligações/Semana", value: "248", pct: 82 },
+  { label: "Emails Enviados/Sem", value: "325", pct: 78 },
 ];
 
 const efficiencyCloser = [
@@ -229,6 +237,133 @@ const efficiencyCloser = [
   { label: "Tempo SQL→Fechamento", value: "13.2d", pct: 73 },
   { label: "Taxa de No-show", value: "15%", pct: 15 },
   { label: "Propostas em Aberto", value: "47", pct: 59 },
+  { label: "Score SPIN Médio", value: "7.5", pct: 75 },
+  { label: "Taxa Indicação", value: "28%", pct: 70 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — SPIN Selling Semanal
+   ───────────────────────────────────────────── */
+
+const spinWeekly = [
+  { sem: "S1", score: 5.8, a: 10, b: 30, c: 60 },
+  { sem: "S2", score: 6.2, a: 15, b: 40, c: 45 },
+  { sem: "S3", score: 6.5, a: 20, b: 45, c: 35 },
+  { sem: "S4", score: 6.9, a: 25, b: 45, c: 30 },
+  { sem: "S5", score: 7.2, a: 30, b: 45, c: 25 },
+  { sem: "S6", score: 7.6, a: 40, b: 40, c: 20 },
+  { sem: "S7", score: 7.3, a: 30, b: 40, c: 30 },
+  { sem: "S8", score: 7.8, a: 45, b: 40, c: 15 },
+  { sem: "S9", score: 8.1, a: 50, b: 35, c: 15 },
+  { sem: "S10", score: 7.0, a: 25, b: 40, c: 35 },
+  { sem: "S11", score: 7.5, a: 40, b: 42, c: 18 },
+  { sem: "S12", score: 8.2, a: 55, b: 30, c: 15 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — Atividade SDR Semanal
+   ───────────────────────────────────────────── */
+
+const atividadeSDR = [
+  { sem: "S1", ligacoes: 145, emails: 210, tentativas: 3.8, tempoResp: 6.2, tempoMsg: 2.8, tempoLig: 5.1 },
+  { sem: "S2", ligacoes: 162, emails: 228, tentativas: 4.1, tempoResp: 5.8, tempoMsg: 2.5, tempoLig: 4.8 },
+  { sem: "S3", ligacoes: 178, emails: 245, tentativas: 4.3, tempoResp: 5.1, tempoMsg: 2.1, tempoLig: 4.2 },
+  { sem: "S4", ligacoes: 170, emails: 240, tentativas: 4.5, tempoResp: 4.8, tempoMsg: 1.9, tempoLig: 3.9 },
+  { sem: "S5", ligacoes: 195, emails: 268, tentativas: 4.8, tempoResp: 4.3, tempoMsg: 1.6, tempoLig: 3.5 },
+  { sem: "S6", ligacoes: 210, emails: 285, tentativas: 5.0, tempoResp: 4.0, tempoMsg: 1.4, tempoLig: 3.2 },
+  { sem: "S7", ligacoes: 188, emails: 260, tentativas: 4.6, tempoResp: 4.5, tempoMsg: 1.8, tempoLig: 3.8 },
+  { sem: "S8", ligacoes: 220, emails: 295, tentativas: 5.2, tempoResp: 3.8, tempoMsg: 1.2, tempoLig: 2.9 },
+  { sem: "S9", ligacoes: 232, emails: 310, tentativas: 5.4, tempoResp: 3.5, tempoMsg: 1.0, tempoLig: 2.5 },
+  { sem: "S10", ligacoes: 215, emails: 290, tentativas: 5.0, tempoResp: 4.1, tempoMsg: 1.3, tempoLig: 3.1 },
+  { sem: "S11", ligacoes: 248, emails: 325, tentativas: 5.6, tempoResp: 3.3, tempoMsg: 0.9, tempoLig: 2.2 },
+  { sem: "S12", ligacoes: 260, emails: 340, tentativas: 5.8, tempoResp: 3.0, tempoMsg: 0.7, tempoLig: 1.8 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — SDR Semanal Completo (12 semanas)
+   ───────────────────────────────────────────── */
+
+const sdrWeekly = [
+  { sem: "S1", leads: 78, contato: 28, qualif: 9, demos: 7, showUps: 5, txResp: 35.9, txBANT: 50.0, txShowUp: 71.4 },
+  { sem: "S2", leads: 85, contato: 33, qualif: 12, demos: 9, showUps: 7, txResp: 38.8, txBANT: 54.5, txShowUp: 77.8 },
+  { sem: "S3", leads: 92, contato: 38, qualif: 15, demos: 11, showUps: 8, txResp: 41.3, txBANT: 60.0, txShowUp: 72.7 },
+  { sem: "S4", leads: 88, contato: 36, qualif: 14, demos: 11, showUps: 9, txResp: 40.9, txBANT: 58.3, txShowUp: 81.8 },
+  { sem: "S5", leads: 95, contato: 42, qualif: 18, demos: 14, showUps: 11, txResp: 44.2, txBANT: 62.1, txShowUp: 78.6 },
+  { sem: "S6", leads: 102, contato: 45, qualif: 20, demos: 15, showUps: 12, txResp: 44.1, txBANT: 64.5, txShowUp: 80.0 },
+  { sem: "S7", leads: 98, contato: 41, qualif: 17, demos: 13, showUps: 9, txResp: 41.8, txBANT: 63.0, txShowUp: 69.2 },
+  { sem: "S8", leads: 105, contato: 46, qualif: 21, demos: 16, showUps: 13, txResp: 43.8, txBANT: 65.6, txShowUp: 81.3 },
+  { sem: "S9", leads: 110, contato: 49, qualif: 22, demos: 17, showUps: 14, txResp: 44.5, txBANT: 64.7, txShowUp: 82.4 },
+  { sem: "S10", leads: 108, contato: 47, qualif: 20, demos: 16, showUps: 11, txResp: 43.5, txBANT: 60.6, txShowUp: 68.8 },
+  { sem: "S11", leads: 115, contato: 52, qualif: 23, demos: 18, showUps: 14, txResp: 45.2, txBANT: 63.9, txShowUp: 77.8 },
+  { sem: "S12", leads: 120, contato: 55, qualif: 25, demos: 19, showUps: 15, txResp: 45.8, txBANT: 65.8, txShowUp: 78.9 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — Closer Semanal Completo (12 semanas)
+   ───────────────────────────────────────────── */
+
+const closerWeekly = [
+  { sem: "S1", demos: 5, propostas: 3, fech: 1, mrr: 1290, txFech: 20.0, ciclo: 25, ticket: 1290, indicacao: 0, followUp: 4.5 },
+  { sem: "S2", demos: 7, propostas: 4, fech: 2, mrr: 3780, txFech: 28.6, ciclo: 22, ticket: 1890, indicacao: 0, followUp: 3.8 },
+  { sem: "S3", demos: 8, propostas: 5, fech: 2, mrr: 3780, txFech: 25.0, ciclo: 19, ticket: 1890, indicacao: 10, followUp: 3.2 },
+  { sem: "S4", demos: 9, propostas: 6, fech: 3, mrr: 6270, txFech: 33.3, ciclo: 17, ticket: 2090, indicacao: 15, followUp: 2.8 },
+  { sem: "S5", demos: 11, propostas: 7, fech: 4, mrr: 8760, txFech: 36.4, ciclo: 15, ticket: 2190, indicacao: 20, followUp: 2.5 },
+  { sem: "S6", demos: 12, propostas: 8, fech: 4, mrr: 8760, txFech: 33.3, ciclo: 14, ticket: 2190, indicacao: 22, followUp: 2.2 },
+  { sem: "S7", demos: 9, propostas: 5, fech: 3, mrr: 6270, txFech: 33.3, ciclo: 16, ticket: 2090, indicacao: 18, followUp: 2.8 },
+  { sem: "S8", demos: 13, propostas: 9, fech: 5, mrr: 11250, txFech: 38.5, ciclo: 12, ticket: 2250, indicacao: 25, followUp: 1.9 },
+  { sem: "S9", demos: 14, propostas: 10, fech: 5, mrr: 11250, txFech: 35.7, ciclo: 11, ticket: 2250, indicacao: 28, followUp: 1.7 },
+  { sem: "S10", demos: 11, propostas: 7, fech: 3, mrr: 6270, txFech: 27.3, ciclo: 18, ticket: 2090, indicacao: 20, followUp: 2.3 },
+  { sem: "S11", demos: 14, propostas: 10, fech: 5, mrr: 11250, txFech: 35.7, ciclo: 10, ticket: 2250, indicacao: 30, followUp: 1.5 },
+  { sem: "S12", demos: 15, propostas: 11, fech: 6, mrr: 13950, txFech: 40.0, ciclo: 9, ticket: 2325, indicacao: 32, followUp: 1.3 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — Heatmap de Objeções (semana x tipo)
+   ───────────────────────────────────────────── */
+
+const heatmapData: { sem: string; chatgpt: number; preco: number; cfm: number; prontuario: number; dependencia: number }[] = [
+  { sem: "S1", chatgpt: 1, preco: 1, cfm: 0, prontuario: 1, dependencia: 3 },
+  { sem: "S2", chatgpt: 4, preco: 2, cfm: 1, prontuario: 0, dependencia: 1 },
+  { sem: "S3", chatgpt: 1, preco: 5, cfm: 1, prontuario: 1, dependencia: 0 },
+  { sem: "S4", chatgpt: 2, preco: 5, cfm: 1, prontuario: 1, dependencia: 0 },
+  { sem: "S5", chatgpt: 1, preco: 2, cfm: 5, prontuario: 2, dependencia: 1 },
+  { sem: "S6", chatgpt: 2, preco: 4, cfm: 2, prontuario: 2, dependencia: 1 },
+  { sem: "S7", chatgpt: 4, preco: 2, cfm: 1, prontuario: 1, dependencia: 2 },
+  { sem: "S8", chatgpt: 2, preco: 3, cfm: 2, prontuario: 4, dependencia: 1 },
+  { sem: "S9", chatgpt: 2, preco: 5, cfm: 2, prontuario: 2, dependencia: 1 },
+  { sem: "S10", chatgpt: 2, preco: 4, cfm: 2, prontuario: 1, dependencia: 2 },
+  { sem: "S11", chatgpt: 2, preco: 2, cfm: 4, prontuario: 2, dependencia: 1 },
+  { sem: "S12", chatgpt: 4, preco: 3, cfm: 2, prontuario: 2, dependencia: 1 },
+];
+
+const heatmapLabels: ("chatgpt" | "preco" | "cfm" | "prontuario" | "dependencia")[] = ["chatgpt", "preco", "cfm", "prontuario", "dependencia"];
+const heatmapNames: Record<string, string> = { chatgpt: "ChatGPT", preco: "Preço", cfm: "CFM", prontuario: "Prontuário", dependencia: "Dependência IA" };
+
+/* ─────────────────────────────────────────────
+   DATA — Objeções com Neutralização
+   ───────────────────────────────────────────── */
+
+const objecoesData = [
+  { nome: "Preço alto", qtd: 38, neutralizacao: 65 },
+  { nome: "Concorrente", qtd: 27, neutralizacao: 72 },
+  { nome: "Sem orçamento", qtd: 23, neutralizacao: 58 },
+  { nome: "Timing ruim", qtd: 19, neutralizacao: 80 },
+  { nome: "Sem interesse", qtd: 14, neutralizacao: 75 },
+];
+
+/* ─────────────────────────────────────────────
+   DATA — Insights IA
+   ───────────────────────────────────────────── */
+
+const insights = [
+  { tipo: "positivo" as const, titulo: "Score SPIN acima da meta", descricao: "Média 7.5 no período (meta: 7.0). Equipe alinhada com metodologia.", acao: "Manter ritmo de coaching e documentar playbook" },
+  { tipo: "positivo" as const, titulo: "Taxa de fechamento consistente", descricao: "Média 22.5% nas últimas 4 semanas (meta: 20%)", acao: "Pipeline saudável — escalar volume de demos" },
+  { tipo: "alerta" as const, titulo: "Tempo 1º atendimento caiu 12%", descricao: "De 4.1h para 3.0h — melhora significativa no SLA", acao: "Manter automações de alerta de novo lead" },
+  { tipo: "oportunidade" as const, titulo: "Objeção 'Preço alto' dominante", descricao: "32% das perdas. Taxa de neutralização: apenas 65%", acao: "Atualizar kit de ROI e comparação de mercado" },
+  { tipo: "positivo" as const, titulo: "Ciclo de venda encurtou 38%", descricao: "De 22 dias para 14 dias no período", acao: "Qualificação mais eficiente acelerando fechamento" },
+  { tipo: "oportunidade" as const, titulo: "MRR acelerando na 2ª metade", descricao: "R$ 56k vs R$ 37k na 1ª metade (+51%)", acao: "Momento ideal para expansão de equipe" },
+  { tipo: "positivo" as const, titulo: "Taxa de indicação crescente", descricao: "28% nas últimas 4 semanas (meta: 25%)", acao: "Programa de referral funcionando — considerar incentivos" },
+  { tipo: "alerta" as const, titulo: "Volume de ligações abaixo da meta", descricao: "Média 202 ligações/sem (meta: 250)", acao: "Revisar blocos de prospecção no calendário" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -246,7 +381,21 @@ const cardTooltips: Record<string, string> = {
   "Motivos de Perda": "Análise dos motivos pelos quais leads saem do funil. Identifica objeções recorrentes para melhorar pitch e processo.",
   "Evolução 12 Meses": "Tendência mensal de vendas, taxa de conversão e ticket médio nos últimos 12 meses. Identifica sazonalidade e impacto de mudanças.",
   "Volume Diário": "Vendas e faturamento por dia nos últimos 30 dias. Linha pontilhada mostra a meta diária. Barras verdes = acima da meta, âmbar = abaixo.",
-  "Indicadores de Eficiência": "Métricas de eficiência separadas por função: SDR (conexão, qualificação, show rate) e Closer (win rate, ciclo, no-show, propostas).",
+  "Indicadores de Eficiência": "Métricas de eficiência SDR (conexão, qualificação, ligações, emails) e Closer (win rate, SPIN, indicação).",
+  "Score SPIN Selling": "Nota média 0-10 de aderência à metodologia SPIN nas calls, avaliada por IA. Score A (≥8), B (6-7.9), C (<6).",
+  "Atividade SDR": "Volume de atividades semanais: ligações, emails enviados, tentativas/lead e tempo 1º atendimento.",
+  "Análise de Objeções": "Ranking de objeções por frequência com taxa de neutralização sobreposta.",
+  "Insights IA": "Alertas inteligentes gerados por regras programáticas baseadas nos dados do período.",
+  "Volume SDR": "Evolução semanal do volume absoluto de leads recebidos, qualificados e demos agendadas ao longo de 12 semanas.",
+  "Taxas SDR": "Evolução das 3 taxas de conversão do SDR (Resposta, BANT+, Show-Up) com linhas de meta.",
+  "MRR e Fechamento": "MRR gerado por semana (barras) e taxa de fechamento (linha sobreposta) ao longo de 12 semanas.",
+  "Ciclo Médio": "Dias médios entre a realização da demo e o fechamento do contrato por semana.",
+  "Follow-up pós-Demo": "Tempo médio em horas para follow-up após a demo realizada. Meta: < 2h.",
+  "Ticket e Indicação": "Evolução do ticket médio por contrato e taxa de indicação por semana.",
+  "Heatmap Objeções": "Mapa de calor mostrando intensidade de cada objeção por semana. Quanto mais escuro, mais frequente.",
+  "Tabela Semanal": "Tabela detalhada com 13 métricas por semana, ordenável por coluna.",
+  "Tempo 1ª Mensagem": "Tempo médio para envio da primeira mensagem (WhatsApp/email) após receber o lead. Meta: < 1h.",
+  "Tempo 1ª Ligação": "Tempo médio para realizar a primeira ligação ao lead. Meta: < 4h.",
 };
 
 /* ─────────────────────────────────────────────
@@ -262,6 +411,7 @@ const kpiIcons: Record<string, React.ReactNode> = {
   target: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
   clock: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
   zap: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>,
+  brain: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 .5.1 1 .3 1.4A3.5 3.5 0 0 0 5 11c0 1.5.9 2.7 2.2 3.2A3 3 0 0 0 7 16a3 3 0 0 0 3 3h.2A3 3 0 0 0 12 22a3 3 0 0 0 1.8-3H14a3 3 0 0 0 3-3c0-.6-.2-1.2-.5-1.8A3.5 3.5 0 0 0 19 11a3.5 3.5 0 0 0-3.3-3.5c.2-.5.3-1 .3-1.5a4 4 0 0 0-4-4z"/></svg>,
 };
 
 /* ─────────────────────────────────────────────
@@ -365,6 +515,11 @@ export default function ComercialPage() {
   // Expanded seller
   const [expandedSeller, setExpandedSeller] = useState<number | null>(null);
   const [hoveredLoss, setHoveredLoss] = useState<string | null>(null);
+  // New state variables
+  const [spinTab, setSpinTab] = useState<"score" | "dist">("score");
+  const [hoveredSpin, setHoveredSpin] = useState<number | null>(null);
+  const [hoveredAtv, setHoveredAtv] = useState<number | null>(null);
+  const [insightsOpen, setInsightsOpen] = useState(true);
 
   // Random particles helper — each particle starts at a different random time
   const rndParticles = (count: number, horizontal = false) => (
@@ -378,6 +533,8 @@ export default function ComercialPage() {
   // Evolution chart computed values
   const maxVendas = Math.max(...evolution12m.map(e => e.vendas));
   const maxVolume = volumeMode === "vendas" ? Math.max(...volumeDiario.map(d => d.vendas)) : Math.max(...volumeDiario.map(d => d.fat));
+  const maxSpin = 10;
+  const maxLig = Math.max(...atividadeSDR.map(d => d.ligacoes));
 
   return (
     <div className="relative min-h-screen overflow-x-hidden overflow-y-auto">
@@ -417,10 +574,62 @@ export default function ComercialPage() {
       {/* Content */}
       <main className="relative px-6 pt-28 pb-28 space-y-6 text-slate-100">
 
+        {/* ════════ INSIGHTS IA — Alertas Inteligentes ════════ */}
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.06]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.08s both" }}>
+          <div className="flex items-center gap-3 px-5 py-3 cursor-pointer select-none hover:bg-white/[0.02] transition-colors" onClick={() => setInsightsOpen(v => !v)} style={{ borderBottom: insightsOpen ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+            <div className="flex items-center gap-2">
+              <div className="size-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8),0_0_20px_rgba(251,191,36,0.4)]" style={{ animation: "insightPulse 2s ease-in-out infinite" }} />
+              <div className="size-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8),0_0_20px_rgba(52,211,153,0.4)]" style={{ animation: "insightPulse 2s ease-in-out 0.4s infinite" }} />
+              <div className="size-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8),0_0_20px_rgba(251,113,133,0.4)]" style={{ animation: "insightPulse 2s ease-in-out 0.8s infinite" }} />
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg>
+            <h3 className="text-sm font-bold text-white tracking-wide">Insights IA — Alertas Inteligentes</h3>
+            <span className="text-[10px] text-neutral-500 font-bold">{insights.length} alertas</span>
+            <InfoTip title="Insights IA" />
+            <div className="ml-auto flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="size-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.6)]" style={{ animation: "insightPulse 1.5s ease-in-out 0.2s infinite" }} />
+                <div className="size-1.5 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(167,139,250,0.6)]" style={{ animation: "insightPulse 1.5s ease-in-out 0.6s infinite" }} />
+                <div className="size-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]" style={{ animation: "insightPulse 1.5s ease-in-out 1.0s infinite" }} />
+              </div>
+              <div className="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-2.5 py-1 hover:bg-white/[0.1] transition-colors">
+                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{insightsOpen ? "Recolher" : "Expandir"}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-amber-400 transition-transform duration-300 ${insightsOpen ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div className={`grid grid-cols-2 lg:grid-cols-4 gap-3 transition-all duration-400 ease-in-out ${insightsOpen ? "p-4 max-h-[600px] opacity-100" : "max-h-0 opacity-0 overflow-hidden p-0"}`}>
+            {insights.map((ins, i) => {
+              const colors = ins.tipo === "positivo"
+                ? { dot: "bg-emerald-500", glow: "shadow-[0_0_10px_rgba(16,185,129,0.6)]", border: "border-emerald-500/25", bg: "bg-emerald-500/[0.06]", label: "text-emerald-400" }
+                : ins.tipo === "alerta"
+                ? { dot: "bg-rose-500", glow: "shadow-[0_0_10px_rgba(244,63,94,0.6)]", border: "border-rose-500/25", bg: "bg-rose-500/[0.06]", label: "text-rose-400" }
+                : { dot: "bg-amber-500", glow: "shadow-[0_0_10px_rgba(245,158,11,0.6)]", border: "border-amber-500/25", bg: "bg-amber-500/[0.06]", label: "text-amber-400" };
+              return (
+                <div key={i} className="group relative" style={{ animation: `animationIn 0.5s ease-out ${0.1 + i * 0.08}s both` }}>
+                  <div className="flex items-center gap-2 mb-1.5 px-1">
+                    <div className={`size-2 rounded-full ${colors.dot} ${colors.glow}`} style={{ animation: `insightPulse ${1.8 + i * 0.2}s ease-in-out infinite` }} />
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${colors.label}`}>{ins.tipo}</span>
+                  </div>
+                  <div className={`relative rounded-xl p-3 border ${colors.border} ${colors.bg} transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-lg`}>
+                    <p className="text-[11px] font-bold text-white mb-1 leading-snug">{ins.titulo}</p>
+                    <p className="text-[10px] text-neutral-400 leading-relaxed mb-1.5">{ins.descricao}</p>
+                    <div className="flex items-start gap-1">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={colors.label}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                      <p className="text-[9px] text-slate-500 italic leading-snug">{ins.acao}</p>
+                    </div>
+                    <div className={`absolute -top-1.5 left-4 w-3 h-3 rotate-45 border-l border-t ${colors.border} ${colors.bg}`} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* ════════ B01 — KPIs de Topo ════════ */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {kpis.map((kpi, idx) => {
-            const pctMeta = Math.min((kpi.realizado / kpi.meta) * 100, 100);
+            const pctMeta = kpi.inverse ? Math.min((kpi.meta / kpi.realizado) * 100, 100) : Math.min((kpi.realizado / kpi.meta) * 100, 100);
             const metaColor = pctMeta >= 80 ? "bg-emerald-500" : pctMeta >= 60 ? "bg-amber-500" : "bg-rose-500";
             return (
               <div key={kpi.label} className="glass-panel p-4 rounded-2xl cursor-default border border-white/[0.04] hover:border-white/[0.08] transition-colors" style={{ ...glassStyle, animation: `animationIn 0.8s ease-out ${0.15 + idx * 0.04}s both` }}>
@@ -977,7 +1186,7 @@ export default function ComercialPage() {
                   <div key={m.month} className="flex-1 flex flex-col items-center cursor-pointer group/bar" onMouseEnter={() => setHoveredEvo(i)} onMouseLeave={() => setHoveredEvo(null)} onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}>
                     {isHov && createPortal(
                       <div className="fixed bg-black/90 border border-white/10 rounded px-2 py-1 text-[11px] font-bold text-white whitespace-nowrap z-[9999] pointer-events-none" style={{ left: mousePos.x + 12, top: mousePos.y - 28 }}>
-                        {m.month}: {m.vendas} vendas · Conv: {m.conversao}% · Ticket: R$ {(m.ticket / 1000).toFixed(1)}k
+                        {m.month}: {m.vendas} vendas · Conv: {m.conversao}% · Ticket: R$ {(m.ticket / 1000).toFixed(1)}k · MRR: R$ {(m.mrr / 1000).toFixed(0)}k
                       </div>,
                       document.body
                     )}
@@ -1092,6 +1301,7 @@ export default function ComercialPage() {
                     return (<>
                       <p className="text-2xl font-bold text-white">{lr.pct}%</p>
                       <p className="text-[11px] text-slate-400">{lr.reason}</p>
+                      <p className="text-[10px] text-emerald-400">Neutr: {lr.neutralizacao}%</p>
                     </>);
                   })() : (<>
                     <p className="text-2xl font-bold text-white">118</p>
@@ -1111,6 +1321,7 @@ export default function ComercialPage() {
                         <div className="h-full rounded-full" style={{ width: `${lr.pct}%`, background: lr.color, opacity: 0.7 }} />
                       </div>
                       <span className="text-xs font-bold text-white min-w-[32px] text-right">{lr.pct}%</span>
+                      <span className="text-[10px] text-emerald-400 min-w-[40px] text-right">N: {lr.neutralizacao}%</span>
                     </div>
                   );
                 })}
@@ -1150,6 +1361,595 @@ export default function ComercialPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* ════════ SCORE SPIN SELLING + Atividade SDR ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Score SPIN Selling */}
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.65s both" }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="text-amber-400/60">{kpiIcons.brain}</div>
+                <h3 className="font-bold text-sm text-slate-300">Score SPIN Selling</h3>
+                <InfoTip title="Score SPIN Selling" />
+              </div>
+              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/[0.03] border border-white/5">
+                <button onClick={() => setSpinTab("score")} className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all ${spinTab === "score" ? "bg-purple-500/15 text-purple-400 border border-purple-500/20" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>Score</button>
+                <button onClick={() => setSpinTab("dist")} className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all ${spinTab === "dist" ? "bg-purple-500/15 text-purple-400 border border-purple-500/20" : "text-slate-500 hover:text-slate-400 border border-transparent"}`}>Distribuição</button>
+              </div>
+            </div>
+            <div className="flex-1 flex gap-1.5 relative min-h-[14rem]">
+              {spinTab === "score" ? (
+                <>
+                  <div className="absolute left-0 right-0 border-t-2 border-dashed border-purple-400/40 pointer-events-none z-[1]" style={{ bottom: `${(7.5 / maxSpin) * 100}%` }}>
+                    <span className="absolute -top-4 right-0 text-[11px] font-bold text-purple-400/70 bg-black/60 px-1 rounded">Meta: 7.5</span>
+                  </div>
+                  {spinWeekly.map((d, i) => {
+                    const h = (d.score / maxSpin) * 100;
+                    const isHov = hoveredSpin === i;
+                    const color = d.score >= 8 ? "from-emerald-600 to-emerald-400" : d.score >= 6 ? "from-amber-600 to-amber-400" : "from-rose-600 to-rose-400";
+                    return (
+                      <div key={d.sem} className="flex-1 flex flex-col items-center cursor-pointer group/bar" onMouseEnter={() => setHoveredSpin(i)} onMouseLeave={() => setHoveredSpin(null)} onMouseMove={e => setMousePos({ x: e.clientX, y: e.clientY })}>
+                        {isHov && typeof document !== "undefined" && createPortal(
+                          <div className="fixed bg-black/95 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] font-bold text-white whitespace-nowrap z-[9999] shadow-lg pointer-events-none" style={{ left: mousePos.x + 12, top: mousePos.y - 28 }}>
+                            {d.sem}: Score <span className={d.score >= 8 ? "text-emerald-400" : d.score >= 6 ? "text-amber-400" : "text-rose-400"}>{d.score}</span> · A: {d.a}% B: {d.b}% C: {d.c}%
+                          </div>, document.body
+                        )}
+                        <div className="flex-1 relative w-full">
+                          <div className={`absolute bottom-0 left-0 right-0 rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125 bg-gradient-to-t ${color}`}
+                            style={{ height: `${h}%`, minHeight: 2, boxShadow: "0 0 12px rgba(168,85,247,0.15)", animationDelay: `${i * 0.06}s` }}>
+                            {rndParticles(3)}
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-neutral-500 mt-1">{d.sem}</span>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                spinWeekly.map((d, i) => (
+                  <div key={d.sem} className="flex-1 flex flex-col items-center cursor-pointer group/bar" onMouseEnter={() => setHoveredSpin(i)} onMouseLeave={() => setHoveredSpin(null)} onMouseMove={e => setMousePos({ x: e.clientX, y: e.clientY })}>
+                    {hoveredSpin === i && typeof document !== "undefined" && createPortal(
+                      <div className="fixed bg-black/95 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] font-bold text-white whitespace-nowrap z-[9999] shadow-lg pointer-events-none" style={{ left: mousePos.x + 12, top: mousePos.y - 28 }}>
+                        {d.sem}: <span className="text-emerald-400">A {d.a}%</span> · <span className="text-amber-400">B {d.b}%</span> · <span className="text-rose-400">C {d.c}%</span>
+                      </div>, document.body
+                    )}
+                    <div className="flex-1 relative w-full flex flex-col justify-end">
+                      <div className="rounded-t-sm bg-rose-500/80" style={{ height: `${d.c}%`, minHeight: 1 }} />
+                      <div className="bg-amber-500/80" style={{ height: `${d.b}%`, minHeight: 1 }} />
+                      <div className="rounded-t bg-emerald-500/80" style={{ height: `${d.a}%`, minHeight: 1 }} />
+                    </div>
+                    <span className="text-[10px] text-neutral-500 mt-1">{d.sem}</span>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-emerald-500" /> Score A (≥8)</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-amber-500" /> Score B (6-7.9)</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-rose-500" /> {"Score C (<6)"}</span>
+              <span className="ml-auto">Média: <span className="text-purple-400 font-bold">{(spinWeekly.reduce((a, b) => a + b.score, 0) / spinWeekly.length).toFixed(1)}</span></span>
+            </div>
+          </div>
+
+          {/* Atividade SDR */}
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.7s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <h3 className="font-bold text-sm text-slate-300">Atividade SDR (Semanal)</h3>
+              <InfoTip title="Atividade SDR" />
+            </div>
+            <div className="flex-1 flex gap-1 relative min-h-[14rem]">
+              <div className="absolute left-0 right-0 border-t-2 border-dashed border-cyan-400/40 pointer-events-none z-[1]" style={{ bottom: `${(200 / maxLig) * 100}%` }}>
+                <span className="absolute -top-4 right-0 text-[11px] font-bold text-cyan-400/70 bg-black/60 px-1 rounded">Meta: 200</span>
+              </div>
+              {atividadeSDR.map((d, i) => {
+                const hLig = (d.ligacoes / maxLig) * 100;
+                const isHov = hoveredAtv === i;
+                return (
+                  <div key={d.sem} className="flex-1 flex flex-col items-center cursor-pointer group/bar" onMouseEnter={() => setHoveredAtv(i)} onMouseLeave={() => setHoveredAtv(null)} onMouseMove={e => setMousePos({ x: e.clientX, y: e.clientY })}>
+                    {isHov && typeof document !== "undefined" && createPortal(
+                      <div className="fixed bg-black/95 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] font-bold text-white whitespace-nowrap z-[9999] shadow-lg pointer-events-none" style={{ left: mousePos.x + 12, top: mousePos.y - 28 }}>
+                        {d.sem}: <span className="text-cyan-400">{d.ligacoes} lig.</span> · {d.emails} emails · {d.tentativas}x/lead · <span className={d.tempoResp <= 4 ? "text-emerald-400" : "text-amber-400"}>{d.tempoResp}h resp</span>
+                      </div>, document.body
+                    )}
+                    <div className="flex-1 relative w-full">
+                      <div className="absolute bottom-0 left-0 right-0 rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125"
+                        style={{ height: `${hLig}%`, minHeight: 2, background: d.ligacoes >= 200 ? "linear-gradient(to top, rgb(8,145,178), rgb(34,211,238))" : "linear-gradient(to top, rgb(217,119,6), rgb(251,191,36))", boxShadow: "0 0 10px rgba(34,211,238,0.15)", animationDelay: `${i * 0.06}s` }}>
+                        {rndParticles(3)}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-neutral-500 mt-1">{d.sem}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span>Média Lig: <span className="text-cyan-400 font-bold">{Math.round(atividadeSDR.reduce((a, b) => a + b.ligacoes, 0) / atividadeSDR.length)}</span>/sem</span>
+              <span>Média Emails: <span className="text-cyan-400 font-bold">{Math.round(atividadeSDR.reduce((a, b) => a + b.emails, 0) / atividadeSDR.length)}</span>/sem</span>
+              <span>Tempo 1º Resp: <span className="text-emerald-400 font-bold">{(atividadeSDR.reduce((a, b) => a + b.tempoResp, 0) / atividadeSDR.length).toFixed(1)}h</span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════ Tempo 1ª Mensagem + Tempo 1ª Ligação ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Tempo 1ª Mensagem */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.72s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <h3 className="font-bold text-sm text-slate-300">Tempo 1ª Mensagem (horas)</h3>
+              <InfoTip title="Tempo 1ª Mensagem" />
+            </div>
+            {(() => {
+              const maxVal = Math.max(...atividadeSDR.map(x => x.tempoMsg));
+              const BAR_AREA = 130;
+              return (
+                <div className="flex gap-[6px]">
+                  {atividadeSDR.map((d, i) => {
+                    const h = (d.tempoMsg / maxVal) * BAR_AREA;
+                    const color = d.tempoMsg <= 1.0 ? "#10b981" : d.tempoMsg <= 2.0 ? "#fbbf24" : "#f43f5e";
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-0">
+                        <span className="text-[9px] font-bold leading-none mb-1" style={{ color }}>{d.tempoMsg.toFixed(1)}</span>
+                        <div className="w-full relative" style={{ height: BAR_AREA }}>
+                          <div className="absolute bottom-0 left-0 right-0 rounded-t" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
+                        </div>
+                        <span className="text-[9px] text-neutral-500 mt-1.5 leading-none">{d.sem}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/[0.04]">
+              <div className="flex items-center gap-4 text-[10px] text-slate-500">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {"≤ 1h"}</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> 1-2h</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> {"> 2h"}</span>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-bold">{"Meta: ≤ 1h"}</span>
+            </div>
+          </div>
+
+          {/* Tempo 1ª Ligação */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.74s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <h3 className="font-bold text-sm text-slate-300">Tempo 1ª Ligação (horas)</h3>
+              <InfoTip title="Tempo 1ª Ligação" />
+            </div>
+            {(() => {
+              const maxVal = Math.max(...atividadeSDR.map(x => x.tempoLig));
+              const BAR_AREA = 130;
+              return (
+                <div className="flex gap-[6px]">
+                  {atividadeSDR.map((d, i) => {
+                    const h = (d.tempoLig / maxVal) * BAR_AREA;
+                    const color = d.tempoLig <= 2.0 ? "#10b981" : d.tempoLig <= 4.0 ? "#fbbf24" : "#f43f5e";
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-0">
+                        <span className="text-[9px] font-bold leading-none mb-1" style={{ color }}>{d.tempoLig.toFixed(1)}</span>
+                        <div className="w-full relative" style={{ height: BAR_AREA }}>
+                          <div className="absolute bottom-0 left-0 right-0 rounded-t" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
+                        </div>
+                        <span className="text-[9px] text-neutral-500 mt-1.5 leading-none">{d.sem}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/[0.04]">
+              <div className="flex items-center gap-4 text-[10px] text-slate-500">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {"≤ 2h"}</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> 2-4h</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> {"> 4h"}</span>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-bold">{"Meta: ≤ 4h"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════ Volume SDR + Taxas SDR ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Volume SDR */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.76s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <h3 className="font-bold text-sm text-slate-300">Volume SDR (12 semanas)</h3>
+              <InfoTip title="Volume SDR" />
+            </div>
+            {(() => {
+              const maxL = Math.max(...sdrWeekly.map(d => d.leads));
+              const SVG_H = 160;
+              const n = sdrWeekly.length;
+              const xp = (i: number) => (i / (n - 1)) * 100;
+              const yp = (v: number) => SVG_H - 10 - (v / maxL) * (SVG_H - 20);
+              const area = (key: "leads" | "qualif" | "demos") => {
+                const pts = sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`);
+                return pts.join(" ") + ` 100%,${SVG_H - 10} 0%,${SVG_H - 10}`;
+              };
+              const line = (key: "leads" | "qualif" | "demos") =>
+                sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`).join(" ");
+              return (
+                <div className="relative">
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1 px-0">
+                    <span>{maxL}</span><span>0</span>
+                  </div>
+                  <svg width="100%" height={SVG_H} className="overflow-visible">
+                    {[0, 0.33, 0.66, 1].map(p => (
+                      <line key={p} x1="0" x2="100%" y1={10 + p * (SVG_H - 20)} y2={10 + p * (SVG_H - 20)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                    ))}
+                    <polygon points={area("leads")} fill="rgba(34,211,238,0.1)" />
+                    <polyline points={line("leads")} fill="none" stroke="#22d3ee" strokeWidth="2" />
+                    <polygon points={area("qualif")} fill="rgba(251,191,36,0.08)" />
+                    <polyline points={line("qualif")} fill="none" stroke="#fbbf24" strokeWidth="2" />
+                    <polygon points={area("demos")} fill="rgba(52,211,153,0.06)" />
+                    <polyline points={line("demos")} fill="none" stroke="#34d399" strokeWidth="2" />
+                    {sdrWeekly.map((d, i) => (
+                      <g key={d.sem}>
+                        <circle cx={`${xp(i)}%`} cy={yp(d.leads)} r="3.5" fill="#22d3ee" />
+                        <circle cx={`${xp(i)}%`} cy={yp(d.qualif)} r="3" fill="#fbbf24" />
+                        <circle cx={`${xp(i)}%`} cy={yp(d.demos)} r="3" fill="#34d399" />
+                      </g>
+                    ))}
+                  </svg>
+                  <div className="flex justify-between mt-1">
+                    {sdrWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-5 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /> Leads</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> Qualificados</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Demos</span>
+            </div>
+          </div>
+
+          {/* Taxas SDR */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.78s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+              <h3 className="font-bold text-sm text-slate-300">Taxas SDR (%)</h3>
+              <InfoTip title="Taxas SDR" />
+            </div>
+            {(() => {
+              const SVG_H = 160;
+              const n = sdrWeekly.length;
+              const xp = (i: number) => (i / (n - 1)) * 100;
+              const yp = (v: number) => SVG_H - 10 - (v / 100) * (SVG_H - 20);
+              const line = (key: "txResp" | "txBANT" | "txShowUp") =>
+                sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`).join(" ");
+              return (
+                <div className="relative">
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
+                    <span>100%</span><span>0%</span>
+                  </div>
+                  <svg width="100%" height={SVG_H} className="overflow-visible">
+                    {[0, 0.33, 0.66, 1].map(p => (
+                      <line key={p} x1="0" x2="100%" y1={10 + p * (SVG_H - 20)} y2={10 + p * (SVG_H - 20)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                    ))}
+                    {/* meta lines */}
+                    <line x1="0" x2="100%" y1={yp(40)} y2={yp(40)} stroke="rgba(251,191,36,0.2)" strokeWidth="1" strokeDasharray="6 4" />
+                    <line x1="0" x2="100%" y1={yp(60)} y2={yp(60)} stroke="rgba(52,211,153,0.2)" strokeWidth="1" strokeDasharray="6 4" />
+                    <line x1="0" x2="100%" y1={yp(75)} y2={yp(75)} stroke="rgba(34,211,238,0.2)" strokeWidth="1" strokeDasharray="6 4" />
+                    <polyline points={line("txResp")} fill="none" stroke="#fbbf24" strokeWidth="2.5" />
+                    <polyline points={line("txBANT")} fill="none" stroke="#34d399" strokeWidth="2.5" />
+                    <polyline points={line("txShowUp")} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
+                    {sdrWeekly.map((d, i) => (
+                      <g key={d.sem}>
+                        <circle cx={`${xp(i)}%`} cy={yp(d.txResp)} r="3" fill="#fbbf24" />
+                        <circle cx={`${xp(i)}%`} cy={yp(d.txBANT)} r="3" fill="#34d399" />
+                        <circle cx={`${xp(i)}%`} cy={yp(d.txShowUp)} r="3.5" fill="#22d3ee" />
+                      </g>
+                    ))}
+                    {/* meta labels */}
+                    <text x="100%" y={yp(40) - 4} textAnchor="end" fontSize="8" fill="rgba(251,191,36,0.5)">Meta Resp 40%</text>
+                    <text x="100%" y={yp(60) - 4} textAnchor="end" fontSize="8" fill="rgba(52,211,153,0.5)">Meta BANT 60%</text>
+                    <text x="100%" y={yp(75) - 4} textAnchor="end" fontSize="8" fill="rgba(34,211,238,0.5)">Meta ShowUp 75%</text>
+                  </svg>
+                  <div className="flex justify-between mt-1">
+                    {sdrWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-5 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> Resposta</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" /> BANT+</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /> Show-Up</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════ MRR + Fechamento | Ciclo Médio ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.8s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-amber-400/60">{kpiIcons.dollar}</div>
+              <h3 className="font-bold text-sm text-slate-300">MRR e Taxa de Fechamento</h3>
+              <InfoTip title="MRR e Fechamento" />
+            </div>
+            {(() => {
+              const maxMRR = Math.max(...closerWeekly.map(d => d.mrr));
+              return (
+                <div className="flex-1 relative min-h-[14rem]">
+                  <div className="absolute left-0 top-0 text-[10px] text-neutral-500">R${(maxMRR/1000).toFixed(0)}k</div>
+                  <div className="absolute right-0 top-0 text-[10px] text-neutral-500">50%</div>
+                  <div className="flex gap-1 items-end h-[13rem]">
+                    {closerWeekly.map((d, i) => {
+                      const h = (d.mrr / maxMRR) * 100;
+                      return (
+                        <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
+                          <div className="flex-1 relative w-full flex items-end justify-center">
+                            <div className="w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125"
+                              style={{ height: `${h}%`, minHeight: 2, background: "linear-gradient(to top, rgb(180,83,9), rgb(251,191,36))", animationDelay: `${i * 0.06}s` }}>
+                              {rndParticles(2)}
+                            </div>
+                          </div>
+                          <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <svg className="absolute inset-0 w-full h-[13rem] pointer-events-none" viewBox="0 0 480 200" preserveAspectRatio="none">
+                    <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11) + 20},${200 - (d.txFech / 50) * 180}`).join(" ")} fill="none" stroke="rgb(52,211,153)" strokeWidth="2.5" />
+                    {closerWeekly.map((d, i) => (
+                      <circle key={d.sem} cx={i * (480 / 11) + 20} cy={200 - (d.txFech / 50) * 180} r="3" fill="rgb(52,211,153)" />
+                    ))}
+                  </svg>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-400" /> MRR (R$)</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-400" /> Taxa Fech. (%)</span>
+              <span className="ml-auto font-bold text-amber-400">Total MRR: R$ {(closerWeekly.reduce((a,b)=>a+b.mrr,0)/1000).toFixed(0)}k</span>
+            </div>
+          </div>
+
+          {/* Ciclo Médio de Venda */}
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.82s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-amber-400/60">{kpiIcons.clock}</div>
+              <h3 className="font-bold text-sm text-slate-300">Ciclo Médio de Venda (dias)</h3>
+              <InfoTip title="Ciclo Médio" />
+            </div>
+            <div className="flex-1 relative min-h-[14rem]">
+              <div className="absolute left-0 top-0 text-[10px] text-neutral-500">30d</div>
+              <div className="absolute left-0 bottom-[20px] text-[10px] text-neutral-500">0d</div>
+              <div className="absolute left-6 right-0 border-t-2 border-dashed border-emerald-400/40 pointer-events-none" style={{ bottom: `${(14 / 30) * 85 + 10}%` }}>
+                <span className="absolute -top-3 right-0 text-[9px] text-emerald-400/60">Meta: 14d</span>
+              </div>
+              <svg className="w-full h-full" viewBox="0 0 480 200" preserveAspectRatio="none">
+                <polygon points={closerWeekly.map((d, i) => `${i * (480 / 11)},${200 - (d.ciclo / 30) * 180}`).join(" ") + ` 480,200 0,200`} fill="rgba(251,191,36,0.08)" />
+                <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11)},${200 - (d.ciclo / 30) * 180}`).join(" ")} fill="none" stroke="rgb(251,191,36)" strokeWidth="2.5" />
+                {closerWeekly.map((d, i) => (
+                  <circle key={d.sem} cx={i * (480 / 11)} cy={200 - (d.ciclo / 30) * 180} r="4" fill={d.ciclo <= 14 ? "rgb(52,211,153)" : d.ciclo <= 18 ? "rgb(251,191,36)" : "rgb(251,113,133)"} stroke="rgba(0,0,0,0.5)" strokeWidth="1" />
+                ))}
+              </svg>
+              <div className="flex justify-between mt-1">
+                {closerWeekly.map(d => <span key={d.sem} className="text-[10px] text-neutral-500">{d.sem}</span>)}
+              </div>
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-500" /> {"≤14d"}</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-500" /> 15-18d</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-rose-500" /> {">18d"}</span>
+              <span className="ml-auto">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length-1].ciclo}d</span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════ Follow-up + Ticket/Indicação ════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.84s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-amber-400/60">{kpiIcons.clock}</div>
+              <h3 className="font-bold text-sm text-slate-300">Tempo Follow-up pós-Demo (horas)</h3>
+              <InfoTip title="Follow-up pós-Demo" />
+            </div>
+            <div className="flex-1 flex gap-1.5 items-end min-h-[14rem] relative">
+              <div className="absolute left-0 right-0 border-t-2 border-dashed border-emerald-400/40 pointer-events-none z-[1]" style={{ bottom: `${(2 / 5) * 100}%` }}>
+                <span className="absolute -top-4 right-0 text-[11px] font-bold text-emerald-400/70 bg-black/60 px-1 rounded">Meta: 2h</span>
+              </div>
+              {closerWeekly.map((d, i) => {
+                const h = (d.followUp / 5) * 100;
+                const color = d.followUp <= 2 ? "from-emerald-600 to-emerald-400" : d.followUp <= 3 ? "from-amber-600 to-amber-400" : "from-rose-600 to-rose-400";
+                return (
+                  <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
+                    <span className="text-[10px] font-bold text-white mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity">{d.followUp}h</span>
+                    <div className="flex-1 relative w-full flex items-end">
+                      <div className={`w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125 bg-gradient-to-t ${color}`}
+                        style={{ height: `${h}%`, minHeight: 2, animationDelay: `${i * 0.06}s` }}>
+                        {rndParticles(2)}
+                      </div>
+                    </div>
+                    <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-emerald-500" /> {"≤2h"}</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-amber-500" /> 2-3h</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-rose-500" /> {">3h"}</span>
+              <span className="ml-auto">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length-1].followUp}h</span></span>
+            </div>
+          </div>
+
+          {/* Ticket Médio + Taxa Indicação */}
+          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.86s both" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-amber-400/60">{kpiIcons.receipt}</div>
+              <h3 className="font-bold text-sm text-slate-300">Ticket Médio + Taxa Indicação</h3>
+              <InfoTip title="Ticket e Indicação" />
+            </div>
+            {(() => {
+              const maxTk = Math.max(...closerWeekly.map(d => d.ticket));
+              return (
+                <div className="flex-1 relative min-h-[14rem]">
+                  <div className="absolute left-0 top-0 text-[10px] text-neutral-500">R${(maxTk/1000).toFixed(1)}k</div>
+                  <div className="absolute right-0 top-0 text-[10px] text-neutral-500">40%</div>
+                  <div className="flex gap-1 items-end h-[13rem]">
+                    {closerWeekly.map((d, i) => {
+                      const h = (d.ticket / maxTk) * 100;
+                      return (
+                        <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
+                          <div className="flex-1 relative w-full flex items-end justify-center">
+                            <div className="w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125"
+                              style={{ height: `${h}%`, minHeight: 2, background: "linear-gradient(to top, rgb(8,145,178), rgb(34,211,238))", animationDelay: `${i * 0.06}s` }}>
+                              {rndParticles(2)}
+                            </div>
+                          </div>
+                          <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <svg className="absolute inset-0 w-full h-[13rem] pointer-events-none" viewBox="0 0 480 200" preserveAspectRatio="none">
+                    <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11) + 20},${200 - (d.indicacao / 40) * 180}`).join(" ")} fill="none" stroke="rgb(251,191,36)" strokeWidth="2.5" />
+                    {closerWeekly.map((d, i) => (
+                      <circle key={d.sem} cx={i * (480 / 11) + 20} cy={200 - (d.indicacao / 40) * 180} r="3" fill="rgb(251,191,36)" />
+                    ))}
+                  </svg>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-cyan-400" /> Ticket Médio (R$)</span>
+              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-400" /> Taxa Indicação (%)</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════ Heatmap de Objeções ════════ */}
+        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.88s both" }}>
+          <div className="flex items-center gap-2 mb-5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+            <h3 className="font-bold text-sm text-slate-300">Heatmap de Objeções (Semana × Tipo)</h3>
+            <InfoTip title="Heatmap Objeções" />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr>
+                  <th className="text-left text-neutral-500 font-bold uppercase tracking-wider pb-2 pr-4">Objeção</th>
+                  {heatmapData.map(d => <th key={d.sem} className="text-center text-neutral-500 font-bold pb-2 px-1">{d.sem}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {heatmapLabels.map(key => (
+                  <tr key={key}>
+                    <td className="text-slate-400 font-medium pr-4 py-1">{heatmapNames[key]}</td>
+                    {heatmapData.map(d => {
+                      const v = d[key];
+                      const maxH = 5;
+                      const intensity = v / maxH;
+                      const bg = v === 0 ? "rgba(255,255,255,0.02)" : `rgba(251,191,36,${0.1 + intensity * 0.6})`;
+                      return (
+                        <td key={d.sem} className="text-center py-1 px-1">
+                          <div className="rounded-md px-2 py-1.5 text-[11px] font-bold transition-all cursor-default" style={{ background: bg, color: v >= 3 ? "#fff" : v >= 1 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)" }}>
+                            {v}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex items-center gap-3 mt-3 text-[10px] text-neutral-500">
+            <span>Intensidade:</span>
+            {[0, 1, 2, 3, 4, 5].map(v => (
+              <div key={v} className="w-6 h-4 rounded-sm" style={{ background: v === 0 ? "rgba(255,255,255,0.02)" : `rgba(251,191,36,${0.1 + (v/5) * 0.6})` }} />
+            ))}
+            <span>{"0 → 5+"}</span>
+          </div>
+        </div>
+
+        {/* ════════ Análise de Objeções ════════ */}
+        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.9s both" }}>
+          <div className="flex items-center gap-2 mb-5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3 className="font-bold text-sm text-slate-300">Análise de Objeções — Frequência vs Neutralização</h3>
+            <InfoTip title="Análise de Objeções" />
+          </div>
+          <div className="space-y-3">
+            {objecoesData.map(obj => {
+              const maxQtd = Math.max(...objecoesData.map(o => o.qtd));
+              const barW = (obj.qtd / maxQtd) * 100;
+              return (
+                <div key={obj.nome} className="flex items-center gap-4">
+                  <span className="text-xs text-slate-400 w-28 text-right shrink-0">{obj.nome}</span>
+                  <div className="flex-1 relative">
+                    <div className="h-6 bg-white/[0.03] rounded overflow-hidden border border-white/[0.04]">
+                      <div className="h-full rounded flex items-center px-2" style={{ width: `${barW}%`, background: "linear-gradient(90deg, rgba(251,191,36,0.3), transparent)" }}>
+                        <span className="text-[10px] font-bold text-white">{obj.qtd}x</span>
+                      </div>
+                    </div>
+                    <div className="absolute right-0 top-0 bottom-0 flex items-center pr-2">
+                      <span className={`text-[11px] font-bold ${obj.neutralizacao >= 70 ? "text-emerald-400" : obj.neutralizacao >= 50 ? "text-amber-400" : "text-rose-400"}`}>
+                        Neutr: {obj.neutralizacao}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ════════ Tabela Semanal Detalhada ════════ */}
+        <div className="glass-panel rounded-2xl p-6 border border-white/[0.04]" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.92s both" }}>
+          <div className="flex items-center gap-2 mb-5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+            <h3 className="font-bold text-sm text-slate-300">Tabela Semanal Detalhada</h3>
+            <InfoTip title="Tabela Semanal" />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr className="border-b border-white/10">
+                  {["Sem", "Leads", "Qualif.", "Demos", "ShowUp", "Tx.Resp", "Tx.BANT", "SPIN", "Fech.", "Tx.Fech", "MRR", "Ciclo", "Ticket"].map(h => (
+                    <th key={h} className="text-left text-neutral-500 font-bold uppercase tracking-wider px-2 py-2">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sdrWeekly.map((s, i) => {
+                  const c = closerWeekly[i];
+                  const sp = spinWeekly[i];
+                  const spinColor = sp.score >= 8 ? "text-emerald-400" : sp.score >= 6 ? "text-amber-400" : "text-rose-400";
+                  const spinBg = sp.score >= 8 ? "bg-emerald-500/10 border-emerald-500/20" : sp.score >= 6 ? "bg-amber-500/10 border-amber-500/20" : "bg-rose-500/10 border-rose-500/20";
+                  return (
+                    <tr key={s.sem} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
+                      <td className="px-2 py-2 font-bold text-amber-400">{s.sem}</td>
+                      <td className="px-2 py-2 text-white">{s.leads}</td>
+                      <td className="px-2 py-2 text-white">{s.qualif}</td>
+                      <td className="px-2 py-2 text-white">{s.demos}</td>
+                      <td className="px-2 py-2 text-white">{s.showUps}</td>
+                      <td className="px-2 py-2"><span className={s.txResp >= 40 ? "text-emerald-400" : "text-amber-400"}>{s.txResp.toFixed(1)}%</span></td>
+                      <td className="px-2 py-2"><span className={s.txBANT >= 60 ? "text-emerald-400" : "text-amber-400"}>{s.txBANT.toFixed(1)}%</span></td>
+                      <td className="px-2 py-2">
+                        <span className={`inline-flex px-1.5 py-0.5 rounded border text-[10px] font-bold ${spinBg} ${spinColor}`}>
+                          {sp.score.toFixed(1)}
+                        </span>
+                      </td>
+                      <td className="px-2 py-2 text-white">{c.fech}</td>
+                      <td className="px-2 py-2"><span className={c.txFech >= 30 ? "text-emerald-400" : "text-amber-400"}>{c.txFech.toFixed(1)}%</span></td>
+                      <td className="px-2 py-2 text-white">R$ {(c.mrr/1000).toFixed(1)}k</td>
+                      <td className="px-2 py-2"><span className={c.ciclo <= 14 ? "text-emerald-400" : c.ciclo <= 18 ? "text-amber-400" : "text-rose-400"}>{c.ciclo}d</span></td>
+                      <td className="px-2 py-2 text-white">R$ {(c.ticket/1000).toFixed(1)}k</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
 
