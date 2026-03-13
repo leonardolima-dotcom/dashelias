@@ -1563,36 +1563,34 @@ export default function ComercialPage() {
             </div>
             {(() => {
               const maxL = Math.max(...sdrWeekly.map(d => d.leads));
-              const SVG_H = 160;
+              const W = 1000; const H = 160; const PY = 10;
               const n = sdrWeekly.length;
-              const xp = (i: number) => (i / (n - 1)) * 100;
-              const yp = (v: number) => SVG_H - 10 - (v / maxL) * (SVG_H - 20);
-              const area = (key: "leads" | "qualif" | "demos") => {
-                const pts = sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`);
-                return pts.join(" ") + ` 100%,${SVG_H - 10} 0%,${SVG_H - 10}`;
-              };
+              const x = (i: number) => (i / (n - 1)) * W;
+              const y = (v: number) => H - PY - (v / maxL) * (H - PY * 2);
+              const area = (key: "leads" | "qualif" | "demos") =>
+                sdrWeekly.map((d, i) => `${x(i)},${y(d[key])}`).join(" ") + ` ${W},${H - PY} 0,${H - PY}`;
               const line = (key: "leads" | "qualif" | "demos") =>
-                sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`).join(" ");
+                sdrWeekly.map((d, i) => `${x(i)},${y(d[key])}`).join(" ");
               return (
                 <div className="relative">
-                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1 px-0">
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
                     <span>{maxL}</span><span>0</span>
                   </div>
-                  <svg width="100%" height={SVG_H} className="overflow-visible">
+                  <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: H }}>
                     {[0, 0.33, 0.66, 1].map(p => (
-                      <line key={p} x1="0" x2="100%" y1={10 + p * (SVG_H - 20)} y2={10 + p * (SVG_H - 20)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                      <line key={p} x1="0" x2={W} y1={PY + p * (H - PY * 2)} y2={PY + p * (H - PY * 2)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
                     ))}
                     <polygon points={area("leads")} fill="rgba(34,211,238,0.1)" />
-                    <polyline points={line("leads")} fill="none" stroke="#22d3ee" strokeWidth="2" />
+                    <polyline points={line("leads")} fill="none" stroke="#22d3ee" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     <polygon points={area("qualif")} fill="rgba(251,191,36,0.08)" />
-                    <polyline points={line("qualif")} fill="none" stroke="#fbbf24" strokeWidth="2" />
+                    <polyline points={line("qualif")} fill="none" stroke="#fbbf24" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     <polygon points={area("demos")} fill="rgba(52,211,153,0.06)" />
-                    <polyline points={line("demos")} fill="none" stroke="#34d399" strokeWidth="2" />
+                    <polyline points={line("demos")} fill="none" stroke="#34d399" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     {sdrWeekly.map((d, i) => (
                       <g key={d.sem}>
-                        <circle cx={`${xp(i)}%`} cy={yp(d.leads)} r="3.5" fill="#22d3ee" />
-                        <circle cx={`${xp(i)}%`} cy={yp(d.qualif)} r="3" fill="#fbbf24" />
-                        <circle cx={`${xp(i)}%`} cy={yp(d.demos)} r="3" fill="#34d399" />
+                        <circle cx={x(i)} cy={y(d.leads)} r="4" fill="#22d3ee" vectorEffect="non-scaling-stroke" />
+                        <circle cx={x(i)} cy={y(d.qualif)} r="3.5" fill="#fbbf24" vectorEffect="non-scaling-stroke" />
+                        <circle cx={x(i)} cy={y(d.demos)} r="3.5" fill="#34d399" vectorEffect="non-scaling-stroke" />
                       </g>
                     ))}
                   </svg>
@@ -1617,40 +1615,43 @@ export default function ComercialPage() {
               <InfoTip title="Taxas SDR" />
             </div>
             {(() => {
-              const SVG_H = 160;
+              const W = 1000; const H = 160; const PY = 10;
               const n = sdrWeekly.length;
-              const xp = (i: number) => (i / (n - 1)) * 100;
-              const yp = (v: number) => SVG_H - 10 - (v / 100) * (SVG_H - 20);
+              const x = (i: number) => (i / (n - 1)) * W;
+              const y = (v: number) => H - PY - (v / 100) * (H - PY * 2);
               const line = (key: "txResp" | "txBANT" | "txShowUp") =>
-                sdrWeekly.map((d, i) => `${xp(i)}%,${yp(d[key])}`).join(" ");
+                sdrWeekly.map((d, i) => `${x(i)},${y(d[key])}`).join(" ");
+              const yPct = (v: number) => ((1 - v / 100) * (H - PY * 2) + PY) / H * 100;
               return (
                 <div className="relative">
-                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
-                    <span>100%</span><span>0%</span>
+                  <div className="text-[9px] text-neutral-600 mb-1">100%</div>
+                  <div className="relative" style={{ height: H }}>
+                    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: H, position: "absolute", inset: 0 }}>
+                      {[0, 0.33, 0.66, 1].map(p => (
+                        <line key={p} x1="0" x2={W} y1={PY + p * (H - PY * 2)} y2={PY + p * (H - PY * 2)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                      ))}
+                      <line x1="0" x2={W} y1={y(40)} y2={y(40)} stroke="rgba(251,191,36,0.2)" strokeWidth="1" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+                      <line x1="0" x2={W} y1={y(60)} y2={y(60)} stroke="rgba(52,211,153,0.2)" strokeWidth="1" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+                      <line x1="0" x2={W} y1={y(75)} y2={y(75)} stroke="rgba(34,211,238,0.2)" strokeWidth="1" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+                      <polyline points={line("txResp")} fill="none" stroke="#fbbf24" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      <polyline points={line("txBANT")} fill="none" stroke="#34d399" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      <polyline points={line("txShowUp")} fill="none" stroke="#22d3ee" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      {sdrWeekly.map((d, i) => (
+                        <g key={d.sem}>
+                          <circle cx={x(i)} cy={y(d.txResp)} r="3.5" fill="#fbbf24" vectorEffect="non-scaling-stroke" />
+                          <circle cx={x(i)} cy={y(d.txBANT)} r="3.5" fill="#34d399" vectorEffect="non-scaling-stroke" />
+                          <circle cx={x(i)} cy={y(d.txShowUp)} r="4" fill="#22d3ee" vectorEffect="non-scaling-stroke" />
+                        </g>
+                      ))}
+                    </svg>
+                    {/* meta labels positioned at line height */}
+                    <span className="absolute right-0 text-[8px] text-cyan-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(75)}%` }}>75%</span>
+                    <span className="absolute right-0 text-[8px] text-emerald-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(60)}%` }}>60%</span>
+                    <span className="absolute right-0 text-[8px] text-amber-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(40)}%` }}>40%</span>
                   </div>
-                  <svg width="100%" height={SVG_H} className="overflow-visible">
-                    {[0, 0.33, 0.66, 1].map(p => (
-                      <line key={p} x1="0" x2="100%" y1={10 + p * (SVG_H - 20)} y2={10 + p * (SVG_H - 20)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                    ))}
-                    {/* meta lines */}
-                    <line x1="0" x2="100%" y1={yp(40)} y2={yp(40)} stroke="rgba(251,191,36,0.2)" strokeWidth="1" strokeDasharray="6 4" />
-                    <line x1="0" x2="100%" y1={yp(60)} y2={yp(60)} stroke="rgba(52,211,153,0.2)" strokeWidth="1" strokeDasharray="6 4" />
-                    <line x1="0" x2="100%" y1={yp(75)} y2={yp(75)} stroke="rgba(34,211,238,0.2)" strokeWidth="1" strokeDasharray="6 4" />
-                    <polyline points={line("txResp")} fill="none" stroke="#fbbf24" strokeWidth="2.5" />
-                    <polyline points={line("txBANT")} fill="none" stroke="#34d399" strokeWidth="2.5" />
-                    <polyline points={line("txShowUp")} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
-                    {sdrWeekly.map((d, i) => (
-                      <g key={d.sem}>
-                        <circle cx={`${xp(i)}%`} cy={yp(d.txResp)} r="3" fill="#fbbf24" />
-                        <circle cx={`${xp(i)}%`} cy={yp(d.txBANT)} r="3" fill="#34d399" />
-                        <circle cx={`${xp(i)}%`} cy={yp(d.txShowUp)} r="3.5" fill="#22d3ee" />
-                      </g>
-                    ))}
-                    {/* meta labels */}
-                    <text x="100%" y={yp(40) - 4} textAnchor="end" fontSize="8" fill="rgba(251,191,36,0.5)">Meta Resp 40%</text>
-                    <text x="100%" y={yp(60) - 4} textAnchor="end" fontSize="8" fill="rgba(52,211,153,0.5)">Meta BANT 60%</text>
-                    <text x="100%" y={yp(75) - 4} textAnchor="end" fontSize="8" fill="rgba(34,211,238,0.5)">Meta ShowUp 75%</text>
-                  </svg>
+                  <div className="flex justify-between text-[9px] text-neutral-600 mt-0.5">
+                    <span>0%</span>
+                  </div>
                   <div className="flex justify-between mt-1">
                     {sdrWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
                   </div>
