@@ -1491,10 +1491,10 @@ export default function ComercialPage() {
                     const h = (d.tempoMsg / maxVal) * BAR_AREA;
                     const color = d.tempoMsg <= 1.0 ? "#10b981" : d.tempoMsg <= 2.0 ? "#fbbf24" : "#f43f5e";
                     return (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-0">
-                        <span className="text-[9px] font-bold leading-none mb-1" style={{ color }}>{d.tempoMsg.toFixed(1)}</span>
+                      <div key={i} className="flex-1 flex flex-col items-center gap-0 group/b cursor-pointer">
+                        <span className="text-[9px] font-bold leading-none mb-1 opacity-0 group-hover/b:opacity-100 transition-opacity" style={{ color }}>{d.tempoMsg.toFixed(1)}h</span>
                         <div className="w-full relative" style={{ height: BAR_AREA }}>
-                          <div className="absolute bottom-0 left-0 right-0 rounded-t" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
+                          <div className="absolute bottom-0 left-0 right-0 rounded-t transition-all group-hover/b:brightness-125" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
                         </div>
                         <span className="text-[9px] text-neutral-500 mt-1.5 leading-none">{d.sem}</span>
                       </div>
@@ -1529,10 +1529,10 @@ export default function ComercialPage() {
                     const h = (d.tempoLig / maxVal) * BAR_AREA;
                     const color = d.tempoLig <= 2.0 ? "#10b981" : d.tempoLig <= 4.0 ? "#fbbf24" : "#f43f5e";
                     return (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-0">
-                        <span className="text-[9px] font-bold leading-none mb-1" style={{ color }}>{d.tempoLig.toFixed(1)}</span>
+                      <div key={i} className="flex-1 flex flex-col items-center gap-0 group/b cursor-pointer">
+                        <span className="text-[9px] font-bold leading-none mb-1 opacity-0 group-hover/b:opacity-100 transition-opacity" style={{ color }}>{d.tempoLig.toFixed(1)}h</span>
                         <div className="w-full relative" style={{ height: BAR_AREA }}>
-                          <div className="absolute bottom-0 left-0 right-0 rounded-t" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
+                          <div className="absolute bottom-0 left-0 right-0 rounded-t transition-all group-hover/b:brightness-125" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
                         </div>
                         <span className="text-[9px] text-neutral-500 mt-1.5 leading-none">{d.sem}</span>
                       </div>
@@ -1576,24 +1576,40 @@ export default function ComercialPage() {
                   <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
                     <span>{maxL}</span><span>0</span>
                   </div>
-                  <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: H }}>
-                    {[0, 0.33, 0.66, 1].map(p => (
-                      <line key={p} x1="0" x2={W} y1={PY + p * (H - PY * 2)} y2={PY + p * (H - PY * 2)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-                    ))}
-                    <polygon points={area("leads")} fill="rgba(34,211,238,0.1)" />
-                    <polyline points={line("leads")} fill="none" stroke="#22d3ee" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                    <polygon points={area("qualif")} fill="rgba(251,191,36,0.08)" />
-                    <polyline points={line("qualif")} fill="none" stroke="#fbbf24" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                    <polygon points={area("demos")} fill="rgba(52,211,153,0.06)" />
-                    <polyline points={line("demos")} fill="none" stroke="#34d399" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                    {sdrWeekly.map((d, i) => (
-                      <g key={d.sem}>
-                        <circle cx={x(i)} cy={y(d.leads)} r="4" fill="#22d3ee" vectorEffect="non-scaling-stroke" />
-                        <circle cx={x(i)} cy={y(d.qualif)} r="3.5" fill="#fbbf24" vectorEffect="non-scaling-stroke" />
-                        <circle cx={x(i)} cy={y(d.demos)} r="3.5" fill="#34d399" vectorEffect="non-scaling-stroke" />
-                      </g>
-                    ))}
-                  </svg>
+                  <div className="relative" style={{ height: H }}>
+                    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: H, position: "absolute", inset: 0 }}>
+                      {[0, 0.33, 0.66, 1].map(p => (
+                        <line key={p} x1="0" x2={W} y1={PY + p * (H - PY * 2)} y2={PY + p * (H - PY * 2)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                      ))}
+                      <polygon points={area("leads")} fill="rgba(34,211,238,0.1)" />
+                      <polyline points={line("leads")} fill="none" stroke="#22d3ee" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <polygon points={area("qualif")} fill="rgba(251,191,36,0.08)" />
+                      <polyline points={line("qualif")} fill="none" stroke="#fbbf24" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <polygon points={area("demos")} fill="rgba(52,211,153,0.06)" />
+                      <polyline points={line("demos")} fill="none" stroke="#34d399" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      {sdrWeekly.map((d, i) => (
+                        <g key={d.sem}>
+                          <circle cx={x(i)} cy={y(d.leads)} r="4" fill="#22d3ee" vectorEffect="non-scaling-stroke" />
+                          <circle cx={x(i)} cy={y(d.qualif)} r="3.5" fill="#fbbf24" vectorEffect="non-scaling-stroke" />
+                          <circle cx={x(i)} cy={y(d.demos)} r="3.5" fill="#34d399" vectorEffect="non-scaling-stroke" />
+                        </g>
+                      ))}
+                    </svg>
+                    {/* Hover columns */}
+                    <div className="absolute inset-0 flex">
+                      {sdrWeekly.map((d, i) => (
+                        <div key={d.sem} className="flex-1 relative group/pt cursor-pointer">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/pt:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="text-white font-bold mb-0.5">{d.sem}</div>
+                            <div className="text-cyan-400">Leads: {d.leads}</div>
+                            <div className="text-amber-400">Qualif: {d.qualif}</div>
+                            <div className="text-emerald-400">Demos: {d.demos}</div>
+                          </div>
+                          <div className="absolute inset-0 bg-white/0 hover:bg-white/[0.02] transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex justify-between mt-1">
                     {sdrWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
                   </div>
@@ -1644,10 +1660,24 @@ export default function ComercialPage() {
                         </g>
                       ))}
                     </svg>
-                    {/* meta labels positioned at line height */}
+                    {/* meta labels */}
                     <span className="absolute right-0 text-[8px] text-cyan-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(75)}%` }}>75%</span>
                     <span className="absolute right-0 text-[8px] text-emerald-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(60)}%` }}>60%</span>
                     <span className="absolute right-0 text-[8px] text-amber-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yPct(40)}%` }}>40%</span>
+                    {/* Hover columns */}
+                    <div className="absolute inset-0 flex">
+                      {sdrWeekly.map((d, i) => (
+                        <div key={d.sem} className="flex-1 relative group/pt cursor-pointer">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/pt:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="text-white font-bold mb-0.5">{d.sem}</div>
+                            <div className="text-amber-400">Resp: {d.txResp}%</div>
+                            <div className="text-emerald-400">BANT+: {d.txBANT}%</div>
+                            <div className="text-cyan-400">Show-Up: {d.txShowUp}%</div>
+                          </div>
+                          <div className="absolute inset-0 bg-white/0 hover:bg-white/[0.02] transition-colors" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="flex justify-between text-[9px] text-neutral-600 mt-0.5">
                     <span>0%</span>
@@ -1668,7 +1698,8 @@ export default function ComercialPage() {
 
         {/* ════════ MRR + Fechamento | Ciclo Médio ════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.8s both" }}>
+          {/* MRR e Taxa de Fechamento */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.8s both" }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="text-amber-400/60">{kpiIcons.dollar}</div>
               <h3 className="font-bold text-sm text-slate-300">MRR e Taxa de Fechamento</h3>
@@ -1676,114 +1707,175 @@ export default function ComercialPage() {
             </div>
             {(() => {
               const maxMRR = Math.max(...closerWeekly.map(d => d.mrr));
+              const BAR_H = 160;
+              const W = 1000;
+              const n = closerWeekly.length;
+              const xSvg = (i: number) => (i / (n - 1)) * W;
+              const ySvg = (v: number) => BAR_H - 10 - (v / 50) * (BAR_H - 20);
               return (
-                <div className="flex-1 relative min-h-[14rem]">
-                  <div className="absolute left-0 top-0 text-[10px] text-neutral-500">R${(maxMRR/1000).toFixed(0)}k</div>
-                  <div className="absolute right-0 top-0 text-[10px] text-neutral-500">50%</div>
-                  <div className="flex gap-1 items-end h-[13rem]">
-                    {closerWeekly.map((d, i) => {
-                      const h = (d.mrr / maxMRR) * 100;
-                      return (
-                        <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
-                          <div className="flex-1 relative w-full flex items-end justify-center">
-                            <div className="w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125"
-                              style={{ height: `${h}%`, minHeight: 2, background: "linear-gradient(to top, rgb(180,83,9), rgb(251,191,36))", animationDelay: `${i * 0.06}s` }}>
-                              {rndParticles(2)}
-                            </div>
-                          </div>
-                          <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
-                        </div>
-                      );
-                    })}
+                <div>
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
+                    <span>R${(maxMRR / 1000).toFixed(0)}k</span>
+                    <span>50%</span>
                   </div>
-                  <svg className="absolute inset-0 w-full h-[13rem] pointer-events-none" viewBox="0 0 480 200" preserveAspectRatio="none">
-                    <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11) + 20},${200 - (d.txFech / 50) * 180}`).join(" ")} fill="none" stroke="rgb(52,211,153)" strokeWidth="2.5" />
-                    {closerWeekly.map((d, i) => (
-                      <circle key={d.sem} cx={i * (480 / 11) + 20} cy={200 - (d.txFech / 50) * 180} r="3" fill="rgb(52,211,153)" />
-                    ))}
-                  </svg>
+                  <div className="relative" style={{ height: BAR_H }}>
+                    {/* Bars */}
+                    <div className="absolute inset-0 flex gap-[5px] items-end">
+                      {closerWeekly.map((d, i) => {
+                        const h = (d.mrr / maxMRR) * (BAR_H - 20);
+                        return (
+                          <div key={i} className="flex-1 rounded-t" style={{ height: Math.max(h, 4), background: "linear-gradient(to top, rgb(180,83,9), rgb(251,191,36))" }} />
+                        );
+                      })}
+                    </div>
+                    {/* Line overlay */}
+                    <svg className="absolute inset-0 pointer-events-none" width="100%" viewBox={`0 0 ${W} ${BAR_H}`} preserveAspectRatio="none" style={{ height: BAR_H }}>
+                      <polyline points={closerWeekly.map((d, i) => `${xSvg(i)},${ySvg(d.txFech)}`).join(" ")} fill="none" stroke="#34d399" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      {closerWeekly.map((d, i) => (
+                        <circle key={d.sem} cx={xSvg(i)} cy={ySvg(d.txFech)} r="4" fill="#34d399" vectorEffect="non-scaling-stroke" />
+                      ))}
+                    </svg>
+                    {/* Hover columns */}
+                    <div className="absolute inset-0 flex">
+                      {closerWeekly.map((d) => (
+                        <div key={d.sem} className="flex-1 relative group/pt cursor-pointer">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/pt:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="text-white font-bold mb-0.5">{d.sem}</div>
+                            <div className="text-amber-400">MRR: R$ {(d.mrr / 1000).toFixed(1)}k</div>
+                            <div className="text-emerald-400">Fechamento: {d.txFech}%</div>
+                          </div>
+                          <div className="absolute inset-0 bg-white/0 hover:bg-white/[0.02] transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    {closerWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
                 </div>
               );
             })()}
-            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-400" /> MRR (R$)</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-400" /> Taxa Fech. (%)</span>
-              <span className="ml-auto font-bold text-amber-400">Total MRR: R$ {(closerWeekly.reduce((a,b)=>a+b.mrr,0)/1000).toFixed(0)}k</span>
+            <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> MRR (R$)</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Taxa Fech. (%)</span>
+              <span className="ml-auto font-bold text-amber-400">Total MRR: R$ {(closerWeekly.reduce((a, b) => a + b.mrr, 0) / 1000).toFixed(0)}k</span>
             </div>
           </div>
 
           {/* Ciclo Médio de Venda */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.82s both" }}>
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.82s both" }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="text-amber-400/60">{kpiIcons.clock}</div>
               <h3 className="font-bold text-sm text-slate-300">Ciclo Médio de Venda (dias)</h3>
               <InfoTip title="Ciclo Médio" />
             </div>
-            <div className="flex-1 relative min-h-[14rem]">
-              <div className="absolute left-0 top-0 text-[10px] text-neutral-500">30d</div>
-              <div className="absolute left-0 bottom-[20px] text-[10px] text-neutral-500">0d</div>
-              <div className="absolute left-6 right-0 border-t-2 border-dashed border-emerald-400/40 pointer-events-none" style={{ bottom: `${(14 / 30) * 85 + 10}%` }}>
-                <span className="absolute -top-3 right-0 text-[9px] text-emerald-400/60">Meta: 14d</span>
-              </div>
-              <svg className="w-full h-full" viewBox="0 0 480 200" preserveAspectRatio="none">
-                <polygon points={closerWeekly.map((d, i) => `${i * (480 / 11)},${200 - (d.ciclo / 30) * 180}`).join(" ") + ` 480,200 0,200`} fill="rgba(251,191,36,0.08)" />
-                <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11)},${200 - (d.ciclo / 30) * 180}`).join(" ")} fill="none" stroke="rgb(251,191,36)" strokeWidth="2.5" />
-                {closerWeekly.map((d, i) => (
-                  <circle key={d.sem} cx={i * (480 / 11)} cy={200 - (d.ciclo / 30) * 180} r="4" fill={d.ciclo <= 14 ? "rgb(52,211,153)" : d.ciclo <= 18 ? "rgb(251,191,36)" : "rgb(251,113,133)"} stroke="rgba(0,0,0,0.5)" strokeWidth="1" />
-                ))}
-              </svg>
-              <div className="flex justify-between mt-1">
-                {closerWeekly.map(d => <span key={d.sem} className="text-[10px] text-neutral-500">{d.sem}</span>)}
-              </div>
-            </div>
-            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-500" /> {"≤14d"}</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-500" /> 15-18d</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-rose-500" /> {">18d"}</span>
-              <span className="ml-auto">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length-1].ciclo}d</span></span>
+            {(() => {
+              const W = 1000; const H = 160; const PY = 10;
+              const n = closerWeekly.length;
+              const x = (i: number) => (i / (n - 1)) * W;
+              const y = (v: number) => H - PY - (v / 30) * (H - PY * 2);
+              const yMeta14 = y(14);
+              const yMetaPct = (yMeta14 / H) * 100;
+              return (
+                <div>
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
+                    <span>30d</span><span>0d</span>
+                  </div>
+                  <div className="relative" style={{ height: H }}>
+                    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: H, position: "absolute", inset: 0 }}>
+                      {[0, 0.33, 0.66, 1].map(p => (
+                        <line key={p} x1="0" x2={W} y1={PY + p * (H - PY * 2)} y2={PY + p * (H - PY * 2)} stroke="rgba(255,255,255,0.03)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                      ))}
+                      <line x1="0" x2={W} y1={yMeta14} y2={yMeta14} stroke="rgba(52,211,153,0.3)" strokeWidth="1.5" strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+                      <polygon points={closerWeekly.map((d, i) => `${x(i)},${y(d.ciclo)}`).join(" ") + ` ${W},${H - PY} 0,${H - PY}`} fill="rgba(251,191,36,0.06)" />
+                      <polyline points={closerWeekly.map((d, i) => `${x(i)},${y(d.ciclo)}`).join(" ")} fill="none" stroke="#fbbf24" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      {closerWeekly.map((d, i) => (
+                        <circle key={d.sem} cx={x(i)} cy={y(d.ciclo)} r="4.5" fill={d.ciclo <= 14 ? "#34d399" : d.ciclo <= 18 ? "#fbbf24" : "#fb7185"} stroke="rgba(0,0,0,0.4)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                      ))}
+                    </svg>
+                    <span className="absolute right-0 text-[8px] text-emerald-400/60 -translate-y-1/2 pointer-events-none" style={{ top: `${yMetaPct}%` }}>Meta 14d</span>
+                    {/* Hover columns */}
+                    <div className="absolute inset-0 flex">
+                      {closerWeekly.map((d) => (
+                        <div key={d.sem} className="flex-1 relative group/pt cursor-pointer">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/pt:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="text-white font-bold mb-0.5">{d.sem}</div>
+                            <div style={{ color: d.ciclo <= 14 ? "#34d399" : d.ciclo <= 18 ? "#fbbf24" : "#fb7185" }}>Ciclo: {d.ciclo} dias</div>
+                          </div>
+                          <div className="absolute inset-0 bg-white/0 hover:bg-white/[0.02] transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    {closerWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {"≤14d"}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> 15-18d</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> {">18d"}</span>
+              <span className="ml-auto text-slate-400">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length - 1].ciclo}d</span></span>
             </div>
           </div>
         </div>
 
         {/* ════════ Follow-up + Ticket/Indicação ════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.84s both" }}>
+          {/* Follow-up pós-Demo */}
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.84s both" }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="text-amber-400/60">{kpiIcons.clock}</div>
               <h3 className="font-bold text-sm text-slate-300">Tempo Follow-up pós-Demo (horas)</h3>
               <InfoTip title="Follow-up pós-Demo" />
             </div>
-            <div className="flex-1 flex gap-1.5 items-end min-h-[14rem] relative">
-              <div className="absolute left-0 right-0 border-t-2 border-dashed border-emerald-400/40 pointer-events-none z-[1]" style={{ bottom: `${(2 / 5) * 100}%` }}>
-                <span className="absolute -top-4 right-0 text-[11px] font-bold text-emerald-400/70 bg-black/60 px-1 rounded">Meta: 2h</span>
-              </div>
-              {closerWeekly.map((d, i) => {
-                const h = (d.followUp / 5) * 100;
-                const color = d.followUp <= 2 ? "from-emerald-600 to-emerald-400" : d.followUp <= 3 ? "from-amber-600 to-amber-400" : "from-rose-600 to-rose-400";
-                return (
-                  <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
-                    <span className="text-[10px] font-bold text-white mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity">{d.followUp}h</span>
-                    <div className="flex-1 relative w-full flex items-end">
-                      <div className={`w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125 bg-gradient-to-t ${color}`}
-                        style={{ height: `${h}%`, minHeight: 2, animationDelay: `${i * 0.06}s` }}>
-                        {rndParticles(2)}
-                      </div>
-                    </div>
-                    <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
+            {(() => {
+              const maxVal = Math.max(...closerWeekly.map(d => d.followUp));
+              const BAR_AREA = 140;
+              const metaPct = (2 / maxVal) * BAR_AREA;
+              return (
+                <div>
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
+                    <span>{maxVal.toFixed(1)}h</span><span>0h</span>
                   </div>
-                );
-              })}
-            </div>
-            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
-              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-emerald-500" /> {"≤2h"}</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-amber-500" /> 2-3h</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-rose-500" /> {">3h"}</span>
-              <span className="ml-auto">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length-1].followUp}h</span></span>
+                  <div className="relative">
+                    <div className="flex gap-[6px]" style={{ height: BAR_AREA }}>
+                      {closerWeekly.map((d) => {
+                        const h = (d.followUp / maxVal) * BAR_AREA;
+                        const color = d.followUp <= 2 ? "#10b981" : d.followUp <= 3 ? "#fbbf24" : "#f43f5e";
+                        return (
+                          <div key={d.sem} className="flex-1 relative group/b cursor-pointer">
+                            <div className="absolute bottom-0 left-0 right-0 rounded-t transition-all group-hover/b:brightness-125" style={{ height: Math.max(h, 4), background: `linear-gradient(to top, ${color}44, ${color})` }} />
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/b:opacity-100 transition-opacity pointer-events-none z-10">
+                              <span style={{ color }}>{d.followUp}h</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Meta line */}
+                    <div className="absolute left-0 right-0 border-t border-dashed border-emerald-400/40 pointer-events-none" style={{ bottom: metaPct }}>
+                      <span className="absolute -top-3 right-0 text-[8px] text-emerald-400/60">Meta: 2h</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    {closerWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {"≤2h"}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> 2-3h</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> {">3h"}</span>
+              <span className="ml-auto text-slate-400">Atual: <span className="text-emerald-400 font-bold">{closerWeekly[closerWeekly.length - 1].followUp}h</span></span>
             </div>
           </div>
 
           {/* Ticket Médio + Taxa Indicação */}
-          <div className="glass-panel rounded-2xl p-6 border border-white/[0.04] flex flex-col" style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.86s both" }}>
+          <div className="rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06]" style={{ animation: "animationIn 0.8s ease-out 0.86s both" }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="text-amber-400/60">{kpiIcons.receipt}</div>
               <h3 className="font-bold text-sm text-slate-300">Ticket Médio + Taxa Indicação</h3>
@@ -1791,38 +1883,57 @@ export default function ComercialPage() {
             </div>
             {(() => {
               const maxTk = Math.max(...closerWeekly.map(d => d.ticket));
+              const BAR_H = 160;
+              const W = 1000;
+              const n = closerWeekly.length;
+              const xSvg = (i: number) => (i / (n - 1)) * W;
+              const ySvg = (v: number) => BAR_H - 10 - (v / 40) * (BAR_H - 20);
               return (
-                <div className="flex-1 relative min-h-[14rem]">
-                  <div className="absolute left-0 top-0 text-[10px] text-neutral-500">R${(maxTk/1000).toFixed(1)}k</div>
-                  <div className="absolute right-0 top-0 text-[10px] text-neutral-500">40%</div>
-                  <div className="flex gap-1 items-end h-[13rem]">
-                    {closerWeekly.map((d, i) => {
-                      const h = (d.ticket / maxTk) * 100;
-                      return (
-                        <div key={d.sem} className="flex-1 flex flex-col items-center group/bar cursor-pointer">
-                          <div className="flex-1 relative w-full flex items-end justify-center">
-                            <div className="w-full rounded-t overflow-hidden transition-all duration-500 group-hover/bar:brightness-125"
-                              style={{ height: `${h}%`, minHeight: 2, background: "linear-gradient(to top, rgb(8,145,178), rgb(34,211,238))", animationDelay: `${i * 0.06}s` }}>
-                              {rndParticles(2)}
-                            </div>
-                          </div>
-                          <span className="text-[9px] text-neutral-500 mt-1">{d.sem}</span>
-                        </div>
-                      );
-                    })}
+                <div>
+                  <div className="flex justify-between text-[9px] text-neutral-600 mb-1">
+                    <span>R${(maxTk / 1000).toFixed(1)}k</span>
+                    <span>40%</span>
                   </div>
-                  <svg className="absolute inset-0 w-full h-[13rem] pointer-events-none" viewBox="0 0 480 200" preserveAspectRatio="none">
-                    <polyline points={closerWeekly.map((d, i) => `${i * (480 / 11) + 20},${200 - (d.indicacao / 40) * 180}`).join(" ")} fill="none" stroke="rgb(251,191,36)" strokeWidth="2.5" />
-                    {closerWeekly.map((d, i) => (
-                      <circle key={d.sem} cx={i * (480 / 11) + 20} cy={200 - (d.indicacao / 40) * 180} r="3" fill="rgb(251,191,36)" />
-                    ))}
-                  </svg>
+                  <div className="relative" style={{ height: BAR_H }}>
+                    {/* Bars */}
+                    <div className="absolute inset-0 flex gap-[5px] items-end">
+                      {closerWeekly.map((d, i) => {
+                        const h = (d.ticket / maxTk) * (BAR_H - 20);
+                        return (
+                          <div key={i} className="flex-1 rounded-t" style={{ height: Math.max(h, 4), background: "linear-gradient(to top, rgb(8,145,178), rgb(34,211,238))" }} />
+                        );
+                      })}
+                    </div>
+                    {/* Line overlay */}
+                    <svg className="absolute inset-0 pointer-events-none" width="100%" viewBox={`0 0 ${W} ${BAR_H}`} preserveAspectRatio="none" style={{ height: BAR_H }}>
+                      <polyline points={closerWeekly.map((d, i) => `${xSvg(i)},${ySvg(d.indicacao)}`).join(" ")} fill="none" stroke="#fbbf24" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                      {closerWeekly.map((d, i) => (
+                        <circle key={d.sem} cx={xSvg(i)} cy={ySvg(d.indicacao)} r="4" fill="#fbbf24" vectorEffect="non-scaling-stroke" />
+                      ))}
+                    </svg>
+                    {/* Hover columns */}
+                    <div className="absolute inset-0 flex">
+                      {closerWeekly.map((d) => (
+                        <div key={d.sem} className="flex-1 relative group/pt cursor-pointer">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[10px] whitespace-nowrap opacity-0 group-hover/pt:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="text-white font-bold mb-0.5">{d.sem}</div>
+                            <div className="text-cyan-400">Ticket: R$ {(d.ticket / 1000).toFixed(1)}k</div>
+                            <div className="text-amber-400">Indicação: {d.indicacao}%</div>
+                          </div>
+                          <div className="absolute inset-0 bg-white/0 hover:bg-white/[0.02] transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    {closerWeekly.map(d => <span key={d.sem} className="text-[9px] text-neutral-500">{d.sem}</span>)}
+                  </div>
                 </div>
               );
             })()}
-            <div className="flex items-center gap-4 mt-3 text-[11px] text-neutral-400">
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-cyan-400" /> Ticket Médio (R$)</span>
-              <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-400" /> Taxa Indicação (%)</span>
+            <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/[0.04] text-[10px] text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /> Ticket Médio (R$)</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> Taxa Indicação (%)</span>
             </div>
           </div>
         </div>
