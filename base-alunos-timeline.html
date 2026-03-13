@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base de Alunos — Timeline do Aluno</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04050c;--surface:#0a0c18;--surface2:#0f1120;--surface3:#141728;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#eceef8;--muted:#6e7294;--dim:#353757;
+  --amber:#fbbf24;--emerald:#34d399;--rose:#fb7185;
+  --violet:#a78bfa;--cyan:#22d3ee;
+  --r:14px;
+  --ok:#34d399;--ok-g:rgba(52,211,153,0.08);
+  --warn:#fbbf24;--warn-g:rgba(251,191,36,0.08);
+  --crit:#fb7185;--crit-g:rgba(251,113,133,0.08);
+  --new:#a78bfa;--new-g:rgba(167,139,250,0.08);
+  --req:#22d3ee;--req-g:rgba(34,211,238,0.08);
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(140px);}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(167,139,250,0.03),transparent 70%);top:-200px;left:50%;transform:translateX(-50%);}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,0.025),transparent 70%);bottom:-80px;right:-60px;}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(52,211,153,0.02),transparent 70%);top:45%;left:-60px;}
+.wrap{max-width:1380px;margin:0 auto;padding:60px 28px 100px;position:relative;z-index:1;}
+
+header{text-align:center;margin-bottom:60px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--violet);background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.2);padding:6px 18px;border-radius:100px;margin-bottom:20px;}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--violet);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-2.5px;line-height:1.08;margin-bottom:14px;}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--violet) 0%,var(--cyan) 60%,var(--emerald) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:13px;max-width:580px;margin:0 auto;font-family:'DM Mono',monospace;font-weight:300;line-height:1.85;}
+
+.badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.b-new{background:var(--new-g);color:var(--new);border:1px solid rgba(167,139,250,0.18);}
+.b-warn{background:var(--warn-g);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-ok{background:var(--ok-g);color:var(--ok);border:1px solid rgba(52,211,153,0.18);}
+.b-crit{background:var(--crit-g);color:var(--crit);border:1px solid rgba(251,113,133,0.18);}
+.b-p1{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.18);}
+.b-p2{background:rgba(251,191,36,0.08);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-req{background:var(--req-g);color:var(--req);border:1px solid rgba(34,211,238,0.18);}
+
+.callout{border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.callout p{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.85;}
+.callout strong{color:var(--text);}
+.c-info{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);}
+.c-new{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.14);}
+.c-ok{background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.14);}
+.c-warn{background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.14);}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:52px 0;}
+.sec-label{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.sec-title{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.sec-desc{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:20px;}
+
+/* ═══════════════════════════
+   MAIN LAYOUT MOCKUP
+═══════════════════════════ */
+.screen-mock{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.screen-topbar{background:rgba(0,0,0,0.4);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.topbar-title{font-size:11px;font-weight:800;letter-spacing:-0.3px;}
+.topbar-nav{display:flex;gap:5px;}
+.tn-item{font-size:8px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:6px;color:var(--muted);}
+.tn-active{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.2);}
+.topbar-date{font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);}
+
+/* Layout 2 colunas */
+.screen-body{display:grid;grid-template-columns:320px 1fr;height:700px;overflow:hidden;}
+
+/* LISTA (esquerda) */
+.student-list{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sl-search{padding:12px 14px;border-bottom:1px solid var(--border);}
+.sl-search input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);outline:none;}
+.sl-items{flex:1;overflow-y:auto;}
+.sl-item{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:background 0.15s;}
+.sl-item:hover{background:rgba(255,255,255,0.03);}
+.sl-item.active{background:rgba(167,139,250,0.06);border-left:2px solid var(--violet);}
+.sli-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.sli-sub{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
+.sli-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.status-pill{font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;}
+.sp-paga{background:rgba(52,211,153,0.12);color:var(--ok);border:1px solid rgba(52,211,153,0.2);}
+.sp-parcial{background:rgba(251,191,36,0.1);color:var(--warn);border:1px solid rgba(251,191,36,0.2);}
+.sp-atrasada{background:rgba(251,113,133,0.1);color:var(--rose);border:1px solid rgba(251,113,133,0.2);}
+.sli-parc{font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);}
+
+/* PAINEL DIREITO */
+.student-panel{overflow-y:auto;display:flex;flex-direction:column;}
+.sp-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--dim);}
+.sp-empty .icon{font-size:32px;opacity:.3;}
+.sp-empty p{font-size:10px;font-family:'DM Mono',monospace;}
+
+/* HEADER DO PAINEL */
+.panel-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-start;flex-shrink:0;}
+.ph-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(167,139,250,0.3),rgba(34,211,238,0.2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;border:1px solid rgba(167,139,250,0.2);}
+.ph-info{flex:1;}
+.ph-name{font-size:17px;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px;}
+.ph-meta{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.7;}
+.ph-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.ph-actions{display:flex;gap:6px;flex-shrink:0;}
+.ph-btn{font-size:8px;font-family:'DM Mono',monospace;font-weight:700;padding:6px 12px;border-radius:7px;cursor:pointer;}
+.ph-btn-wa{background:rgba(37,211,102,0.12);color:#25d366;border:1px solid rgba(37,211,102,0.25);}
+.ph-btn-sec{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+
+/* TABS dentro do painel */
+.panel-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ptab{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;padding:10px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;letter-spacing:.5px;}
+.ptab.active{color:var(--violet);border-bottom-color:var(--violet);}
+
+/* PANEL BODY */
+.panel-body{padding:16px 22px;flex:1;overflow-y:auto;}
+
+/* KPI row de engajamento */
+.eng-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.ek{background:var(--surface3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;text-align:center;}
+.ek .ev{font-size:18px;font-weight:800;letter-spacing:-0.5px;line-height:1;margin-bottom:3px;}
+.ek .el{font-size:7.5px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.ek .et{font-size:8px;font-family:'DM Mono',monospace;margin-top:2px;}
+
+/* BARRA DE PROGRESSO */
+.prog-item{margin-bottom:10px;}
+.prog-header{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;}
+.prog-name{font-weight:700;}
+.prog-pct{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);}
+.prog-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+.prog-fill{height:6px;border-radius:4px;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:20px;}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:var(--border);}
+.tl-item{position:relative;padding:0 0 18px 18px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute;left:-14px;top:2px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--bg);flex-shrink:0;}
+.tl-date{font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);margin-bottom:3px;letter-spacing:.5px;}
+.tl-title{font-size:11px;font-weight:700;margin-bottom:2px;}
+.tl-desc{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+.tl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.tl-tag{font-size:7.5px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--muted);}
+
+/* PARCELAS GRID */
+.parc-grid{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.parc-cell{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:'DM Mono',monospace;}
+.pc-ok{background:rgba(52,211,153,0.15);color:var(--ok);border:1px solid rgba(52,211,153,0.2);}
+.pc-late{background:rgba(251,113,133,0.12);color:var(--rose);border:1px solid rgba(251,113,133,0.2);}
+.pc-pend{background:rgba(255,255,255,0.04);color:var(--dim);border:1px solid var(--border);}
+.pc-cur{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.25);}
+
+/* SCORE RING */
+.score-ring-wrap{display:flex;align-items:center;gap:14px;background:var(--surface3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:12px;}
+
+/* MODULOS */
+.mod-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+.mod-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.mod-info{flex:1;}
+.mod-name{font-size:10px;font-weight:700;margin-bottom:1px;}
+.mod-meta{font-size:8.5px;font-family:'DM Mono',monospace;color:var(--muted);}
+.mod-status{font-size:8px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:4px;}
+.ms-done{background:rgba(52,211,153,0.1);color:var(--ok);}
+.ms-prog{background:rgba(251,191,36,0.1);color:var(--warn);}
+.ms-lock{background:rgba(255,255,255,0.04);color:var(--dim);}
+
+/* SPEC COLS */
+.spec-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.spec-col h4{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.spec-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.spec-col li{font-size:11px;line-height:1.5;display:flex;gap:7px;}
+.spec-col li::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.spec-col li .s{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);display:block;line-height:1.5;margin-top:2px;}
+
+/* DATASET TABLE */
+.ds-table{width:100%;border-collapse:collapse;}
+.ds-table th{text-align:left;padding:7px 12px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2);}
+.ds-table td{padding:9px 12px;font-size:10px;font-family:'DM Mono',monospace;border-bottom:1px solid rgba(255,255,255,0.025);vertical-align:top;line-height:1.6;}
+.ds-table td:first-child{color:var(--req);font-weight:700;}
+.ds-table tr:last-child td{border-bottom:none;}
+
+/* IMPL ORDER */
+.impl{display:flex;flex-direction:column;gap:8px;}
+.impl-item{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.impl-n{font-family:'DM Mono',monospace;font-size:28px;font-weight:800;color:var(--surface3);min-width:32px;line-height:1;}
+.impl-b h4{font-size:13px;font-weight:800;margin-bottom:3px;letter-spacing:-0.3px;}
+.impl-b p{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.impl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+
+footer{text-align:center;padding-top:36px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;}
+footer span{color:var(--amber);}
+
+@media(max-width:1100px){.screen-body{grid-template-columns:280px 1fr;height:auto;}.spec-cols{grid-template-columns:1fr 1fr;}.eng-kpis{grid-template-columns:1fr 1fr;}}
+@media(max-width:720px){.screen-body{grid-template-columns:1fr;height:auto;}.student-list{border-right:none;border-bottom:1px solid var(--border);}.spec-cols{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="eyebrow">Base de Alunos · Tela 6</div>
+  <h1>Timeline <em>do Aluno</em></h1>
+  <p class="sub">Ao clicar num aluno, o painel direito revela a jornada completa dele com o Seu Elias — engajamento, módulos, mentorias, pagamentos e histórico de interações em ordem cronológica.</p>
+</header>
+
+<!-- ══════════════════════
+     ESTADO ATUAL
+══════════════════════ -->
+<div style="margin-bottom:48px;">
+  <div class="sec-label">01 — Estado atual vs o que será</div>
+  <div class="sec-title">O que muda</div>
+
+  <div class="callout c-warn">
+    <p><strong>Problema central:</strong> Hoje ao clicar num aluno, o painel mostra dados cadastrais + grade de parcelas. Isso responde "quem é o aluno?" — mas não responde "como está a jornada dele?" O Seu Elias não consegue saber se o Carlos Silva assistiu as aulas desta semana, em qual módulo travou, quantas horas de conteúdo consumiu ou se a inadimplência do Rafael Santos está piando por causa de uma desistência silenciosa. <strong>A timeline resolve exatamente isso.</strong></p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="background:var(--surface);border:1px solid rgba(251,113,133,0.15);border-radius:var(--r);padding:18px 22px;">
+      <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--crit);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">ANTES — Painel atual</div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:2;">
+        Nome, telefone, email, Instagram<br>
+        Cidade / estado / segmento<br>
+        Score (número colorido)<br>
+        Produto + parcelas + status pag.<br>
+        Grade de parcelas (verde/vermelho)<br>
+        Botões WhatsApp e Reagendar<br>
+        <span style="color:var(--dim);">— Sem histórico de aulas</span><br>
+        <span style="color:var(--dim);">— Sem módulos concluídos</span><br>
+        <span style="color:var(--dim);">— Sem tempo de consumo</span><br>
+        <span style="color:var(--dim);">— Sem mentorias</span><br>
+        <span style="color:var(--dim);">— Sem timeline cronológica</span>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid rgba(52,211,153,0.15);border-radius:var(--r);padding:18px 22px;">
+      <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--ok);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">DEPOIS — Painel com Timeline</div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:2;">
+        Header: nome + avatar + badges + ações<br>
+        <span style="color:var(--ok);">4 abas: Resumo · Jornada · Financeiro · Histórico</span><br>
+        <span style="color:var(--ok);">KPIs de engajamento: horas, módulos, streak</span><br>
+        <span style="color:var(--ok);">Barra de progresso por curso/produto</span><br>
+        <span style="color:var(--ok);">Timeline cronológica de eventos</span><br>
+        <span style="color:var(--ok);">Módulos: concluído / em progresso / bloqueado</span><br>
+        <span style="color:var(--ok);">Mentorias: data, duração, tema, gravação</span><br>
+        <span style="color:var(--ok);">Financeiro expandido com aging e score</span><br>
+        <span style="color:var(--ok);">Histórico de contatos (SDR + Agentes IA)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MOCKUP COMPLETO
+══════════════════════ -->
+<div style="margin-bottom:14px;">
+  <div class="sec-label">02 — Mockup da tela completa</div>
+  <div class="sec-title">Layout: lista à esquerda · painel com 4 abas à direita</div>
+  <div class="sec-desc">Aluno "Marcos Oliveira" selecionado — parcial 4/12 · Formação Barber Pro · aba "Jornada" ativa</div>
+</div>
+
+<div class="screen-mock">
+  <!-- Topbar -->
+  <div class="screen-topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="font-size:9px;color:var(--dim);">←</div>
+      <div>
+        <div class="topbar-title">Dashboard Administrativo</div>
+        <div style="font-size:8px;color:var(--dim);font-family:'DM Mono',monospace;">PAINEL DE GESTÃO</div>
+      </div>
+    </div>
+    <div class="topbar-nav">
+      <span class="tn-item">VISÃO GERAL</span>
+      <span class="tn-item">FUNIL DE VENDAS</span>
+      <span class="tn-item">FINANCEIRO</span>
+      <span class="tn-item">AGENTES IA</span>
+      <span class="tn-item tn-active">BASE DE ALUNOS</span>
+      <span class="tn-item">TURMAS</span>
+    </div>
+    <div class="topbar-date" style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">13 de mar. de 2026 · 14:32</div>
+  </div>
+
+  <!-- Body -->
+  <div class="screen-body">
+
+    <!-- LISTA DE ALUNOS -->
+    <div class="student-list">
+      <div class="sl-search">
+        <input type="text" placeholder="Buscar por nome ou telefone..." readonly>
+      </div>
+      <div class="sl-items">
+
+        <!-- Carlos Silva -->
+        <div class="sl-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name">Carlos Silva</div>
+            <div class="sli-sub">(11) 98765-4321 · Formação Barber Pro</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--ok);margin-top:2px;">▶ 24.5h · 8/12 módulos</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-paga">paga</span>
+            <span class="sli-parc">6/6</span>
+          </div>
+        </div>
+
+        <!-- Marcos Oliveira — ATIVO -->
+        <div class="sl-item active" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name" style="color:var(--violet);">Marcos Oliveira</div>
+            <div class="sli-sub">(11) 91234-5678 · Formação Barber Pro</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--warn);margin-top:2px;">⚠ 3.2h · 2/12 módulos · sem login há 9d</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-parcial">parcial</span>
+            <span class="sli-parc">4/12</span>
+          </div>
+        </div>
+
+        <!-- Rafael Santos -->
+        <div class="sl-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name">Rafael Santos</div>
+            <div class="sli-sub">(21) 99876-5432 · Master Cut</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--rose);margin-top:2px;">⚠ 0.8h · 0/8 módulos · sem login há 34d</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-atrasada">atrasada</span>
+            <span class="sli-parc">2/12</span>
+          </div>
+        </div>
+
+        <!-- João Pedro Lima -->
+        <div class="sl-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name">João Pedro Lima</div>
+            <div class="sli-sub">(11) 97654-3210 · Formação Barber Pro</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--ok);margin-top:2px;">✓ 41.2h · 12/12 módulos · concluído</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-paga">paga</span>
+            <span class="sli-parc">12/12</span>
+          </div>
+        </div>
+
+        <!-- Felipe Costa -->
+        <div class="sl-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name">Felipe Costa</div>
+            <div class="sli-sub">(31) 98765-1234 · Formação Barber Pro</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--cyan);margin-top:2px;">▶ 11.7h · 5/12 módulos · ativo</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-parcial">parcial</span>
+            <span class="sli-parc">3/6</span>
+          </div>
+        </div>
+
+        <!-- André Souza -->
+        <div class="sl-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="sli-name">André Souza</div>
+            <div class="sli-sub">(11) 91111-2222 · Master Cut</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;">▶ 6.4h · 3/8 módulos</div>
+          </div>
+          <div class="sli-right">
+            <span class="status-pill sp-parcial">parcial</span>
+            <span class="sli-parc">2/12</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAINEL DIREITO — MARCOS OLIVEIRA -->
+    <div class="student-panel">
+
+      <!-- Header -->
+      <div class="panel-header">
+        <div class="ph-avatar" style="color:var(--violet);">MO</div>
+        <div class="ph-info">
+          <div class="ph-name">Marcos Oliveira</div>
+          <div class="ph-meta">
+            (11) 91234-5678 · @marcos.oliveira · São Paulo, SP<br>
+            Segmento: Barbearia própria · Sócio: sim · Formação Barber Pro (Turma 47)
+          </div>
+          <div class="ph-badges">
+            <span class="badge b-warn">⚠ Parcial · 4/12 parcelas</span>
+            <span class="badge" style="background:rgba(251,113,133,0.08);color:var(--rose);border:1px solid rgba(251,113,133,0.18);">Sem login há 9 dias</span>
+            <span class="badge b-new">Score 62</span>
+            <span class="badge" style="background:rgba(34,211,238,0.07);color:var(--cyan);border:1px solid rgba(34,211,238,0.18);">Matrícula 14/01/26</span>
+          </div>
+        </div>
+        <div class="ph-actions">
+          <button class="ph-btn ph-btn-wa">WhatsApp</button>
+          <button class="ph-btn ph-btn-sec">Reagendar</button>
+          <button class="ph-btn ph-btn-sec">+ Nota</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="panel-tabs">
+        <span class="ptab">Resumo</span>
+        <span class="ptab active">Jornada</span>
+        <span class="ptab">Financeiro</span>
+        <span class="ptab">Histórico</span>
+      </div>
+
+      <!-- Body: Aba JORNADA -->
+      <div class="panel-body">
+
+        <!-- KPIs de engajamento -->
+        <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Engajamento na Área do Aluno</div>
+        <div class="eng-kpis">
+          <div class="ek">
+            <div class="ev" style="color:var(--warn)">3.2h</div>
+            <div class="el">Horas de tela</div>
+            <div class="et" style="color:var(--crit);">⚠ Baixo (meta: 8h/mês)</div>
+          </div>
+          <div class="ek">
+            <div class="ev" style="color:var(--warn)">2/12</div>
+            <div class="el">Módulos concluídos</div>
+            <div class="et" style="color:var(--muted)">16.7% do curso</div>
+          </div>
+          <div class="ek">
+            <div class="ev" style="color:var(--crit)">9d</div>
+            <div class="el">Último login</div>
+            <div class="et" style="color:var(--crit);">Sem acesso desde 04/03</div>
+          </div>
+          <div class="ek">
+            <div class="ev" style="color:var(--muted)">0</div>
+            <div class="el">Streak atual</div>
+            <div class="et" style="color:var(--muted)">Recorde: 4 dias</div>
+          </div>
+        </div>
+
+        <!-- Progresso do curso -->
+        <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;margin-top:4px;">Progresso no Curso</div>
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;">
+          <div class="prog-item">
+            <div class="prog-header">
+              <span class="prog-name">Formação Barber Pro</span>
+              <span class="prog-pct" style="color:var(--warn)">16.7% — 2/12 módulos</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:16.7%;background:linear-gradient(90deg,var(--warn),rgba(251,191,36,0.5));"></div></div>
+          </div>
+          <div style="height:8px;"></div>
+          <!-- Módulos -->
+          <div class="mod-row">
+            <div class="mod-icon" style="background:rgba(52,211,153,0.12);">✓</div>
+            <div class="mod-info">
+              <div class="mod-name">Módulo 1 — Fundamentos do Corte</div>
+              <div class="mod-meta">Concluído em 18/01/26 · 1h 24min · 100% das aulas</div>
+            </div>
+            <span class="mod-status ms-done">Concluído</span>
+          </div>
+          <div class="mod-row">
+            <div class="mod-icon" style="background:rgba(52,211,153,0.12);">✓</div>
+            <div class="mod-info">
+              <div class="mod-name">Módulo 2 — Técnicas de Navalha</div>
+              <div class="mod-meta">Concluído em 23/01/26 · 1h 48min · 100% das aulas</div>
+            </div>
+            <span class="mod-status ms-done">Concluído</span>
+          </div>
+          <div class="mod-row" style="border-color:rgba(251,191,36,0.2);background:rgba(251,191,36,0.02);">
+            <div class="mod-icon" style="background:rgba(251,191,36,0.12);">▶</div>
+            <div class="mod-info">
+              <div class="mod-name">Módulo 3 — Degradê Avançado</div>
+              <div class="mod-meta" style="color:var(--warn);">Em progresso · 3/8 aulas · Parado há 9 dias</div>
+            </div>
+            <span class="mod-status ms-prog">Em progresso</span>
+          </div>
+          <div class="mod-row">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.04);">🔒</div>
+            <div class="mod-info">
+              <div class="mod-name">Módulo 4 — Business da Barbearia</div>
+              <div class="mod-meta">Bloqueado · Disponível após concluir Módulo 3</div>
+            </div>
+            <span class="mod-status ms-lock">Bloqueado</span>
+          </div>
+          <div style="font-size:8.5px;font-family:'DM Mono',monospace;color:var(--dim);margin-top:6px;">+ 8 módulos restantes bloqueados</div>
+        </div>
+
+        <!-- Timeline de eventos -->
+        <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Timeline da Jornada</div>
+
+        <div class="timeline">
+
+          <!-- Hoje -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--rose);"></div>
+            <div class="tl-date">13 Mar 2026 · hoje</div>
+            <div class="tl-title" style="color:var(--rose);">⚠ Alerta: 9 dias sem acesso</div>
+            <div class="tl-desc">Agente Pós-venda identificou inatividade. Mensagem de reativação enviada via WhatsApp às 09:14. Aguardando resposta.</div>
+            <div class="tl-tags"><span class="tl-tag" style="color:var(--violet);border-color:rgba(167,139,250,0.2);">🤖 Agente Pós-venda</span><span class="tl-tag">WhatsApp enviado</span></div>
+          </div>
+
+          <!-- Último acesso -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--muted);"></div>
+            <div class="tl-date">04 Mar 2026</div>
+            <div class="tl-title">Último acesso — Módulo 3 (Aula 3/8)</div>
+            <div class="tl-desc">Sessão de 34min. Assistiu até Aula 3 do Módulo 3 mas não concluiu. Saiu no meio da aula "Técnica de Fade Perfeito".</div>
+            <div class="tl-tags"><span class="tl-tag">34 min de sessão</span><span class="tl-tag">Progresso 37.5% do módulo</span></div>
+          </div>
+
+          <!-- Pagamento em atraso -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--warn);"></div>
+            <div class="tl-date">01 Mar 2026</div>
+            <div class="tl-title" style="color:var(--warn);">Parcela 5/12 venceu sem pagamento</div>
+            <div class="tl-desc">Vencimento: R$400,00. Agente de Cobrança enviou 3 mensagens (01/03, 05/03 e 08/03). Sem resposta até o momento.</div>
+            <div class="tl-tags"><span class="tl-tag" style="color:var(--rose);border-color:rgba(251,113,133,0.2);">R$400 em atraso</span><span class="tl-tag" style="color:var(--violet);border-color:rgba(167,139,250,0.2);">🤖 3 tentativas de cobrança</span></div>
+          </div>
+
+          <!-- Mentoria -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--violet);"></div>
+            <div class="tl-date">22 Fev 2026</div>
+            <div class="tl-title" style="color:var(--violet);">🎯 Mentoria Individual — 1h 20min</div>
+            <div class="tl-desc">Sessão com Seu Elias. Tema: "Como precificar serviços na minha barbearia". Gravação disponível. Plano de ação: 3 ações definidas pelo aluno. Feedback: ★★★★★</div>
+            <div class="tl-tags">
+              <span class="tl-tag" style="color:var(--violet);border-color:rgba(167,139,250,0.2);">Mentoria Individual</span>
+              <span class="tl-tag">1h 20min</span>
+              <span class="tl-tag" style="color:var(--ok);border-color:rgba(52,211,153,0.15);">★★★★★</span>
+              <span class="tl-tag">Gravação disponível</span>
+            </div>
+          </div>
+
+          <!-- Acesso intenso -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--ok);"></div>
+            <div class="tl-date">15 – 23 Jan 2026</div>
+            <div class="tl-title" style="color:var(--ok);">Período de maior engajamento — Módulos 1 e 2</div>
+            <div class="tl-desc">8 dias consecutivos de acesso (streak máximo). Concluiu Módulo 1 em 4 dias e Módulo 2 em mais 5 dias. Total: 3.2h de conteúdo consumido. Média de 24min/sessão.</div>
+            <div class="tl-tags"><span class="tl-tag" style="color:var(--ok);border-color:rgba(52,211,153,0.15);">🔥 8 dias de streak</span><span class="tl-tag">3.2h consumidas</span><span class="tl-tag">2 módulos concluídos</span></div>
+          </div>
+
+          <!-- Parcela paga -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--ok);"></div>
+            <div class="tl-date">14 Jan 2026</div>
+            <div class="tl-title">Parcela 1/12 paga — R$400,00 ✓</div>
+            <div class="tl-desc">Pagamento via Pix confirmado. Acesso liberado à Área do Aluno. Agente de Boas-vindas enviou mensagem de onboarding e link do primeiro módulo.</div>
+            <div class="tl-tags"><span class="tl-tag" style="color:var(--ok);border-color:rgba(52,211,153,0.15);">Pix confirmado</span><span class="tl-tag" style="color:var(--violet);border-color:rgba(167,139,250,0.2);">🤖 Onboarding automático</span></div>
+          </div>
+
+          <!-- Matrícula -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--cyan);"></div>
+            <div class="tl-date">14 Jan 2026</div>
+            <div class="tl-title" style="color:var(--cyan);">🎓 Matrícula — Formação Barber Pro</div>
+            <div class="tl-desc">Fechamento realizado pelo Closer Lucas Martins. Canal de origem: Instagram. SDR qualificou em 3 dias. Ciclo total da venda: 8 dias. Produto: Pix 12x R$400/mês.</div>
+            <div class="tl-tags">
+              <span class="tl-tag" style="color:var(--cyan);border-color:rgba(34,211,238,0.2);">Matrícula</span>
+              <span class="tl-tag">12x R$400</span>
+              <span class="tl-tag">Closer: Lucas</span>
+              <span class="tl-tag">Origem: Instagram</span>
+            </div>
+          </div>
+
+          <!-- Primeiro contato SDR -->
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--dim);"></div>
+            <div class="tl-date">06 Jan 2026</div>
+            <div class="tl-title">Primeiro contato — Agente SDR</div>
+            <div class="tl-desc">Lead captado via Instagram Stories (anúncio "Como triplicar sua renda na barbearia"). Agente SDR iniciou conversa em 4min após opt-in. Qualificado como SQL após 3 mensagens.</div>
+            <div class="tl-tags"><span class="tl-tag" style="color:var(--violet);border-color:rgba(167,139,250,0.2);">🤖 Agente SDR</span><span class="tl-tag">Instagram Ads</span><span class="tl-tag">Qualificado em 3 msgs</span></div>
+          </div>
+
+        </div><!-- /timeline -->
+      </div><!-- /panel-body -->
+    </div><!-- /student-panel -->
+  </div><!-- /screen-body -->
+</div><!-- /screen-mock -->
+
+<!-- ══════════════════════
+     ABA FINANCEIRO MOCKUP
+══════════════════════ -->
+<div style="margin-top:40px;margin-bottom:14px;">
+  <div class="sec-label">03 — Aba Financeiro (detalhe)</div>
+  <div class="sec-title">Inadimplência · parcelas · score de recuperação</div>
+</div>
+
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;">
+  <!-- Score de saúde financeira -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+    <div class="score-ring-wrap">
+      <svg viewBox="0 0 60 60" style="width:60px;height:60px;flex-shrink:0;">
+        <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+        <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="6"
+          stroke-dasharray="90.5 60.5" stroke-dashoffset="-37.7" stroke-linecap="round"/>
+        <text x="30" y="35" font-size="13" fill="white" font-family="sans-serif" font-weight="800" text-anchor="middle">62</text>
+      </svg>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--warn);margin-bottom:3px;">Score de Saúde: Médio</div>
+        <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.7;">4/12 parcelas pagas · 1 em atraso<br>Última atividade há 9 dias<br>Risco de churn: <span style="color:var(--crit);">Alto</span></div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid rgba(251,113,133,0.15);border-radius:10px;padding:14px;">
+      <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Situação atual</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;">
+          <span style="color:var(--muted)">Total do curso</span><span>R$4.800 (12×R$400)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;">
+          <span style="color:var(--ok)">Já pago</span><span style="color:var(--ok)">R$1.600 (4 parcelas)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;">
+          <span style="color:var(--crit)">Em atraso</span><span style="color:var(--crit)">R$400 (parc. 5 · 12d)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;">
+          <span style="color:var(--muted)">A vencer</span><span>R$2.800 (7 parcelas)</span>
+        </div>
+        <div style="height:1px;background:var(--border);margin:3px 0;"></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;">
+          <span>Recuperação esperada</span><span style="color:var(--warn)">62% · R$2.976</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade de parcelas expandida -->
+  <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Grade de parcelas — 12 meses</div>
+  <div class="parc-grid">
+    <div class="parc-cell pc-ok" title="Jan · R$400 · 14/01/26">P1<div style="font-size:6px;margin-top:1px;">Jan</div></div>
+    <div class="parc-cell pc-ok" title="Fev · R$400 · 14/02/26">P2<div style="font-size:6px;margin-top:1px;">Fev</div></div>
+    <div class="parc-cell pc-ok" title="Mar · R$400 · 14/02/26">P3<div style="font-size:6px;margin-top:1px;">Mar</div></div>
+    <div class="parc-cell pc-ok" title="Abr">P4<div style="font-size:6px;margin-top:1px;">Abr</div></div>
+    <div class="parc-cell pc-late" title="Mai · vencida há 12 dias">P5<div style="font-size:6px;margin-top:1px;">⚠</div></div>
+    <div class="parc-cell pc-cur" title="Jun · vence em 18 dias · próxima">P6<div style="font-size:6px;margin-top:1px;">Próx</div></div>
+    <div class="parc-cell pc-pend">P7<div style="font-size:6px;margin-top:1px;">Jul</div></div>
+    <div class="parc-cell pc-pend">P8<div style="font-size:6px;margin-top:1px;">Ago</div></div>
+    <div class="parc-cell pc-pend">P9<div style="font-size:6px;margin-top:1px;">Set</div></div>
+    <div class="parc-cell pc-pend">P10<div style="font-size:6px;margin-top:1px;">Out</div></div>
+    <div class="parc-cell pc-pend">P11<div style="font-size:6px;margin-top:1px;">Nov</div></div>
+    <div class="parc-cell pc-pend">P12<div style="font-size:6px;margin-top:1px;">Dez</div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:8px;font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.5);margin-right:3px;vertical-align:middle;"></span>Pago</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,113,133,0.5);margin-right:3px;vertical-align:middle;"></span>Em atraso</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,191,36,0.5);margin-right:3px;vertical-align:middle;"></span>Próxima</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.06);margin-right:3px;vertical-align:middle;"></span>A vencer</span>
+  </div>
+
+  <!-- Histórico de tentativas de cobrança -->
+  <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin:14px 0 8px;">Histórico de cobranças — Parcela 5</div>
+  <div style="background:var(--surface2);border:1px solid rgba(251,113,133,0.12);border-radius:10px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:100px 1fr 80px 80px;padding:7px 12px;border-bottom:1px solid var(--border);font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1px;text-transform:uppercase;background:var(--surface3);">
+      <span>Data</span><span>Mensagem</span><span>Canal</span><span>Resposta</span>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 80px 80px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px;font-family:'DM Mono',monospace;align-items:center;">
+      <span style="color:var(--muted)">01/03/26</span><span>Lembrete amigável — "Oi Marcos, sua parcela vence amanhã..."</span><span><span class="badge" style="background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.15);">🤖 IA</span></span><span style="color:var(--dim)">Visto</span>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 80px 80px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px;font-family:'DM Mono',monospace;align-items:center;">
+      <span style="color:var(--muted)">05/03/26</span><span>Follow-up — "Marcos, identificamos sua parcela em aberto..."</span><span><span class="badge" style="background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.15);">🤖 IA</span></span><span style="color:var(--dim)">Não visto</span>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 80px 80px;padding:8px 12px;font-size:10px;font-family:'DM Mono',monospace;align-items:center;">
+      <span style="color:var(--muted)">08/03/26</span><span>Escalado para humano — "Marcos, preciso de 5min com você..."</span><span><span class="badge b-warn">Humano</span></span><span style="color:var(--crit)">Sem resp.</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     ESPECIFICAÇÕES
+══════════════════════ -->
+<div style="margin-bottom:14px;">
+  <div class="sec-label">04 — Especificações técnicas</div>
+  <div class="sec-title">Estrutura das 4 abas · dados necessários · lógica</div>
+</div>
+
+<!-- ABA 1: RESUMO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:12px;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--violet),rgba(167,139,250,0.3),transparent);"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Aba 1 · Resumo</span><span class="badge b-p1">P1</span></div>
+  <h3 style="font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;">Visão Rápida — "O que preciso saber em 5 segundos"</h3>
+  <p style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;">Primeira aba ao selecionar o aluno. Concentra os indicadores mais críticos: saúde financeira, engajamento e próxima ação recomendada. Projetada para o ritual matinal do Seu Elias.</p>
+  <div class="spec-cols">
+    <div class="spec-col">
+      <h4 style="color:var(--violet)">Seções</h4>
+      <ul>
+        <li>Score de saúde geral (0–100) com anel colorido<span class="s">Verde ≥70 · Âmbar 40–69 · Vermelho &lt;40</span></li>
+        <li>3 indicadores inline: engajamento · pagamento · risco churn</li>
+        <li>Próxima ação recomendada: "Ligar · Enviar lembrete · Reagendar mentoria"<span class="s">Gerada pelo Agente Pós-venda com base nos dados</span></li>
+        <li>Últimos 3 eventos da timeline (preview)</li>
+        <li>Botão "Ver jornada completa" → muda para aba Jornada</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--amber)">Score de saúde — cálculo</h4>
+      <ul>
+        <li>Engajamento (40%): horas de tela + módulos concluídos + dias desde último login<span class="s">Penalizar: sem login &gt;7d = −15pts · sem login &gt;14d = −25pts</span></li>
+        <li>Financeiro (40%): % de parcelas pagas + dias de atraso<span class="s">Atraso &gt;15d = −20pts · 2+ parcelas atrasadas = −35pts</span></li>
+        <li>Engajamento com conteúdo (20%): perguntas · feedback · mentoria agendada</li>
+        <li>Score calculado em tempo real — atualiza ao abrir o painel</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--cyan)">Próxima ação recomendada</h4>
+      <ul>
+        <li>Lógica baseada no score e nos eventos recentes</li>
+        <li>Score &lt;40 + sem login &gt;7d = "Ligar pessoalmente — risco de desistência"<span class="s">Com botão de ligação direta pelo celular</span></li>
+        <li>Parcela em atraso + sem resposta = "Escalar cobrança para humano"</li>
+        <li>Módulo em progresso há &gt;5d = "Enviar dica motivacional" → template pré-pronto</li>
+        <li>Mentoria disponível e não agendada = "Sugerir agendamento"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 2: JORNADA -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:12px;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--emerald),rgba(52,211,153,0.3),transparent);"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Aba 2 · Jornada</span><span class="badge b-p1">P1</span></div>
+  <h3 style="font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;">Engajamento + Módulos + Timeline Cronológica</h3>
+  <p style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;">O coração do painel. Tudo que o aluno fez, em ordem cronológica, com filtro por tipo de evento.</p>
+  <div class="spec-cols">
+    <div class="spec-col">
+      <h4 style="color:var(--emerald)">KPIs de engajamento</h4>
+      <ul>
+        <li>Horas de tela total acumulada na área do aluno<span class="s">Soma de todas as sessões · Fonte: LMS / área do aluno</span></li>
+        <li>Módulos concluídos / total do produto<span class="s">Ex: 2/12 · com barra de progresso</span></li>
+        <li>Dias desde último login (com alerta visual se &gt;7d)</li>
+        <li>Streak máximo atingido (dias consecutivos de acesso)</li>
+        <li>Média de minutos por sessão</li>
+        <li>Total de mentorias realizadas</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--amber)">Módulos — detalhe</h4>
+      <ul>
+        <li>Lista todos os módulos do produto comprado</li>
+        <li>Status: ✓ Concluído · ▶ Em progresso · 🔒 Bloqueado · ○ Disponível</li>
+        <li>Concluído: data de conclusão + tempo total consumido</li>
+        <li>Em progresso: aula atual (X/Y) + último acesso + % completo</li>
+        <li>Click no módulo: expande lista de aulas com status individual</li>
+        <li>Aula travada (parou no meio): badge "Parado aqui" em âmbar</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--cyan)">Timeline — tipos de evento</h4>
+      <ul>
+        <li>🎓 Matrícula — produto, canal, closer, ciclo de venda, forma de pagamento</li>
+        <li>💰 Pagamento — parcela número, valor, status, canal (Pix/cartão)</li>
+        <li>⚠ Atraso — dias em atraso, tentativas de cobrança, resposta do aluno</li>
+        <li>▶ Acesso — data, módulo acessado, duração da sessão</li>
+        <li>✓ Módulo concluído — módulo, tempo total, data</li>
+        <li>🎯 Mentoria — data, duração, tema, feedback (★), link gravação</li>
+        <li>🤖 Ação do agente — qual agente, canal, mensagem enviada, resposta</li>
+        <li>📝 Nota manual — adicionada pelo Elias manualmente</li>
+        <li>🏆 Certificado emitido</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 3: FINANCEIRO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:12px;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),rgba(251,191,36,0.3),transparent);"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Aba 3 · Financeiro</span><span class="badge b-p1">P1</span></div>
+  <h3 style="font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;">Inadimplência · Parcelas · Score de Recuperação</h3>
+  <p style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;">Expansão do que já existe (grade de parcelas) com score de saúde financeira, histórico de cobranças por parcela e projeção de recuperação.</p>
+  <div class="spec-cols">
+    <div class="spec-col">
+      <h4 style="color:var(--amber)">Dados financeiros</h4>
+      <ul>
+        <li>Score de saúde financeira (0–100) com anel<span class="s">Verde = paga em dia · Âmbar = parcial/atraso leve · Vermelho = inadimplente</span></li>
+        <li>Resumo: total pago · em atraso · a vencer · % do total quitado</li>
+        <li>Grade visual de parcelas expandida (mantida do atual)<span class="s">+ tooltip por parcela: data vencimento, data pagamento, canal</span></li>
+        <li>Próxima parcela: data + valor + dias para vencer (ou dias em atraso)</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--cyan)">Histórico de cobranças</h4>
+      <ul>
+        <li>Por parcela em atraso: tabela de todas as tentativas</li>
+        <li>Colunas: data · mensagem (preview) · canal · status resposta</li>
+        <li>Status de resposta: Pago ✓ · Respondeu · Visto · Não visto · Sem resposta</li>
+        <li>Qual agente enviou vs humano<span class="s">Badge "🤖 IA" ou "Humano" em cada tentativa</span></li>
+        <li>Botão "Iniciar negociação" → abre WhatsApp com template</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--violet)">Score de recuperação</h4>
+      <ul>
+        <li>% de probabilidade de recuperar a dívida atual<span class="s">Baseado em: dias em atraso · histórico de pagamentos · engajamento no curso · perfil</span></li>
+        <li>Verde &gt;70%: alta chance, manter cobrança automática</li>
+        <li>Âmbar 40–70%: atenção, sugerir negociação direta</li>
+        <li>Vermelho &lt;40%: baixa chance, escalar para Seu Elias / considerar suspensão</li>
+        <li>Receita esperada = % × valor em aberto</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 4: HISTÓRICO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:12px;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),rgba(34,211,238,0.3),transparent);"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-req">Aba 4 · Histórico</span><span class="badge b-p2">P2</span></div>
+  <h3 style="font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;">Histórico de Contatos — Agentes IA + Humanos</h3>
+  <p style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;">Log completo de todas as interações com o aluno: mensagens dos agentes de IA, contatos manuais, respostas recebidas e notas internas adicionadas pelo Seu Elias.</p>
+  <div class="spec-cols">
+    <div class="spec-col">
+      <h4 style="color:var(--cyan)">Log de mensagens</h4>
+      <ul>
+        <li>Todas as mensagens enviadas ao aluno, em ordem cronológica</li>
+        <li>Filtro: Todos · Agente SDR · Agente Cobrança · Agente Pós-venda · Humano · Notas</li>
+        <li>Por mensagem: timestamp · remetente · preview da mensagem · status (enviada/visto/respondida)</li>
+        <li>Resposta do aluno exibida inline quando existir</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--amber)">Notas manuais</h4>
+      <ul>
+        <li>Campo para o Elias adicionar notas sobre o aluno<span class="s">"Falou que vai pagar semana que vem" · "Tem dificuldade com o módulo 3"</span></li>
+        <li>Nota aparece na timeline com ícone 📝 e autor</li>
+        <li>Categorias: Financeiro · Engajamento · Mentoria · Outros</li>
+        <li>Notas ficam visíveis para todos os agentes como contexto<span class="s">Injetadas no system prompt do agente ao interagir com esse aluno</span></li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--violet)">Integrações necessárias</h4>
+      <ul>
+        <li>GoHighLevel: histórico de conversas do WhatsApp<span class="s">Via GHL API → buscar conversas por telefone do aluno</span></li>
+        <li>Área do aluno (LMS): sessões, módulos, tempo de tela<span class="s">Webhook ou polling da plataforma de cursos (Hotmart / Kiwify / própria)</span></li>
+        <li>n8n: log de execuções dos agentes para esse aluno<span class="s">INCIDENT_LOG filtrado por aluno_id</span></li>
+        <li>Supabase: notas manuais salvas pelo Elias</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DATASETS -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;">
+  <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">Novos datasets necessários</div>
+  <table class="ds-table">
+    <thead><tr><th>Dataset</th><th>Campos</th><th>Origem</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>ALUNO_ENGAJAMENTO</td>
+        <td style="color:var(--muted)">aluno_id, horasTela, modulosConcluidos, totalModulos, ultimoLogin, streakAtual, streakMaximo, mediaMinutosSessao, totalSessoes</td>
+        <td style="color:var(--muted)">LMS (Hotmart / Kiwify / própria) via webhook ou polling diário → Supabase</td>
+      </tr>
+      <tr>
+        <td>ALUNO_MODULOS</td>
+        <td style="color:var(--muted)">aluno_id, modulo_id, nome, ordem, status (concluido/progresso/disponivel/bloqueado), aulasTotal, aulasConcluidas, tempoConsumido, dataConclusao, aulaAtual</td>
+        <td style="color:var(--muted)">LMS via API · sincronizado diariamente ou em tempo real via webhook</td>
+      </tr>
+      <tr>
+        <td>ALUNO_MENTORIAS</td>
+        <td style="color:var(--muted)">aluno_id, data, duracao, tema, feedback (1–5), linkGravacao, notas, agendadoPor</td>
+        <td style="color:var(--muted)">Google Calendar / GHL Calendar · registro manual ou via agente de Agendamento</td>
+      </tr>
+      <tr>
+        <td>ALUNO_TIMELINE</td>
+        <td style="color:var(--muted)">aluno_id, tipo (matricula/pagamento/atraso/acesso/modulo/mentoria/agente/nota), data, titulo, descricao, meta (JSON livre por tipo), agente</td>
+        <td style="color:var(--muted)">Gerado automaticamente por webhooks de cada fonte · unificado no Supabase</td>
+      </tr>
+      <tr>
+        <td>ALUNO_CONTATOS</td>
+        <td style="color:var(--muted)">aluno_id, data, canal, agente (SDR/Cobranca/PosVenda/Humano), mensagem, statusResposta, resposta</td>
+        <td style="color:var(--muted)">GHL API (WhatsApp) + n8n log de execuções dos agentes</td>
+      </tr>
+      <tr>
+        <td>ALUNOS (expandir)</td>
+        <td style="color:var(--muted)">+ scoreEngajamento, + scorePagamento, + scoreGeral, + riscoChurn, + proximaAcaoRecomendada, + dataMatricula, + canalOrigem, + closer</td>
+        <td style="color:var(--muted)">Calculado em background job diário · salvo no ALUNOS existente</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- LISTA EXPANDIDA -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;">
+  <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">Lista de alunos — melhorias na coluna esquerda</div>
+  <div class="spec-cols">
+    <div class="spec-col">
+      <h4 style="color:var(--violet)">Cada item da lista (atual + novo)</h4>
+      <ul>
+        <li>Nome + telefone + produto (mantido)</li>
+        <li>Badge status pagamento (mantido: paga/parcial/atrasada)</li>
+        <li>Parcelas X/Y (mantido)</li>
+        <li><strong>NOVO:</strong> 3ª linha de info contextual abaixo<span class="s">Ex: "24.5h · 8/12 módulos" ou "⚠ Sem login há 9 dias" ou "✓ Concluído"</span></li>
+        <li>Borda esquerda colorida por saúde geral<span class="s">Verde=ok · Âmbar=atenção · Vermelho=risco</span></li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--amber)">Filtros na lista</h4>
+      <ul>
+        <li>Busca por nome ou telefone (mantida)</li>
+        <li>NOVO: filtro por status de pagamento (paga/parcial/atrasada)</li>
+        <li>NOVO: filtro por engajamento (ativo/inativo/em risco)</li>
+        <li>NOVO: filtro por produto (Formação Barber Pro / Master Cut)</li>
+        <li>NOVO: ordenação por score · por nome · por última atividade · por vencimento</li>
+      </ul>
+    </div>
+    <div class="spec-col">
+      <h4 style="color:var(--cyan)">Indicadores na lista</h4>
+      <ul>
+        <li>Ícone ⚠ vermelho quando: atraso &gt;15d OU sem login &gt;14d<span class="s">Visível sem precisar clicar — ritual matinal</span></li>
+        <li>Ícone 🤖 quando agente enviou mensagem nas últimas 24h</li>
+        <li>Ícone 🎯 quando tem mentoria agendada nos próximos 3 dias</li>
+        <li>Ícone ✓ verde quando aluno concluiu o curso</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- IMPLEMENTAÇÃO -->
+<div style="margin-bottom:14px;">
+  <div class="sec-label">05 — Ordem de implementação</div>
+</div>
+<div class="impl">
+  <div class="impl-item" style="border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.015);">
+    <div class="impl-n" style="color:rgba(248,113,113,0.2);">01</div>
+    <div class="impl-b">
+      <h4>Score + 3ª linha na lista + Aba Financeiro expandida</h4>
+      <p>Começa pelos dados que já existem no ALUNOS (parcelas, status_pag, faturamento). Calcular scoreEngajamento e scorePagamento. Adicionar 3ª linha na lista com info contextual. Expandir o painel de Financeiro com grade de parcelas melhorada, score de saúde e histórico de cobranças. Não requer integração com LMS ainda.</p>
+      <div class="impl-tags"><span class="badge b-p1">P1</span><span class="badge b-ok">Dados já existem</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">ALUNOS + lógica de score · sem nova integração externa</span></div>
+    </div>
+  </div>
+  <div class="impl-item" style="border-color:rgba(248,113,113,0.15);">
+    <div class="impl-n" style="color:rgba(248,113,113,0.18);">02</div>
+    <div class="impl-b">
+      <h4>Integração LMS → ALUNO_ENGAJAMENTO + ALUNO_MODULOS</h4>
+      <p>Conectar a plataforma de cursos (Hotmart / Kiwify / própria) ao Supabase via webhook ou polling diário no n8n. Popular ALUNO_ENGAJAMENTO e ALUNO_MODULOS. Só após isso a Aba Jornada fica funcional com dados reais de horas de tela e módulos. Esta é a integração mais crítica — sem ela, a timeline tem apenas dados financeiros.</p>
+      <div class="impl-tags"><span class="badge b-p1">P1</span><span class="badge b-warn">Requer integração LMS</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">n8n workflow → LMS API → Supabase ALUNO_ENGAJAMENTO + ALUNO_MODULOS</span></div>
+    </div>
+  </div>
+  <div class="impl-item">
+    <div class="impl-n" style="color:rgba(167,139,250,0.15);">03</div>
+    <div class="impl-b">
+      <h4>Aba Jornada: KPIs de engajamento + lista de módulos + timeline</h4>
+      <p>Com os dados do LMS disponíveis, construir a Aba Jornada completa: KPIs de engajamento, barra de progresso por curso, lista de módulos com status e detalhe de aulas, e a timeline cronológica unificando todos os eventos. ALUNO_TIMELINE centraliza tudo — é o aggregator de eventos de todas as fontes.</p>
+      <div class="impl-tags"><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Depende do passo 2 · ALUNO_TIMELINE unifica eventos de todas as fontes</span></div>
+    </div>
+  </div>
+  <div class="impl-item">
+    <div class="impl-n" style="color:rgba(167,139,250,0.1);">04</div>
+    <div class="impl-b">
+      <h4>Aba Resumo: score geral + próxima ação recomendada + 4 filtros na lista</h4>
+      <p>Score geral ponderando engajamento e financeiro. Lógica de próxima ação recomendada. Filtros na lista (por status, engajamento, produto, ordenação). Ícones de alerta na lista (⚠ 🤖 🎯 ✓). Esta aba depende de todos os dados anteriores estarem disponíveis.</p>
+      <div class="impl-tags"><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Depende dos passos 1 e 2 · lógica de score + UX de filtros</span></div>
+    </div>
+  </div>
+  <div class="impl-item">
+    <div class="impl-n" style="color:rgba(167,139,250,0.08);">05</div>
+    <div class="impl-b">
+      <h4>Aba Histórico: log GHL + notas manuais + campo de nota inline</h4>
+      <p>Integração com GHL API para buscar histórico de WhatsApp por telefone. Campo para o Elias adicionar notas manuais com categoria. Log de execuções dos agentes filtrado por aluno. Notas injetadas no contexto dos agentes ao interagir com esse aluno.</p>
+      <div class="impl-tags"><span class="badge b-p2">P2</span><span class="badge b-warn">Requer GHL API</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">GHL API + ALUNO_CONTATOS + campo de nota no Supabase</span></div>
+    </div>
+  </div>
+</div>
+
+<footer style="margin-top:52px;">
+  Gerado por <span>Tria Company</span> · Base de Alunos — Timeline do Aluno · dashelias.vercel.app
+</footer>
+</div>
+</body>
+</html>

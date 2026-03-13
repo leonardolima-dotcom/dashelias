@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Índice — Dashboard Administrativo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: rgba(255,255,255,0.03);
+      --surface-hover: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.06);
+      --border-light: rgba(255,255,255,0.04);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --amber: #fbbf24;
+      --amber-dim: rgba(251,191,36,0.15);
+      --emerald: #34d399;
+      --emerald-dim: rgba(16,185,129,0.12);
+      --purple: #c084fc;
+      --purple-dim: rgba(168,85,247,0.12);
+      --blue: #60a5fa;
+      --blue-dim: rgba(59,130,246,0.12);
+      --rose: #fb7185;
+      --rose-dim: rgba(244,63,94,0.1);
+      --cyan: #22d3ee;
+      --cyan-dim: rgba(34,211,238,0.12);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Ambient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120vh; height: 120vh;
+      background: rgba(255, 177, 23, 0.08);
+      filter: blur(140px);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: orbPulse 5s ease-in-out infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); filter: blur(6px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeIn 0.8s ease-out both;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .page-header h1 span { color: var(--amber); }
+    .page-header p {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    .page-header .file-ref {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    /* Nav pills */
+    .nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 40px;
+      animation: fadeIn 0.8s ease-out 0.1s both;
+    }
+    .nav-pills a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-decoration: none;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-pills a:hover {
+      color: var(--amber);
+      background: var(--amber-dim);
+      border-color: rgba(251,191,36,0.2);
+    }
+    .nav-pills a .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    /* Section */
+    .screen-section {
+      margin-bottom: 40px;
+      animation: fadeIn 0.8s ease-out both;
+    }
+
+    .screen-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .screen-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--amber);
+      background: var(--amber-dim);
+      flex-shrink: 0;
+    }
+    .screen-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      flex: 1;
+    }
+    .screen-header .key-badge {
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .screen-header .line-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--purple);
+      background: var(--purple-dim);
+      border: 1px solid rgba(168,85,247,0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .screen-header .func-badge {
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      color: var(--cyan);
+      background: var(--cyan-dim);
+      border: 1px solid rgba(34,211,238,0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .screen-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-left: 44px;
+    }
+
+    .state-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--emerald);
+      background: var(--emerald-dim);
+      border: 1px solid rgba(16,185,129,0.15);
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin-left: 44px;
+      margin-bottom: 16px;
+    }
+    .state-info::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 6px rgba(16,185,129,0.4);
+    }
+
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 10px;
+      padding-left: 44px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      border-color: rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      filter: blur(30px);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
+    .card.amber::before { background: rgba(251,191,36,0.15); }
+    .card.emerald::before { background: rgba(16,185,129,0.15); }
+    .card.purple::before { background: rgba(168,85,247,0.15); }
+    .card.blue::before { background: rgba(59,130,246,0.15); }
+    .card.rose::before { background: rgba(244,63,94,0.15); }
+    .card.cyan::before { background: rgba(34,211,238,0.15); }
+
+    .card-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+    .card-type.kpi { color: var(--amber); background: var(--amber-dim); }
+    .card-type.chart { color: var(--purple); background: var(--purple-dim); }
+    .card-type.table { color: var(--blue); background: var(--blue-dim); }
+    .card-type.list { color: var(--emerald); background: var(--emerald-dim); }
+    .card-type.interactive { color: var(--cyan); background: var(--cyan-dim); }
+    .card-type.special { color: var(--rose); background: var(--rose-dim); }
+
+    .card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .card p {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .card .data-src {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 9px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.04);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .card .grid-info {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* Dividers */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 40px 0;
+    }
+
+    /* Components & Data tables */
+    .ref-section {
+      margin-top: 48px;
+      animation: fadeIn 0.8s ease-out both;
+    }
+    .ref-section h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ref-section h2 .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .ref-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ref-table thead th {
+      background: rgba(255,255,255,0.04);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    .ref-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-muted);
+    }
+    .ref-table tbody tr:last-child td { border-bottom: none; }
+    .ref-table tbody tr:hover { background: var(--surface-hover); }
+    .ref-table .mono {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+    }
+    .ref-table .line {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      color: var(--purple);
+    }
+    .ref-table .count {
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    /* Footer */
+    .page-footer {
+      margin-top: 60px;
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 0.8s ease-out both;
+    }
+    .page-footer p {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .page-footer .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px rgba(16,185,129,0.6);
+      margin-right: 6px;
+      vertical-align: middle;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .cards-grid { grid-template-columns: 1fr; padding-left: 0; }
+      .screen-desc, .state-info { padding-left: 0; margin-left: 0; }
+      .container { padding: 20px 16px 60px; }
+      .nav-pills { gap: 4px; }
+      .nav-pills a { padding: 5px 10px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Dashboard <span>Administrativo</span></h1>
+    <p>Índice Completo de Telas</p>
+    <div class="file-ref">src/app/dashboard/administrativo/page.tsx &nbsp;·&nbsp; 8 telas &nbsp;·&nbsp; 6 componentes &nbsp;·&nbsp; 13 datasets</div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-pills">
+    <a href="#home"><span class="num">1</span> Visão Geral</a>
+    <a href="#funil"><span class="num">2</span> Funil de Vendas</a>
+    <a href="#financeiro"><span class="num">3</span> Financeiro</a>
+    <a href="#equipe"><span class="num">4</span> Equipe Comercial</a>
+    <a href="#agentes"><span class="num">5</span> Agentes IA</a>
+    <a href="#alunos"><span class="num">6</span> Base de Alunos</a>
+    <a href="#turmas"><span class="num">7</span> Turmas</a>
+    <a href="#marketing"><span class="num">8</span> Marketing</a>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       TELA 1 — VISÃO GERAL
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="home" style="animation-delay:0.15s">
+    <div class="screen-header">
+      <div class="screen-num">1</div>
+      <h2>Visão Geral</h2>
+      <span class="key-badge">page: "home"</span>
+      <span class="func-badge">HomeScreen()</span>
+      <span class="line-badge">L327</span>
+    </div>
+    <p class="screen-desc">Painel principal com resumo de todos os indicadores. Alertas clicáveis que navegam para telas específicas. Recebe <code style="color:var(--cyan)">setPage</code> como prop para navegação interna.</p>
+
+    <div class="cards-grid">
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards</div>
+        <h4>4 KPIs Principais</h4>
+        <p>Receita do mês (R$ 43.200) · Vendas fechadas (89) · Taxa de conversão (36%) · Inadimplência ativa (R$ 12.400)</p>
+        <div class="grid-info">grid-cols-2 md:grid-cols-4</div>
+      </div>
+
+      <div class="card rose">
+        <div class="card-type special">Alertas</div>
+        <h4>3 Cards de Alerta</h4>
+        <p>Inadimplentes há +30 dias · Turma 47 com poucas vagas · Agente Cobrança degradado. Cada card navega para a tela relevante ao clicar.</p>
+        <span class="data-src">ALERTAS[3]</span>
+        <div class="grid-info">grid-cols-1 md:grid-cols-3</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type chart">Gráfico de Barras</div>
+        <h4>Receita Mensal</h4>
+        <p>Barras empilhadas dos últimos 6 meses: Realizada (verde) + Projetada (verde claro) + Recuperada (amber). Partículas e glow animados.</p>
+        <span class="data-src">RECEITA_MENSAL[6]</span>
+        <div class="grid-info">lg:col-span-7</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type chart">Barras Horizontais</div>
+        <h4>Mini Funil</h4>
+        <p>5 etapas com barras coloridas vibrantes (cyan, blue, purple, amber, emerald), partículas, % de conversão entre etapas. Card de perdidos abaixo.</p>
+        <span class="data-src">FUNIL_DATA[6]</span>
+        <div class="grid-info">lg:col-span-5</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type list">Lista</div>
+        <h4>Próximas Turmas</h4>
+        <p>3 turmas abertas com barra de ocupação visual (OccBar): confirmados (verde), bloqueados (listrado amber), livres.</p>
+        <span class="data-src">TURMAS (filtrado)</span>
+      </div>
+
+      <div class="card purple">
+        <div class="card-type list">Feed / Timeline</div>
+        <h4>Atividade Recente</h4>
+        <p>8 eventos recentes com ícone SVG, texto descritivo e tempo relativo. Scroll customizado. Ícones: bot, dollar, calendar, alert, bell, search, check.</p>
+        <span class="data-src">ATIVIDADE[8]</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 2 — FUNIL DE VENDAS
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="funil" style="animation-delay:0.2s">
+    <div class="screen-header">
+      <div class="screen-num">2</div>
+      <h2>Funil de Vendas</h2>
+      <span class="key-badge">page: "funil"</span>
+      <span class="func-badge">FunilScreen()</span>
+      <span class="line-badge">L500</span>
+    </div>
+    <p class="screen-desc">Visão detalhada do funil completo com todas as etapas de conversão. Etapas clicáveis com destaque visual.</p>
+    <div class="state-info">useState: etapaSel — etapa do funil selecionada</div>
+
+    <div class="cards-grid">
+      <div class="card cyan">
+        <div class="card-type interactive">Interativo</div>
+        <h4>Funil de Vendas Completo</h4>
+        <p>5 barras horizontais proporcionais e clicáveis (Captados → Enriquecidos → Qualificados → Negociação → Fechados). Seleção destaca com borda colorida. % entre etapas. Card de perdidos com gargalo identificado.</p>
+        <span class="data-src">FUNIL_DATA[6]</span>
+        <div class="grid-info">lg:col-span-8</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards Empilhados</div>
+        <h4>3 Métricas do Funil</h4>
+        <p>Tempo médio de conversão (4.2 dias) · Primeiro atendimento (47 seg) · Perda principal (Sem resposta — 62% das perdas)</p>
+        <div class="grid-info">lg:col-span-4 · flex-col</div>
+      </div>
+
+      <div class="card purple">
+        <div class="card-type chart">Linha / Área SVG</div>
+        <h4>Evolução do Funil</h4>
+        <p>3 séries (Captados, Qualificados, Fechados) ao longo de 30 dias. Grid horizontal, área preenchida com opacidade, pontos nos dias D01–D30.</p>
+        <span class="data-src">FUNIL_EVOLUCAO[7]</span>
+        <div class="grid-info">full-width</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 3 — FINANCEIRO
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="financeiro" style="animation-delay:0.25s">
+    <div class="screen-header">
+      <div class="screen-num">3</div>
+      <h2>Financeiro</h2>
+      <span class="key-badge">page: "financeiro"</span>
+      <span class="func-badge">FinanceiroScreen()</span>
+      <span class="line-badge">L613</span>
+    </div>
+    <p class="screen-desc">Controle financeiro com receitas, inadimplência, formas de pagamento e detalhamento por aluno.</p>
+
+    <div class="cards-grid">
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards — Linha 1</div>
+        <h4>3 KPIs de Receita</h4>
+        <p>Receita realizada (R$ 43.200) · Receita projetada 3 meses (R$ 124.800) · Inadimplência total (R$ 12.400, 4.2%)</p>
+        <div class="grid-info">grid-cols-2 md:grid-cols-3</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards — Linha 2</div>
+        <h4>3 KPIs Complementares</h4>
+        <p>Receita recuperada (R$ 3.800) · Ticket médio (R$ 2.580) · Custo por venda (R$ 283)</p>
+        <div class="grid-info">grid-cols-2 md:grid-cols-3</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type chart">Gráfico de Barras</div>
+        <h4>Últimos 6 Meses</h4>
+        <p>Receita Realizada (verde gradient) vs Recuperada (amber gradient). Partículas animadas nas barras.</p>
+        <span class="data-src">RECEITA_MENSAL[6]</span>
+        <div class="grid-info">lg:col-span-7</div>
+      </div>
+
+      <div class="card blue">
+        <div class="card-type chart">Donut SVG + Lista</div>
+        <h4>Formas de Pagamento</h4>
+        <p>Donut com 4 segmentos (Cartão crédito, Pix à vista, Pix 6x, Pix 12x). Lista abaixo com vendas e taxa de inadimplência por forma.</p>
+        <span class="data-src">formaPag[4] (local)</span>
+        <div class="grid-info">lg:col-span-5</div>
+      </div>
+
+      <div class="card rose">
+        <div class="card-type table">Tabela</div>
+        <h4>Inadimplência por Aluno</h4>
+        <p>4 alunos: nome, turma, valor em atraso, dias de atraso (badge), tentativas de cobrança, status (badge colorido).</p>
+        <span class="data-src">inadPorAluno[4] (local)</span>
+        <div class="grid-info">full-width</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 4 — EQUIPE COMERCIAL
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="equipe" style="animation-delay:0.3s">
+    <div class="screen-header">
+      <div class="screen-num">4</div>
+      <h2>Equipe Comercial</h2>
+      <span class="key-badge">page: "equipe"</span>
+      <span class="func-badge">EquipeScreen()</span>
+      <span class="line-badge">L747</span>
+    </div>
+    <p class="screen-desc">Performance da equipe de vendas comparando agentes IA e vendedores humanos.</p>
+
+    <div class="cards-grid">
+      <div class="card amber">
+        <div class="card-type list">Ranking</div>
+        <h4>Ranking de Vendedores</h4>
+        <p>5 vendedores rankeados por receita (1 IA + 4 humanos). Avatar com iniciais, badge IA/Humano/Top, barra de receita, métricas: vendas, conversão, ticket, custo/venda, tempo resposta.</p>
+        <span class="data-src">VENDEDORES[5]</span>
+        <div class="grid-info">full-width</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type table">Comparativo</div>
+        <h4>IA vs Humanos</h4>
+        <p>5 métricas lado a lado: Custo/venda, Tempo resposta, Conversão, Ticket médio, Disponibilidade. Winner destacado com fundo colorido.</p>
+        <span class="data-src">iaVsHumano[5] (local)</span>
+        <div class="grid-info">lg:grid-cols-2 (esquerda)</div>
+      </div>
+
+      <div class="card purple">
+        <div class="card-type chart">Linha / Área SVG</div>
+        <h4>Performance Semanal</h4>
+        <p>4 séries (Agente SDR, Camila, Lucas, Pedro) ao longo de 6 semanas. Área preenchida + linha. Grid horizontal.</p>
+        <span class="data-src">PERF_SEMANAL[6]</span>
+        <div class="grid-info">lg:grid-cols-2 (direita)</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 5 — AGENTES IA
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="agentes" style="animation-delay:0.35s">
+    <div class="screen-header">
+      <div class="screen-num">5</div>
+      <h2>Agentes IA</h2>
+      <span class="key-badge">page: "agentes"</span>
+      <span class="func-badge">AgentesScreen()</span>
+      <span class="line-badge">L879</span>
+    </div>
+    <p class="screen-desc">Monitoramento de todos os agentes de inteligência artificial com métricas operacionais e custo.</p>
+    <div class="state-info">useState: selAgent — agente selecionado</div>
+
+    <div class="cards-grid">
+      <div class="card cyan">
+        <div class="card-type interactive">Cards Clicáveis</div>
+        <h4>5 Agentes IA</h4>
+        <p>Enriquecimento · SDR · Agendamento · Cobrança · Pós-venda. Cada card: ícone, status (online/degradado com dot colorido e glow), exec 24h, sucesso %, tokens, custo mensal.</p>
+        <span class="data-src">AGENTES[5]</span>
+        <div class="grid-info">grid-cols-2 md:grid-cols-5</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type special">Destaque</div>
+        <h4>Deflexão Geral</h4>
+        <p>73% — resolvido sem humano. 256 pela IA, 95 escaladas. Economia de R$ 9.200/mês (~2 vendedores). Valor grande com glow verde.</p>
+        <div class="grid-info">lg:col-span-4 · text-center</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type chart">Gráfico de Barras</div>
+        <h4>Execuções dos Agentes</h4>
+        <p>Sucesso (verde) vs Erro (vermelho) por dia da semana (Seg–Dom). Valor numérico no topo de cada barra. Partículas nas barras verdes.</p>
+        <span class="data-src">AGENT_EXEC_DIARIO[7]</span>
+        <div class="grid-info">lg:col-span-8</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type chart">Barras Horizontais</div>
+        <h4>Custo por Agente</h4>
+        <p>5 agentes com barra proporcional ao custo de um vendedor humano (R$ 4.600). Linha tracejada separando IA do referencial humano. Total e % equivalente no rodapé.</p>
+        <span class="data-src">AGENTES[5]</span>
+        <div class="grid-info">full-width</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 6 — BASE DE ALUNOS
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="alunos" style="animation-delay:0.4s">
+    <div class="screen-header">
+      <div class="screen-num">6</div>
+      <h2>Base de Alunos</h2>
+      <span class="key-badge">page: "alunos"</span>
+      <span class="func-badge">AlunosScreen()</span>
+      <span class="line-badge">L1006</span>
+    </div>
+    <p class="screen-desc">CRM de alunos com busca, seleção e painel lateral de detalhes. Layout muda dinamicamente ao selecionar um aluno.</p>
+    <div class="state-info">useState: sel — aluno selecionado &nbsp;|&nbsp; busca — texto de filtro</div>
+
+    <div class="cards-grid">
+      <div class="card cyan">
+        <div class="card-type interactive">Busca + Lista</div>
+        <h4>Lista de Alunos</h4>
+        <p>Input de busca (nome ou telefone). 6 cards clicáveis: nome, telefone, produto, badge status pagamento (paga/parcial/atrasada), parcelas. Borda amber no selecionado.</p>
+        <span class="data-src">ALUNOS[6]</span>
+        <div class="grid-info">Coluna esquerda (340px quando selecionado)</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type interactive">Painel de Detalhes</div>
+        <h4>Ficha do Aluno</h4>
+        <p>Aparece ao clicar. Seções: Dados pessoais (nome, tel, email, IG, cidade, segmento) · Score (colorido) · Faturamento · Compra (produto + parcelas + status) · Turma agendada · Grid visual de parcelas (verde/vermelho/cinza). Botões WhatsApp e Reagendar.</p>
+        <span class="data-src">ALUNOS[selecionado]</span>
+        <div class="grid-info">Coluna direita (flex 1fr)</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 7 — TURMAS
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="turmas" style="animation-delay:0.45s">
+    <div class="screen-header">
+      <div class="screen-num">7</div>
+      <h2>Turmas</h2>
+      <span class="key-badge">page: "turmas"</span>
+      <span class="func-badge">TurmasScreen()</span>
+      <span class="line-badge">L1106</span>
+    </div>
+    <p class="screen-desc">Gestão de turmas com vagas, ocupação e datas. Sem estado interno (stateless).</p>
+
+    <div class="cards-grid">
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards</div>
+        <h4>3 KPIs de Turmas</h4>
+        <p>Turmas abertas · Vagas livres (calculado) · Vagas bloqueadas (total)</p>
+        <div class="grid-info">grid-cols-2 md:grid-cols-3</div>
+      </div>
+
+      <div class="card emerald">
+        <div class="card-type list">Lista de Cards</div>
+        <h4>4 Turmas</h4>
+        <p>Cada turma: nome, produto, datas (início/fim), local, badge status (aberta/fechada). Barra de ocupação (OccBar) com confirmados, bloqueados, livres e contador numérico.</p>
+        <span class="data-src">TURMAS[4]</span>
+        <div class="grid-info">flex-col gap-4</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TELA 8 — MARKETING
+       ══════════════════════════════════════════ -->
+  <section class="screen-section" id="marketing" style="animation-delay:0.5s">
+    <div class="screen-header">
+      <div class="screen-num">8</div>
+      <h2>Marketing</h2>
+      <span class="key-badge">page: "marketing"</span>
+      <span class="func-badge">MarketingScreen()</span>
+      <span class="line-badge">L1145</span>
+    </div>
+    <p class="screen-desc">Análise de captação de leads por canal de origem com distribuição, volume e heatmap temporal.</p>
+    <div class="state-info">useState: hovSeg — segmento do donut em hover</div>
+
+    <div class="cards-grid">
+      <div class="card amber">
+        <div class="card-type kpi">KPI Cards</div>
+        <h4>3 KPIs de Marketing</h4>
+        <p>Total de leads (100% orgânico) · Custo por lead (R$ 0) · Conversão geral (% + vendas)</p>
+        <div class="grid-info">grid-cols-2 md:grid-cols-3</div>
+      </div>
+
+      <div class="card purple">
+        <div class="card-type chart">Barras Duplas</div>
+        <h4>Leads por Origem</h4>
+        <p>4 origens (Instagram Orgânico, Indicação, WhatsApp Direto, Outro). Cada origem: barra de leads (cor única) + barra de vendas (verde). Badge conversão %. Gradientes e glow por canal.</p>
+        <span class="data-src">ORIGEM_DATA[4]</span>
+        <div class="grid-info">lg:col-span-7</div>
+      </div>
+
+      <div class="card cyan">
+        <div class="card-type interactive">Donut SVG Interativo</div>
+        <h4>Distribuição por Origem</h4>
+        <p>SVG com linearGradient (purple, emerald, cyan, slate), filtro glow, hover com expansão strokeWidth + camada glow + dimming dos outros segmentos. Centro: total de leads. Tooltip flutuante no hover. Legenda sincronizada com highlight.</p>
+        <span class="data-src">ORIGEM_DATA[4]</span>
+        <div class="grid-info">lg:col-span-5</div>
+      </div>
+
+      <div class="card amber">
+        <div class="card-type chart">Heatmap</div>
+        <h4>Heatmap de Captação</h4>
+        <p>7 dias × 18 horas (6h–23h). Cor amber com opacidade proporcional ao volume. Hover com scale + brightness. Escala visual (baixo → alto) no rodapé. Título por célula com dia, hora e valor.</p>
+        <span class="data-src">HEATMAP_DATA[126]</span>
+        <div class="grid-info">full-width · min-w-[700px]</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       COMPONENTES REUTILIZÁVEIS
+       ══════════════════════════════════════════ -->
+  <section class="ref-section" style="animation-delay:0.55s">
+    <h2>
+      <span class="icon" style="background:var(--cyan-dim); color:var(--cyan); border-radius:10px;">&#9881;</span>
+      Componentes Reutilizáveis
+    </h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Linha</th>
+          <th>Descrição</th>
+          <th>Hooks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">Icon</td>
+          <td class="line">L184</td>
+          <td>18 ícones SVG puros (dollar, chart, percent, alert, cart, users, bot, calendar, graduation, target, funnel, search, chat, handshake, bell, check, clock, inbox, trophy, lock, chair, info)</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mono">InfoTip</td>
+          <td class="line">L220</td>
+          <td>Tooltip via <code>createPortal</code> posicionado acima do ícone (i). Aparece no hover. Auto-ajusta posição para não sair da tela.</td>
+          <td>3× useState, useRef, useEffect</td>
+        </tr>
+        <tr>
+          <td class="mono">SectionHeader</td>
+          <td class="line">L255</td>
+          <td>Ícone amber + título bold + InfoTip automático + subtítulo opcional + slot children</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mono">KpiCard</td>
+          <td class="line">L268</td>
+          <td>Card glass com label, valor amber com glow (drop-shadow), subtexto, delta com seta (up verde / down vermelho). Animação staggered.</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mono">Badge</td>
+          <td class="line">L292</td>
+          <td>Pill rounded-full com 7 variantes de cor: amber, green, red, blue, purple, slate, cyan</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mono">OccBar</td>
+          <td class="line">L305</td>
+          <td>Barra de ocupação: confirmados (gradient verde), bloqueados (listrado amber 45°), livres. Legenda numérica abaixo.</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       DATASETS MOCK
+       ══════════════════════════════════════════ -->
+  <section class="ref-section" style="animation-delay:0.6s">
+    <h2>
+      <span class="icon" style="background:var(--amber-dim); color:var(--amber); border-radius:10px;">&#9776;</span>
+      Dados Mock
+    </h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Constante</th>
+          <th>Linha</th>
+          <th>Registros</th>
+          <th>Campos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">RECEITA_MENSAL</td>
+          <td class="line">L12</td>
+          <td class="count">6</td>
+          <td>mes, realizada, projetada, recuperada</td>
+        </tr>
+        <tr>
+          <td class="mono">FUNIL_DATA</td>
+          <td class="line">L21</td>
+          <td class="count">6</td>
+          <td>etapa, valor, pct</td>
+        </tr>
+        <tr>
+          <td class="mono">FUNIL_EVOLUCAO</td>
+          <td class="line">L30</td>
+          <td class="count">7</td>
+          <td>dia, captados, qualificados, fechados</td>
+        </tr>
+        <tr>
+          <td class="mono">VENDEDORES</td>
+          <td class="line">L40</td>
+          <td class="count">5</td>
+          <td>nome, tipo, vendas, receita, conversao, ticket, tempoResp, custo</td>
+        </tr>
+        <tr>
+          <td class="mono">PERF_SEMANAL</td>
+          <td class="line">L48</td>
+          <td class="count">6</td>
+          <td>sem, agente, camila, lucas, pedro</td>
+        </tr>
+        <tr>
+          <td class="mono">AGENTES</td>
+          <td class="line">L57</td>
+          <td class="count">5</td>
+          <td>nome, icon, status, exec24h, sucesso, tokens, custoMes</td>
+        </tr>
+        <tr>
+          <td class="mono">AGENT_EXEC_DIARIO</td>
+          <td class="line">L65</td>
+          <td class="count">7</td>
+          <td>dia, sucesso, erro</td>
+        </tr>
+        <tr>
+          <td class="mono">ALUNOS</td>
+          <td class="line">L75</td>
+          <td class="count">6</td>
+          <td>id, nome, tel, email, ig, cidade, estado, score, produto, status_pag, parcelas, turma, faturamento, segmento, estado_civil, socio</td>
+        </tr>
+        <tr>
+          <td class="mono">TURMAS</td>
+          <td class="line">L84</td>
+          <td class="count">4</td>
+          <td>id, nome, produto, inicio, fim, total, ocupadas, bloqueadas, status, local</td>
+        </tr>
+        <tr>
+          <td class="mono">ORIGEM_DATA</td>
+          <td class="line">L91</td>
+          <td class="count">4</td>
+          <td>origem, leads, vendas, conversao</td>
+        </tr>
+        <tr>
+          <td class="mono">HEATMAP_DATA</td>
+          <td class="line">L98</td>
+          <td class="count">126</td>
+          <td>day, hour, value (gerado com IIFE)</td>
+        </tr>
+        <tr>
+          <td class="mono">ATIVIDADE</td>
+          <td class="line">L110</td>
+          <td class="count">8</td>
+          <td>icon, text, tempo</td>
+        </tr>
+        <tr>
+          <td class="mono">ALERTAS</td>
+          <td class="line">L121</td>
+          <td class="count">3</td>
+          <td>text, type, tela</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       HELPERS & TOOLTIPS
+       ══════════════════════════════════════════ -->
+  <section class="ref-section" style="animation-delay:0.65s">
+    <h2>
+      <span class="icon" style="background:var(--purple-dim); color:var(--purple); border-radius:10px;">&#10070;</span>
+      Helpers &amp; Estilos
+    </h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Linha</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">fmt(n)</td>
+          <td class="line">L131</td>
+          <td>Formata número com separador pt-BR</td>
+        </tr>
+        <tr>
+          <td class="mono">fmtR(n)</td>
+          <td class="line">L132</td>
+          <td>Formata como moeda: "R$ X.XXX"</td>
+        </tr>
+        <tr>
+          <td class="mono">glassStyle</td>
+          <td class="line">L134</td>
+          <td>CSS object: gradient 135°, blur(6px) saturate(140%), shadow, overflow visible</td>
+        </tr>
+        <tr>
+          <td class="mono">rndParticles(n, h?)</td>
+          <td class="line">L143</td>
+          <td>Gera div com n partículas animadas (vertical ou horizontal)</td>
+        </tr>
+        <tr>
+          <td class="mono">PAGES</td>
+          <td class="line">L151</td>
+          <td>Array de 8 páginas: { key, label } para navegação por abas</td>
+        </tr>
+        <tr>
+          <td class="mono">cardTooltips</td>
+          <td class="line">L162</td>
+          <td>13 tooltips mapeados por título de seção (usados pelo InfoTip)</td>
+        </tr>
+        <tr>
+          <td class="mono">pagBadgeColor(s)</td>
+          <td class="line">L178</td>
+          <td>Retorna cor do badge conforme status: paga→green, atrasada→red, parcial→amber</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <p><span class="dot"></span>Dashboard Administrativo — Índice gerado em 12/03/2026</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

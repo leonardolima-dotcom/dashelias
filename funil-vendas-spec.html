@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funil de Vendas — Análise & Melhorias</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04050c;
+  --surface:#0a0c18;
+  --surface2:#0f1120;
+  --surface3:#141728;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#eceef8;
+  --muted:#6e7294;
+  --dim:#353757;
+  --amber:#fbbf24;
+  --emerald:#34d399;
+  --rose:#fb7185;
+  --violet:#a78bfa;
+  --cyan:#22d3ee;
+  --sky:#38bdf8;
+  --r:14px;--r-sm:9px;
+  --ok:#34d399;   --ok-g:rgba(52,211,153,0.08);
+  --warn:#fbbf24; --warn-g:rgba(251,191,36,0.08);
+  --crit:#fb7185; --crit-g:rgba(251,113,133,0.08);
+  --new:#a78bfa;  --new-g:rgba(167,139,250,0.08);
+  --req:#22d3ee;  --req-g:rgba(34,211,238,0.08);
+
+  /* stage colors — mirror do dashboard real */
+  --s1:#6b7280; /* Captados - cinza */
+  --s2:#3b82f6; /* Enriquecidos - azul */
+  --s3:#8b5cf6; /* Qualificados - roxo */
+  --s4:#d97706; /* Negociação - âmbar */
+  --s5:#10b981; /* Fechados - verde */
+  --s-lost:#ef4444;
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);}
+.o1{width:600px;height:600px;background:radial-gradient(circle,rgba(139,92,246,0.04),transparent 70%);top:-180px;left:50%;transform:translateX(-50%);}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(251,191,36,0.035),transparent 70%);bottom:-100px;right:-60px;}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(34,211,238,0.03),transparent 70%);top:40%;left:-60px;}
+.wrap{max-width:1380px;margin:0 auto;padding:60px 28px 100px;position:relative;z-index:1;}
+
+/* header */
+header{text-align:center;margin-bottom:60px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--violet);background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);padding:6px 18px;border-radius:100px;margin-bottom:20px;}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--violet);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-2.5px;line-height:1.08;margin-bottom:14px;}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--violet) 0%,var(--cyan) 60%,var(--emerald) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:13px;max-width:540px;margin:0 auto;font-family:'DM Mono',monospace;font-weight:300;line-height:1.8;}
+
+/* verdict bar */
+.verdict{display:flex;align-items:stretch;margin-bottom:48px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.vd{flex:1;padding:14px 20px;text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1px;border-right:1px solid var(--border);}
+.vd:last-child{border-right:none;}
+.vd .vv{font-size:26px;font-weight:800;letter-spacing:-1px;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;}
+.vd .vl{color:var(--muted);font-size:9px;}
+
+/* divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:52px 0;}
+
+/* section */
+.sec{margin-bottom:56px;}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.sec-n{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:var(--dim);min-width:28px;}
+.sec-head h2{font-size:20px;font-weight:800;letter-spacing:-0.5px;flex:1;}
+.sec-head .sd{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.b-ok{background:var(--ok-g);color:var(--ok);border:1px solid rgba(52,211,153,0.18);}
+.b-warn{background:var(--warn-g);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-crit{background:var(--crit-g);color:var(--crit);border:1px solid rgba(251,113,133,0.18);}
+.b-new{background:var(--new-g);color:var(--new);border:1px solid rgba(167,139,250,0.18);}
+.b-req{background:var(--req-g);color:var(--req);border:1px solid rgba(34,211,238,0.18);}
+.b-p1{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.18);}
+.b-p2{background:rgba(251,191,36,0.08);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-p3{background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.18);}
+
+/* audit rows */
+.audit{display:flex;flex-direction:column;gap:8px;}
+.ar{display:grid;grid-template-columns:90px 1fr 90px 220px;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:11px;}
+.ar.crit-row{border-color:rgba(251,113,133,0.2);background:rgba(251,113,133,0.025);}
+.ar.warn-row{border-color:rgba(251,191,36,0.14);}
+.ar.ok-row{border-color:rgba(52,211,153,0.12);}
+.ar-id{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--dim);line-height:1.7;}
+.ar-name{font-weight:700;font-size:12px;line-height:1.4;}
+.ar-name .an{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.5;}
+.ar-v{text-align:center;padding-top:2px;}
+.ar-fix{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.ar-fix strong{color:var(--text);display:block;margin-bottom:2px;font-size:10px;}
+
+/* callout */
+.callout{border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.callout p{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;}
+.callout strong{color:var(--text);}
+.c-info{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);}
+.c-crit{background:rgba(251,113,133,0.04);border:1px solid rgba(251,113,133,0.14);}
+.c-warn{background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.14);}
+
+/* ─── FUNIL MOCK ATUAL ─── */
+.funnel-current{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;position:relative;overflow:hidden;}
+.funnel-current::before{content:'ESTADO ATUAL — LIDO DA TELA';position:absolute;top:10px;right:14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;}
+.fc-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.fc-bar-wrap{flex:1;position:relative;}
+.fc-bar{height:36px;border-radius:6px;display:flex;align-items:center;padding:0 14px;font-size:13px;font-weight:800;color:rgba(255,255,255,0.9);}
+.fc-label{min-width:160px;text-align:right;}
+.fc-label .fl-name{font-size:12px;font-weight:700;}
+.fc-label .fl-pct{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;}
+.fc-label .fl-warn{color:var(--crit);}
+
+/* missing indicators on bars */
+.missing-tag{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-family:'DM Mono',monospace;color:var(--crit);background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);padding:2px 7px;border-radius:4px;margin-left:8px;}
+
+/* gap items */
+.gap-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:11px;margin-bottom:7px;}
+.gap-num{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--dim);min-width:20px;margin-top:1px;}
+.gap-title{font-weight:700;margin-bottom:3px;}
+.gap-desc{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+
+/* ─── FUNIL MOCK PROPOSTO ─── */
+.funnel-proposed{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:24px;position:relative;overflow:hidden;}
+.funnel-proposed::before{content:'MOCKUP PROPOSTO';position:absolute;top:10px;right:14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;}
+
+/* lane headers */
+.lane-header{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:7px;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.lh-sdr{background:rgba(34,211,238,0.07);border:1px solid rgba(34,211,238,0.15);color:var(--cyan);}
+.lh-closer{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.15);color:var(--amber);}
+
+/* proposed bar row */
+.pb-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.pb-bar{height:38px;border-radius:6px;display:flex;align-items:center;padding:0 14px;font-size:13px;font-weight:800;transition:width .4s;position:relative;}
+.pb-info{min-width:300px;display:flex;flex-direction:column;gap:3px;}
+.pb-name{font-size:11px;font-weight:700;}
+.pb-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.pb-tag{font-size:8px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:4px;}
+.tag-pct{background:rgba(255,255,255,0.06);color:var(--muted);}
+.tag-time{background:rgba(34,211,238,0.08);color:var(--cyan);}
+.tag-delta-up{background:rgba(52,211,153,0.08);color:var(--ok);}
+.tag-delta-dn{background:rgba(251,113,133,0.08);color:var(--crit);}
+.tag-pipe{background:rgba(251,191,36,0.08);color:var(--amber);}
+.handoff-divider{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);margin:10px 0;}
+
+/* detail panel mock */
+.detail-panel{background:var(--surface2);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:16px 18px;margin-top:10px;}
+.dp-title{font-size:10px;font-family:'DM Mono',monospace;color:var(--violet);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.dp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.dp-card{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.dp-card .dv{font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.dp-card .dl{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;}
+
+/* reason breakdown */
+.reason-bars{display:flex;flex-direction:column;gap:5px;margin-top:10px;}
+.rb-row{display:flex;align-items:center;gap:8px;font-size:10px;}
+.rb-label{min-width:120px;font-family:'DM Mono',monospace;color:var(--muted);}
+.rb-wrap{flex:1;background:rgba(255,255,255,0.04);border-radius:3px;height:12px;overflow:hidden;}
+.rb-fill{height:12px;border-radius:3px;display:flex;align-items:center;padding-left:5px;}
+.rb-fill span{font-size:7px;font-weight:700;color:rgba(255,255,255,0.7);}
+.rb-pct{min-width:32px;text-align:right;font-family:'DM Mono',monospace;font-size:9px;color:var(--text);}
+
+/* pipeline value */
+.pipeline-row{display:flex;gap:8px;margin:10px 0;}
+.pipe-card{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;}
+.pipe-card .pv{font-size:20px;font-weight:800;letter-spacing:-0.5px;}
+.pipe-card .pl{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+
+/* evolution chart additions */
+.evo-additions{display:flex;flex-direction:column;gap:7px;margin-top:14px;}
+.ea{display:flex;align-items:flex-start;gap:8px;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.ea::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.ea strong{color:var(--text);}
+.ea span{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+
+/* spec block */
+.spec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:14px;position:relative;overflow:hidden;}
+.spec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.spec-new::before{background:linear-gradient(90deg,var(--violet),var(--cyan),transparent);}
+.spec-fix::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.spec h3{font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;}
+.spec .sdesc{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;}
+.spec-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.spec-col h4{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.spec-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.spec-col li{font-size:11px;line-height:1.5;display:flex;gap:7px;}
+.spec-col li::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.spec-col li .s{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);display:block;line-height:1.5;margin-top:1px;}
+
+/* priority timeline */
+.tl{display:flex;flex-direction:column;gap:8px;}
+.tli{display:flex;align-items:flex-start;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.tli-n{font-family:'DM Mono',monospace;font-size:28px;font-weight:800;color:var(--surface3);min-width:32px;line-height:1;}
+.tli-b h4{font-size:13px;font-weight:800;margin-bottom:3px;letter-spacing:-0.3px;}
+.tli-b p{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.tli-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+
+/* summary table */
+.st{width:100%;border-collapse:collapse;}
+.st th{text-align:left;padding:9px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.st td{padding:10px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;}
+.st td:first-child{font-weight:700;font-size:12px;width:200px;}
+.st td:nth-child(2){font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.st tr:last-child td{border-bottom:none;}
+
+footer{text-align:center;padding-top:36px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;}
+footer span{color:var(--amber);}
+
+@media(max-width:960px){.spec-cols{grid-template-columns:1fr;}.ar{grid-template-columns:70px 1fr;}.ar-v,.ar-fix{grid-column:2;}.dp-grid{grid-template-columns:1fr 1fr;}.pipeline-row{flex-wrap:wrap;}}
+@media(max-width:600px){.verdict{flex-direction:column;}.vd{border-right:none;border-bottom:1px solid var(--border);}.vd:last-child{border-bottom:none;}.pb-info{min-width:180px;}}
+</style>
+</head>
+<body>
+
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="eyebrow">Dashboard Administrativo · Tela 2</div>
+  <h1>Análise — <em>Funil de Vendas</em></h1>
+  <p class="sub">Leitura da tela atual · gaps identificados · mockup da versão proposta · especificações técnicas de cada adição</p>
+</header>
+
+<!-- VERDICT -->
+<div class="verdict">
+  <div class="vd"><span class="vv" style="color:var(--ok)">5</span><span class="vl">etapas mapeadas</span></div>
+  <div class="vd"><span class="vv" style="color:var(--ok)">3</span><span class="vl">KPIs laterais OK</span></div>
+  <div class="vd"><span class="vv" style="color:var(--crit)">8</span><span class="vl">gaps críticos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--violet)">6</span><span class="vl">adições propostas</span></div>
+  <div class="vd"><span class="vv" style="color:var(--amber)">1</span><span class="vl">refatoração estrutural</span></div>
+</div>
+
+<!-- ═══════════════════
+     01 — ESTADO ATUAL
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <div>
+      <h2>Estado Atual — Leitura da Tela</h2>
+      <div class="sd">O que existe hoje · o que funciona · o que está faltando em cada bloco</div>
+    </div>
+  </div>
+
+  <div class="callout c-info" style="margin-bottom:18px;">
+    <p><strong>O que a tela entrega bem:</strong> O funil visual com barras proporcionais e coloridas é excelente — leitura imediata de volume por etapa. A identificação do gargalo principal ("Qualificado → Negociação, perda de 37%") e os 3 KPIs laterais (tempo de conversão, primeiro atendimento, perda principal) são blocos bem executados. A evolução do funil em 30 dias fecha o contexto histórico.</p>
+  </div>
+
+  <!-- Funil Atual Mock com indicadores dos gaps -->
+  <div class="funnel-current">
+
+    <div class="fc-row">
+      <div class="fc-bar-wrap"><div class="fc-bar" style="width:100%;background:linear-gradient(90deg,rgba(107,114,128,0.6),rgba(107,114,128,0.3))">247</div></div>
+      <div class="fc-label">
+        <div class="fl-name">Captados</div>
+        <div class="fl-pct">topo do funil</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <span class="missing-tag">sem delta vs mês ant.</span>
+        <span class="missing-tag">sem origem</span>
+      </div>
+    </div>
+
+    <div class="fc-row">
+      <div class="fc-bar-wrap"><div class="fc-bar" style="width:93.5%;background:linear-gradient(90deg,rgba(59,130,246,0.65),rgba(59,130,246,0.3))">231</div></div>
+      <div class="fc-label">
+        <div class="fl-name">Enriquecidos</div>
+        <div class="fl-pct">94% da etapa anterior</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <span class="missing-tag">sem tempo nesta etapa</span>
+      </div>
+    </div>
+
+    <div class="fc-row">
+      <div class="fc-bar-wrap"><div class="fc-bar" style="width:72%;background:linear-gradient(90deg,rgba(139,92,246,0.65),rgba(139,92,246,0.3))">178</div></div>
+      <div class="fc-label">
+        <div class="fl-name">Qualificados</div>
+        <div class="fl-pct">77% da etapa anterior</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <span class="missing-tag">sem motivo de perda</span>
+      </div>
+    </div>
+
+    <div class="fc-row">
+      <div class="fc-bar-wrap"><div class="fc-bar" style="width:45.3%;background:linear-gradient(90deg,rgba(217,119,6,0.65),rgba(217,119,6,0.3))">112</div></div>
+      <div class="fc-label">
+        <div class="fl-name">Negociação</div>
+        <div class="fl-pct fl-warn">63% da etapa anterior ⚠</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <span class="missing-tag">sem valor de pipeline</span>
+        <span class="missing-tag">sem sla</span>
+      </div>
+    </div>
+
+    <div class="fc-row">
+      <div class="fc-bar-wrap"><div class="fc-bar" style="width:36%;background:linear-gradient(90deg,rgba(16,185,129,0.65),rgba(16,185,129,0.3))">89</div></div>
+      <div class="fc-label">
+        <div class="fl-name">Fechados</div>
+        <div class="fl-pct">79% da etapa anterior</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <span class="missing-tag">sem receita gerada</span>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(251,113,133,0.07);border:1px solid rgba(251,113,133,0.2);border-radius:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="color:var(--crit);font-weight:700;font-size:12px;">158 Perdidos</span>
+      <span style="font-size:11px;color:var(--muted);">Maior gargalo: Qualificado → Negociação (perda de 37%)</span>
+      <span class="missing-tag">sem breakdown de motivos</span>
+      <span class="missing-tag">sem SDR vs Closer</span>
+    </div>
+
+    <div style="margin-top:10px;font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);text-align:center;line-height:1.8;">
+      Marcações <span style="color:var(--crit)">em vermelho</span> = dados que deveriam estar na tela mas não estão · detalhados na seção 02
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     02 — GAPS
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <div>
+      <h2>Os 8 Gaps — O que está faltando</h2>
+      <div class="sd">Análise bloco por bloco dos dados ausentes que impactam a tomada de decisão</div>
+    </div>
+  </div>
+
+  <div class="callout c-crit">
+    <p><strong>Gap estrutural central:</strong> O funil atual mistura duas responsabilidades operacionais numa mesma visualização sem distinção. As etapas Captados → Qualificados são responsabilidade do <strong>SDR</strong>. As etapas Qualificados → Fechados são responsabilidade do <strong>Closer</strong>. Quando a conversão cai em Negociação (63%), é impossível saber se o problema é o SDR entregando leads ruins ou o Closer não fechando bem. São problemas com soluções completamente diferentes.</p>
+  </div>
+
+  <div style="margin-top:14px;">
+
+    <div class="ar crit-row" style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span class="badge b-crit">Gap 1 · Estrutural</span>
+        <span style="font-size:12px;font-weight:800;">Funil sem separação SDR / Closer</span>
+      </div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.7;">
+        O gargalo em Qualificado→Negociação (37% de perda) pode ser:<br>
+        <strong style="color:var(--text);">(a) SDR qualificando mal</strong> — leads chegam ao Closer sem fit real<br>
+        <strong style="color:var(--text);">(b) Closer não trabalhando os leads</strong> — leads bons, execução fraca<br>
+        Sem a divisão visual, a decisão corretiva é impossível. Solução: duas lanes visuais separadas com KPIs próprios por função.
+      </div>
+    </div>
+
+    <div style="height:8px;"></div>
+
+    <div class="gap-item warn-row" style="border-color:rgba(251,191,36,0.15);">
+      <div class="gap-num">G2</div>
+      <div>
+        <div class="gap-title">Sem tempo de permanência por etapa</div>
+        <div class="gap-desc">A tela mostra quantos leads <em>estão</em> em cada etapa, mas não há quanto tempo estão lá. Um lead em "Negociação" há 1 dia é diferente de um lead parado há 14 dias. <strong style="color:var(--text);">Tempo médio por etapa + alertas de SLA vencido</strong> transformam o funil de foto em diagnóstico operacional.</div>
+      </div>
+    </div>
+
+    <div class="gap-item warn-row" style="border-color:rgba(251,191,36,0.15);">
+      <div class="gap-num">G3</div>
+      <div>
+        <div class="gap-title">Conversão sem delta vs período anterior</div>
+        <div class="gap-desc">Os % entre etapas (94%, 77%, 63%, 79%) são estáticos. <strong style="color:var(--text);">Não há comparação vs mês anterior ou vs semana anterior.</strong> O 63% em Negociação é tendência de queda ou estabilidade? Sem delta, é impossível saber se o funil está melhorando ou degradando.</div>
+      </div>
+    </div>
+
+    <div class="gap-item warn-row" style="border-color:rgba(251,191,36,0.15);">
+      <div class="gap-num">G4</div>
+      <div>
+        <div class="gap-title">Valor de pipeline invisível (R$ em aberto)</div>
+        <div class="gap-desc">Com 112 leads em Negociação e um ticket médio de R$2.580, o pipeline ativo vale <strong style="color:var(--text);">~R$288.960 em oportunidades em aberto</strong>. Com 89 fechados, a receita gerada é ~R$229.620. Esses números não aparecem em lugar nenhum na tela, tornando o funil uma contagem de leads sem dimensão financeira.</div>
+      </div>
+    </div>
+
+    <div class="gap-item warn-row" style="border-color:rgba(251,191,36,0.15);">
+      <div class="gap-num">G5</div>
+      <div>
+        <div class="gap-title">Motivos de perda por etapa — ausentes</div>
+        <div class="gap-desc">A tela informa que "Sem resposta" é a perda principal global (62%). Mas "Sem resposta" em Captados é diferente de "Sem resposta" em Negociação. <strong style="color:var(--text);">Em qual etapa os leads somem? Por qual motivo específico?</strong> Sem esse breakdown por etapa, a ação corretiva não tem endereço.</div>
+      </div>
+    </div>
+
+    <div class="gap-item warn-row" style="border-color:rgba(251,191,36,0.15);">
+      <div class="gap-num">G6</div>
+      <div>
+        <div class="gap-title">Clique na etapa não mostra painel de detalhe</div>
+        <div class="gap-desc">O index confirma que existe <code style="color:var(--cyan);font-size:10px;">useState: etapaSel</code> — etapa selecionada. A tela diz "Clique em uma etapa para detalhes". Mas na screenshot não há painel de detalhe visível ao clicar. <strong style="color:var(--text);">O painel precisa existir e ser rico:</strong> lista dos leads naquela etapa, tempo médio, vendedor responsável, ação rápida.</div>
+      </div>
+    </div>
+
+    <div class="gap-item" style="border-color:rgba(139,92,246,0.15);">
+      <div class="gap-num">G7</div>
+      <div>
+        <div class="gap-title">Evolução do funil sem Enriquecidos e Negociação</div>
+        <div class="gap-desc">O gráfico de evolução mostra apenas 3 séries (Captados, Qualificados, Fechados). <strong style="color:var(--text);">Enriquecidos e Negociação estão ausentes do histórico.</strong> O gargalo em Negociação (63%) é exatamente a etapa cujo histórico não existe. Impossível saber se esse número melhorou ou piorou nos últimos 30 dias.</div>
+      </div>
+    </div>
+
+    <div class="gap-item" style="border-color:rgba(139,92,246,0.15);">
+      <div class="gap-num">G8</div>
+      <div>
+        <div class="gap-title">Nenhuma projeção de receita baseada no pipeline</div>
+        <div class="gap-desc">Com as taxas de conversão conhecidas, é possível calcular a receita esperada dos leads atuais: <strong style="color:var(--text);">112 em Negociação × 79% de conversão Closer × R$2.580 = ~R$228.000 em pipeline qualificado.</strong> Essa informação não existe na tela — e é exatamente o número que conecta o funil operacional com a meta financeira do mês.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     03 — MOCKUP PROPOSTO
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <div>
+      <h2>Mockup — Funil Proposto</h2>
+      <div class="sd">Nova estrutura visual com separação SDR/Closer · tempo por etapa · delta · valor de pipeline · painel de detalhe</div>
+    </div>
+  </div>
+
+  <div class="funnel-proposed">
+
+    <!-- Pipeline value row -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">① VALOR DO PIPELINE — dimensão financeira do funil</p>
+    <div class="pipeline-row" style="margin-bottom:16px;">
+      <div class="pipe-card" style="border-color:rgba(34,211,238,0.15);">
+        <div class="pv" style="color:var(--cyan)">247</div>
+        <div class="pl">Leads no funil</div>
+      </div>
+      <div class="pipe-card" style="border-color:rgba(251,191,36,0.15);">
+        <div class="pv" style="color:var(--amber)">R$ 288k</div>
+        <div class="pl">Pipeline em Negociação</div>
+      </div>
+      <div class="pipe-card" style="border-color:rgba(52,211,153,0.15);">
+        <div class="pv" style="color:var(--ok)">R$ 229k</div>
+        <div class="pl">Receita fechada (mês)</div>
+      </div>
+      <div class="pipe-card" style="border-color:rgba(167,139,250,0.15);">
+        <div class="pv" style="color:var(--violet)">R$ 181k</div>
+        <div class="pl">Projeção pipeline→fechamento</div>
+      </div>
+      <div class="pipe-card" style="border-color:rgba(251,113,133,0.15);">
+        <div class="pv" style="color:var(--crit)">4.2d</div>
+        <div class="pl">Ciclo médio completo</div>
+      </div>
+    </div>
+
+    <!-- SDR lane -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">② FUNIL DUPLO — responsabilidade SDR / Closer separada</p>
+    <div class="lane-header lh-sdr">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#22d3ee" stroke-width="1.5"/><circle cx="7" cy="5" r="2" fill="#22d3ee"/><path d="M3 11c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/></svg>
+      LANE SDR — Captação &amp; Qualificação
+      <span style="margin-left:auto;font-size:9px;opacity:.7;">Meta: Qualificado → Reunião agendada</span>
+    </div>
+
+    <div class="pb-row">
+      <div style="flex:1;">
+        <div class="pb-bar" style="width:100%;background:linear-gradient(90deg,rgba(107,114,128,0.55),rgba(107,114,128,0.2))">247</div>
+      </div>
+      <div class="pb-info">
+        <div class="pb-name">Captados</div>
+        <div class="pb-meta">
+          <span class="pb-tag tag-time">Tempo médio: 0.3d</span>
+          <span class="pb-tag tag-delta-up">▲ +12% vs mês ant.</span>
+          <span class="pb-tag" style="background:rgba(107,114,128,0.1);color:var(--muted);">Instagram 48% · Indicação 31% · WhatsApp 21%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-row">
+      <div style="flex:1;">
+        <div class="pb-bar" style="width:93.5%;background:linear-gradient(90deg,rgba(59,130,246,0.6),rgba(59,130,246,0.25))">231</div>
+      </div>
+      <div class="pb-info">
+        <div class="pb-name">Enriquecidos <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">94% da etapa anterior</span></div>
+        <div class="pb-meta">
+          <span class="pb-tag tag-time">Tempo médio: 0.8d</span>
+          <span class="pb-tag tag-delta-up">▲ +3% vs mês ant.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-row">
+      <div style="flex:1;">
+        <div class="pb-bar" style="width:72%;background:linear-gradient(90deg,rgba(139,92,246,0.6),rgba(139,92,246,0.25))">178</div>
+      </div>
+      <div class="pb-info">
+        <div class="pb-name">Qualificados <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">77% da etapa anterior</span></div>
+        <div class="pb-meta">
+          <span class="pb-tag tag-time">Tempo médio: 1.2d</span>
+          <span class="pb-tag tag-delta-dn">▼ −5% vs mês ant.</span>
+          <span class="pb-tag" style="background:rgba(251,113,113,0.08);color:var(--crit);">53 perdidos · "Sem resposta" 67%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HANDOFF LINE -->
+    <div style="display:flex;align-items:center;gap:10px;margin:12px 0;">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(34,211,238,0.2),rgba(251,191,36,0.2));"></div>
+      <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);background:var(--surface3);padding:3px 12px;border-radius:100px;border:1px solid var(--border);white-space:nowrap;">⇅ HANDOFF SDR → Closer · Reunião Agendada</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(251,191,36,0.2),rgba(34,211,238,0.2));"></div>
+    </div>
+
+    <!-- Closer lane -->
+    <div class="lane-header lh-closer" style="margin-top:0;">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="10" height="7" rx="1.5" stroke="#fbbf24" stroke-width="1.5"/><path d="M5 4V3a2 2 0 0 1 4 0v1" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/></svg>
+      LANE CLOSER — Negociação &amp; Fechamento
+      <span style="margin-left:auto;font-size:9px;opacity:.7;">Meta: Win Rate &gt; 80%</span>
+    </div>
+
+    <div class="pb-row">
+      <div style="flex:1;">
+        <div class="pb-bar" style="width:45.3%;background:linear-gradient(90deg,rgba(217,119,6,0.65),rgba(217,119,6,0.25))">112</div>
+      </div>
+      <div class="pb-info">
+        <div class="pb-name">Negociação <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--crit);">63% · ⚠ gargalo</span></div>
+        <div class="pb-meta">
+          <span class="pb-tag tag-time">Tempo médio: 1.8d</span>
+          <span class="pb-tag tag-delta-dn">▼ −8% vs mês ant.</span>
+          <span class="pb-tag tag-pipe">Pipeline: R$ 288.960</span>
+          <span style="font-size:8px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:4px;background:rgba(251,113,113,0.1);color:var(--crit);">⚠ 14 leads há +7 dias sem update</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-row">
+      <div style="flex:1;">
+        <div class="pb-bar" style="width:36%;background:linear-gradient(90deg,rgba(16,185,129,0.65),rgba(16,185,129,0.25))">89</div>
+      </div>
+      <div class="pb-info">
+        <div class="pb-name">Fechados <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">79% da etapa anterior</span></div>
+        <div class="pb-meta">
+          <span class="pb-tag tag-time">Ciclo Closer: 2.1d</span>
+          <span class="pb-tag tag-delta-up">▲ +2% vs mês ant.</span>
+          <span class="pb-tag" style="background:rgba(52,211,153,0.1);color:var(--ok);">Receita: R$ 229.620</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(251,113,133,0.07);border:1px solid rgba(251,113,133,0.18);border-radius:7px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+      <div>
+        <span style="color:var(--crit);font-weight:700;font-size:12px;">158 Perdidos</span>
+        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-left:8px;">por etapa:</span>
+      </div>
+      <div class="reason-bars" style="flex:1;margin-top:0;">
+        <div class="rb-row">
+          <div class="rb-label">Qualif.→Negoc.</div>
+          <div class="rb-wrap"><div class="rb-fill" style="width:58%;background:rgba(251,113,133,0.35);"><span>66</span></div></div>
+          <div class="rb-pct">42%</div>
+        </div>
+        <div class="rb-row">
+          <div class="rb-label">Captados</div>
+          <div class="rb-wrap"><div class="rb-fill" style="width:35%;background:rgba(251,113,133,0.25);"><span>53</span></div></div>
+          <div class="rb-pct">34%</div>
+        </div>
+        <div class="rb-row">
+          <div class="rb-label">Negoc.→Fechado</div>
+          <div class="rb-wrap"><div class="rb-fill" style="width:19%;background:rgba(251,113,133,0.18);"><span>23</span></div></div>
+          <div class="rb-pct">15%</div>
+        </div>
+        <div class="rb-row">
+          <div class="rb-label">Enriquecidos</div>
+          <div class="rb-wrap"><div class="rb-fill" style="width:10%;background:rgba(251,113,133,0.12);"><span>16</span></div></div>
+          <div class="rb-pct">10%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de detalhe ao clicar numa etapa -->
+    <div style="margin-top:14px;">
+      <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">③ PAINEL DE DETALHE — ao clicar em "Negociação" (etapa selecionada)</p>
+      <div class="detail-panel">
+        <div class="dp-title">Negociação · 112 leads · etapa selecionada</div>
+        <div class="dp-grid">
+          <div class="dp-card" style="border-color:rgba(217,119,6,0.2);">
+            <div class="dv" style="color:var(--amber)">1.8d</div>
+            <div class="dl">Tempo médio nesta etapa</div>
+          </div>
+          <div class="dp-card" style="border-color:rgba(251,113,133,0.2);">
+            <div class="dv" style="color:var(--crit)">14</div>
+            <div class="dl">Leads com SLA vencido (+7d)</div>
+          </div>
+          <div class="dp-card" style="border-color:rgba(251,191,36,0.2);">
+            <div class="dv" style="color:var(--amber)">R$288k</div>
+            <div class="dl">Valor total no pipeline</div>
+          </div>
+          <div class="dp-card" style="border-color:rgba(52,211,153,0.15);">
+            <div class="dv" style="color:var(--ok)">R$181k</div>
+            <div class="dl">Projeção de conversão (79%)</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">↓ Lista de leads nesta etapa · nome · responsável · dias na etapa · valor estimado · ação rápida (WhatsApp / Reagendar)</div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:10px;font-family:'DM Mono',monospace;flex:1;min-width:200px;">
+            <span style="font-weight:700;">Ana Paula S.</span> · <span style="color:var(--crit);">⚠ 9 dias</span> · Camila · R$2.580 · <span style="color:var(--cyan);cursor:pointer;">→ WhatsApp</span>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:10px;font-family:'DM Mono',monospace;flex:1;min-width:200px;">
+            <span style="font-weight:700;">Rodrigo M.</span> · <span style="color:var(--warn);">3 dias</span> · Lucas · R$5.160 · <span style="color:var(--cyan);cursor:pointer;">→ Reagendar</span>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:10px;font-family:'DM Mono',monospace;flex:1;min-width:200px;opacity:.5;">
+            <span style="font-size:8px;color:var(--dim);">+ 110 leads · "Ver todos" →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     04 — SPECS DETALHADAS
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">04</span>
+    <div>
+      <h2>Especificações — 6 Adições</h2>
+      <div class="sd">Cada adição com lógica, dados e comportamento esperado</div>
+    </div>
+  </div>
+
+  <!-- F1: Funil Duplo -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-new">Novo · F1</span><span class="badge b-p1">P1 · Refatoração Estrutural</span>
+    </div>
+    <h3>Separação SDR / Closer — Funil Duplo com Handoff</h3>
+    <p class="sdesc">Refatoração visual do funil em duas lanes com linha de handoff separando responsabilidades. Resolve o gap estrutural que impede diagnóstico correto da queda em Qualificado→Negociação.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Lane SDR (cyan)</h4>
+        <ul>
+          <li>Etapas: Captados → Enriquecidos → Qualificados<span class="s">Responsabilidade do Agente SDR + vendedores de prospecção</span></li>
+          <li>KPIs próprios da lane SDR<span class="s">Taxa de Contato · Tempo até Qualificação · Tentativas/Lead · Show Rate (aparecer na reunião)</span></li>
+          <li>Meta da lane: "Qualificado → Reunião Agendada"<span class="s">Exibida como label no header da lane</span></li>
+          <li>Responsável: Agente SDR automático + supervisão humana</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Lane Closer (amber)</h4>
+        <ul>
+          <li>Etapas: Negociação → Fechados<span class="s">Responsabilidade dos vendedores humanos (Camila, Lucas, Pedro)</span></li>
+          <li>KPIs próprios da lane Closer<span class="s">Win Rate · Tempo SQL→Fechamento · Taxa de No-show · Propostas em Aberto</span></li>
+          <li>Meta da lane: "Win Rate &gt; 80%"<span class="s">Configurável · badge verde/vermelho baseado na meta</span></li>
+          <li>Pipeline value visível nesta lane<span class="s">Valor monetário dos leads em Negociação</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Linha de Handoff</h4>
+        <ul>
+          <li>Divider visual separando as duas lanes<span class="s">Label: "HANDOFF SDR → Closer · Reunião Agendada"</span></li>
+          <li>Métrica de handoff: show rate<span class="s">% dos agendados que aparecem na reunião — é o elo entre as duas lanes</span></li>
+          <li>Alerta se show rate cair abaixo de 70%<span class="s">Indica problema no handoff: SDR agendando leads sem fit ou compromisso</span></li>
+          <li>Dados: FUNIL_DATA precisa de campo tipo: 'sdr' | 'closer'<span class="s">Ou definir por etapa: etapas 1–3 = SDR, 4–5 = Closer</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F2: Tempo por etapa + SLA -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-new">Novo · F2</span><span class="badge b-p1">P1</span>
+    </div>
+    <h3>Tempo por Etapa + Alertas de SLA</h3>
+    <p class="sdesc">Cada barra do funil ganha tag de tempo médio de permanência e alerta quando leads ultrapassam o SLA definido. Transforma o funil de contagem estática em monitor de velocity operacional.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Dados por etapa</h4>
+        <ul>
+          <li>Tempo médio na etapa (dias)<span class="s">Ex: "Captados 0.3d · Enriquecidos 0.8d · Negociação 1.8d"</span></li>
+          <li>Leads com SLA vencido<span class="s">Leads acima do tempo máximo definido por etapa</span></li>
+          <li>Badge de alerta quando SLA vencido &gt; 10% dos leads<span class="s">Ex: "14 leads há +7 dias em Negociação" · badge vermelho com pulsação</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">SLAs sugeridos</h4>
+        <ul>
+          <li>Captados → Primeiro contato: máx 2h<span class="s">Urgência alta — lead frio rapidamente</span></li>
+          <li>Enriquecidos → Qualificado: máx 1 dia</li>
+          <li>Qualificado → Reunião agendada: máx 2 dias</li>
+          <li>Negociação → Fechamento: máx 7 dias<span class="s">Configurável pelo Elias no painel de settings</span></li>
+          <li>Lead sem update por 3+ dias → alerta automático<span class="s">Independente da etapa</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados necessários</h4>
+        <ul>
+          <li>Timestamp de entrada em cada etapa<span class="s">Novo campo em FUNIL_DATA: { etapa, leadId, entradaEm, saidaEm }</span></li>
+          <li>Ou calcular via data da última atividade por lead<span class="s">ALUNOS.ultimaAtividade se já existir no CRM</span></li>
+          <li>SLA configurável no METAS dataset<span class="s">{ etapa, slaMaxDias } · mesmo dataset criado para metas financeiras</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F3: Delta de conversão -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-warn">Melhorar · F3</span><span class="badge b-p1">P1</span>
+    </div>
+    <h3>Delta de Conversão — Comparação vs Período Anterior</h3>
+    <p class="sdesc">Adicionar ao % de conversão entre etapas o delta vs mês anterior e vs semana anterior. Sem isso, os percentuais são fotografias sem contexto de tendência.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Visual</h4>
+        <ul>
+          <li>Tag pequena ao lado do % de conversão<span class="s">Ex: "63% ▼ −8% vs mês ant." em vermelho</span></li>
+          <li>Cor dinâmica: verde se melhorou, vermelho se piorou, âmbar se estável (±2%)<span class="s">Threshold de estabilidade configurável</span></li>
+          <li>Tooltip no hover: histórico dos últimos 3 meses por etapa<span class="s">Mini sparkline da taxa de conversão naquela etapa</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Comparativos disponíveis</h4>
+        <ul>
+          <li>vs mês anterior (default)<span class="s">Mais relevante para ciclo comercial</span></li>
+          <li>vs semana anterior<span class="s">Para identificar variações de curto prazo · toggle no header da tela</span></li>
+          <li>vs média dos últimos 3 meses<span class="s">Baseline mais estável · útil para etapas com muita variância</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>FUNIL_EVOLUCAO já tem histórico por dia<span class="s">Calcular % de conversão por período agrupando por semana/mês</span></li>
+          <li>Adicionar período ao seletor de datas<span class="s">Toggle: Março 2026 / Fevereiro 2026 / Últimos 7 dias</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F4: Valor de Pipeline -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-new">Novo · F4</span><span class="badge b-p1">P1</span>
+    </div>
+    <h3>Dimensão Financeira do Funil — Pipeline Value</h3>
+    <p class="sdesc">Faixa de 5 KPIs financeiros no topo da tela. Conecta o funil operacional (leads) ao financeiro (receita). É o elo que faltava entre a tela de Funil e a tela Financeiro.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">5 KPIs financeiros</h4>
+        <ul>
+          <li>Total de leads no funil<span class="s">Soma de todas as etapas</span></li>
+          <li>Pipeline ativo (R$) — valor em Negociação<span class="s">Leads em Negociação × Ticket Médio</span></li>
+          <li>Receita fechada no mês (R$)<span class="s">Leads Fechados × Ticket Médio · sincronizado com Tela 3</span></li>
+          <li>Projeção pipeline→fechamento (R$)<span class="s">Pipeline Ativo × Taxa de conversão Negociação→Fechado (79%)</span></li>
+          <li>Ciclo médio completo (dias)<span class="s">Soma dos tempos médios de todas as etapas</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Cálculo da projeção</h4>
+        <ul>
+          <li>Projeção conservadora: × taxa atual (79%)<span class="s">R$288k × 79% = R$227k projetado do pipeline em Negociação</span></li>
+          <li>Projeção otimista: × média histórica 3 meses<span class="s">Caso a taxa atual esteja em queda</span></li>
+          <li>Projeção total do mês: fechado + projetado<span class="s">R$229k + R$227k = R$456k · contexto para meta do mês</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>Ticket médio de FINANCEIRO.ticketMedio (R$2.580)<span class="s">Já existe no dataset VENDEDORES — reutilizar</span></li>
+          <li>Leads por etapa de FUNIL_DATA (já existe)</li>
+          <li>Taxa histórica de conversão por etapa<span class="s">Calculado de FUNIL_EVOLUCAO — média dos últimos 3 meses por etapa</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F5: Painel de Detalhe por Etapa -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-warn">Completar · F5</span><span class="badge b-p1">P1</span>
+    </div>
+    <h3>Painel de Detalhe — Completar o etapaSel</h3>
+    <p class="sdesc">O useState etapaSel existe mas o painel de detalhe ao clicar numa etapa está incompleto. Ao clicar em uma barra, deve abrir um painel rico na parte inferior com todos os dados daquela etapa.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">KPIs do painel</h4>
+        <ul>
+          <li>Leads nesta etapa (total)<span class="s">Com breakdown por vendedor responsável</span></li>
+          <li>Tempo médio + leads com SLA vencido<span class="s">Badge vermelho se SLA vencido &gt;10% dos leads</span></li>
+          <li>Valor de pipeline (para Negociação)<span class="s">Total × Ticket médio</span></li>
+          <li>Projeção de fechamento desta etapa<span class="s">Pipeline × taxa de conversão histórica da etapa</span></li>
+          <li>Top motivo de perda nesta etapa<span class="s">Ex: "Sem resposta (67%)"</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Lista de leads</h4>
+        <ul>
+          <li>Mini-tabela rolável com leads naquela etapa<span class="s">Paginada · máx 10 visíveis · "Ver todos" navega para Tela 6 filtrada</span></li>
+          <li>Por lead: nome · responsável · dias na etapa · valor estimado<span class="s">Ordenado por dias na etapa (mais antigo primeiro)</span></li>
+          <li>Borda vermelha nos leads com SLA vencido<span class="s">Destaque visual imediato dos que precisam de ação</span></li>
+          <li>Botão de ação rápida: WhatsApp · Reagendar · Mover etapa</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados e UX</h4>
+        <ul>
+          <li>Reutiliza ALUNOS dataset para montar a lista<span class="s">Filtrar por status/etapa da jornada do aluno</span></li>
+          <li>Painel desliza para baixo com animação<span class="s">Não substitui o funil — fica abaixo das barras</span></li>
+          <li>Fechar clicando na mesma etapa novamente (toggle)<span class="s">Comportamento padrão de accordion</span></li>
+          <li>Botão "Ver todos na etapa" → navega Tela 6 com filtro pré-aplicado</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F6: Evolução completa -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <span class="badge b-warn">Expandir · F6</span><span class="badge b-p2">P2</span>
+    </div>
+    <h3>Evolução do Funil — 5 Séries + Taxa de Conversão Diária</h3>
+    <p class="sdesc">O gráfico atual mostra Captados, Qualificados e Fechados. Enriquecidos e Negociação estão ausentes — e Negociação é exatamente o gargalo. Adicionar as 5 séries e uma linha de taxa de conversão sobreposta.</p>
+    <div class="evo-additions">
+      <div class="ea"><strong>Adicionar Enriquecidos</strong> <span>· 5ª série no gráfico (cor azul) · dataset FUNIL_EVOLUCAO precisa do campo enriquecidos por dia</span></div>
+      <div class="ea"><strong>Adicionar Negociação</strong> <span>· 6ª série (cor âmbar) · o gargalo no eixo do tempo · permite ver se está piorando semana a semana</span></div>
+      <div class="ea"><strong>2ª linha Y (direita): taxa de conversão diária</strong> <span>· linha sobreposta mostrando % Captados→Fechados por dia · detecta quedas abruptas de conversão</span></div>
+      <div class="ea"><strong>Período de 90 dias com toggle</strong> <span>· Atual: 30 dias · Adicionar opções de 7d / 30d / 90d · para detectar padrões sazonais</span></div>
+      <div class="ea"><strong>Annotation de eventos</strong> <span>· Marcação vertical quando houve mudança de script, nova campanha ou troca de vendedor · contextualiza picos e quedas no gráfico</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     05 — PRIORIDADES
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">05</span>
+    <div>
+      <h2>Ordem de Implementação</h2>
+      <div class="sd">Ordenado pelo impacto direto na gestão do funil e tomada de decisão operacional</div>
+    </div>
+  </div>
+
+  <div class="tl">
+    <div class="tli" style="border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.02);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.2);">01</div>
+      <div class="tli-b">
+        <h4>Separação SDR / Closer (F1) + Delta de Conversão (F3)</h4>
+        <p>São mudanças visuais que não requerem novos datasets — apenas reorganização do layout e adição de cálculo de delta sobre dados já existentes em FUNIL_EVOLUCAO. O impacto é imediato: Elias consegue pela primeira vez saber se a queda em Negociação é problema do SDR ou do Closer.</p>
+        <div class="tli-tags"><span class="badge b-new">Estrutural</span><span class="badge b-p1">P1 Crítico</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Mudança visual + cálculo de delta · sem novo dataset</span></div>
+      </div>
+    </div>
+    <div class="tli" style="border-color:rgba(248,113,113,0.15);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.18);">02</div>
+      <div class="tli-b">
+        <h4>Pipeline Value (F4) + KPIs Financeiros do Funil</h4>
+        <p>Requer cruzar Ticket Médio (VENDEDORES) com FUNIL_DATA — cálculo simples. Transforma a tela de funil em tela de decisão financeira. Elias consegue pela primeira vez ver "R$288k em pipeline ativo" sem ir para a tela Financeiro.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Novos KPIs · usa datasets existentes</span></div>
+      </div>
+    </div>
+    <div class="tli" style="border-color:rgba(251,191,36,0.14);">
+      <div class="tli-n" style="color:rgba(251,191,36,0.15);">03</div>
+      <div class="tli-b">
+        <h4>Completar o Painel de Detalhe (F5)</h4>
+        <p>O etapaSel já existe — é completar a funcionalidade que está incompleta. Reutiliza ALUNOS dataset com filtro por etapa. O painel de detalhe com lista de leads + ações rápidas (WhatsApp, Reagendar) transforma a tela de dashboard em CRM operacional.</p>
+        <div class="tli-tags"><span class="badge b-warn">Completar existente</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Completar etapaSel · lista de leads + ações · usa ALUNOS dataset</span></div>
+      </div>
+    </div>
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.15);">04</div>
+      <div class="tli-b">
+        <h4>Tempo por Etapa + SLA (F2)</h4>
+        <p>Requer novo campo de timestamp por etapa em FUNIL_DATA — é o item de maior dependência de dado novo. Pode ser implementado progressivamente: primeiro apenas calculando tempo médio global, depois adicionando alertas de SLA por lead individual.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Requer novo campo: entradaEm por etapa · implementar incrementalmente</span></div>
+      </div>
+    </div>
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.1);">05</div>
+      <div class="tli-b">
+        <h4>Evolução Completa com 5 Séries (F6)</h4>
+        <p>Expansão do gráfico existente. Requer dados históricos de Enriquecidos e Negociação por dia em FUNIL_EVOLUCAO. A annotation de eventos é o item mais rico — permite contextualizar qualquer pico ou queda no histórico.</p>
+        <div class="tli-tags"><span class="badge b-warn">Expandir existente</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Adicionar séries a FUNIL_EVOLUCAO · nova linha Y para taxa de conversão</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- TABELA RESUMO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:40px;overflow-x:auto;">
+  <h3 style="font-size:14px;font-weight:800;letter-spacing:-0.3px;margin-bottom:18px;">Resumo — Tela Funil de Vendas após Atualização</h3>
+  <table class="st">
+    <thead>
+      <tr><th>Item</th><th>Tipo</th><th>Impacto operacional</th><th>Prioridade</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>F1 — Funil Duplo SDR/Closer</td>
+        <td>Refatoração visual · duas lanes</td>
+        <td>Diagnóstico correto do gargalo — SDR ou Closer? Pergunta que hoje é impossível responder.</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>F2 — Tempo por Etapa + SLA</td>
+        <td>Novo · requer timestamp de etapa</td>
+        <td>14 leads parados em Negociação há +7 dias são invisíveis hoje. Com SLA, viram alerta vermelho automático.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>F3 — Delta de Conversão</td>
+        <td>Melhoria visual · cálculo sobre dados existentes</td>
+        <td>"63% Negociação" pode ser tendência de queda de 8% — hoje esse contexto não existe na tela.</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>F4 — Pipeline Value</td>
+        <td>Novo · usa datasets existentes</td>
+        <td>R$288k em Negociação são invisíveis. Conecta funil operacional com impacto financeiro do mês.</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>F5 — Painel de Detalhe</td>
+        <td>Completar etapaSel existente</td>
+        <td>Clicar numa etapa hoje não mostra nada útil. Com o painel completo, vira CRM operacional inline.</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>F6 — Evolução Completa</td>
+        <td>Expandir gráfico · adicionar séries</td>
+        <td>O gargalo (Negociação) é exatamente a etapa ausente do histórico. Incompletude crítica para análise de tendência.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  Gerado por <span>Tria Company</span> · Dashboard Administrativo — Tela Funil de Vendas · dashelias.vercel.app
+</footer>
+
+</div>
+</body>
+</html>

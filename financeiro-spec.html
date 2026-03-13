@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financeiro — Especificação Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04050c;--surface:#0a0c18;--surface2:#0f1120;--surface3:#141728;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#eceef8;--muted:#6e7294;--dim:#353757;
+  --amber:#fbbf24;--emerald:#34d399;--rose:#fb7185;
+  --violet:#a78bfa;--cyan:#22d3ee;--sky:#38bdf8;
+  --r:14px;
+  --ok:#34d399;  --ok-g:rgba(52,211,153,0.08);
+  --warn:#fbbf24;--warn-g:rgba(251,191,36,0.08);
+  --crit:#fb7185;--crit-g:rgba(251,113,133,0.08);
+  --new:#a78bfa; --new-g:rgba(167,139,250,0.08);
+  --req:#22d3ee; --req-g:rgba(34,211,238,0.08);
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(130px);}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,0.03),transparent 70%);top:-200px;left:50%;transform:translateX(-50%);}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(251,191,36,0.035),transparent 70%);bottom:-80px;right:-60px;}
+.o3{width:280px;height:280px;background:radial-gradient(circle,rgba(167,139,250,0.03),transparent 70%);top:35%;left:-50px;}
+.wrap{max-width:1380px;margin:0 auto;padding:60px 28px 100px;position:relative;z-index:1;}
+
+/* HEADER */
+header{text-align:center;margin-bottom:60px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--emerald);background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);padding:6px 18px;border-radius:100px;margin-bottom:20px;}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--emerald);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-2.5px;line-height:1.08;margin-bottom:14px;}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--emerald) 0%,var(--cyan) 50%,var(--amber) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:13px;max-width:580px;margin:0 auto;font-family:'DM Mono',monospace;font-weight:300;line-height:1.8;}
+
+/* VERDICT */
+.verdict{display:flex;align-items:stretch;margin-bottom:48px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.vd{flex:1;padding:14px 18px;text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1px;border-right:1px solid var(--border);}
+.vd:last-child{border-right:none;}
+.vd .vv{font-size:24px;font-weight:800;letter-spacing:-1px;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;}
+.vd .vl{color:var(--muted);font-size:9px;}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:52px 0;}
+
+/* SECTION */
+.sec{margin-bottom:56px;}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.sec-n{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:var(--dim);min-width:28px;}
+.sec-head h2{font-size:20px;font-weight:800;letter-spacing:-0.5px;flex:1;}
+.sec-sub{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.b-ok{background:var(--ok-g);color:var(--ok);border:1px solid rgba(52,211,153,0.18);}
+.b-warn{background:var(--warn-g);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-crit{background:var(--crit-g);color:var(--crit);border:1px solid rgba(251,113,133,0.18);}
+.b-new{background:var(--new-g);color:var(--new);border:1px solid rgba(167,139,250,0.18);}
+.b-req{background:var(--req-g);color:var(--req);border:1px solid rgba(34,211,238,0.18);}
+.b-p1{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.18);}
+.b-p2{background:rgba(251,191,36,0.08);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-p3{background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.18);}
+
+/* CALLOUT */
+.callout{border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.callout p{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.8;}
+.callout strong{color:var(--text);}
+.c-info{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);}
+.c-crit{background:rgba(251,113,133,0.04);border:1px solid rgba(251,113,133,0.14);}
+.c-warn{background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.14);}
+.c-new{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.14);}
+.c-ok{background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.14);}
+
+/* AUDIT */
+.audit{display:flex;flex-direction:column;gap:8px;}
+.ar{display:grid;grid-template-columns:90px 1fr 90px 220px;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:11px;}
+.ar.crit-row{border-color:rgba(251,113,133,0.2);background:rgba(251,113,133,0.025);}
+.ar.warn-row{border-color:rgba(251,191,36,0.14);}
+.ar.ok-row{border-color:rgba(52,211,153,0.12);}
+.ar-id{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--dim);line-height:1.7;}
+.ar-name{font-weight:700;font-size:12px;}
+.ar-name .an{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.5;}
+.ar-fix{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.ar-fix strong{color:var(--text);display:block;margin-bottom:2px;font-size:10px;}
+
+/* DRE TABLE */
+.dre-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.dre-table{width:100%;border-collapse:collapse;font-size:11px;}
+.dre-table th{text-align:left;padding:8px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2);}
+.dre-table th:not(:first-child){text-align:right;}
+.dre-table td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.025);}
+.dre-table td:not(:first-child){text-align:right;font-family:'DM Mono',monospace;font-size:10px;}
+.dre-section td{font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);padding:10px 14px 4px;background:rgba(255,255,255,0.012);}
+.dre-total td{background:rgba(255,255,255,0.025);font-weight:700;}
+.dre-subtotal td{background:rgba(255,255,255,0.015);font-style:italic;}
+.dre-result td{background:rgba(52,211,153,0.05);font-weight:800;font-size:12px;color:var(--ok);}
+.dre-neg{color:var(--crit)!important;}
+.dre-pos{color:var(--ok)!important;}
+.dre-neu{color:var(--muted)!important;}
+.dre-bold{font-weight:800!important;}
+
+/* MARGEM STACK */
+.margem-stack{display:flex;height:48px;border-radius:8px;overflow:hidden;margin-top:12px;}
+.ms{display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;padding:0 4px;}
+
+/* CUSTO BARS */
+.custo-rows{display:flex;flex-direction:column;gap:7px;}
+.cr{display:flex;align-items:center;gap:10px;font-size:11px;}
+.cr-label{min-width:170px;font-family:'DM Mono',monospace;color:var(--muted);font-size:10px;}
+.cr-bar-wrap{flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:18px;overflow:hidden;}
+.cr-fill{height:18px;border-radius:4px;display:flex;align-items:center;padding-left:8px;}
+.cr-fill span{font-size:8px;font-weight:700;color:rgba(255,255,255,0.75);}
+.cr-pct{min-width:40px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.cr-val{min-width:72px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;font-weight:600;}
+
+/* FORECAST CARDS */
+.forecast-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.fc-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.fc-period{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.fc-val{font-size:26px;font-weight:800;letter-spacing:-1.5px;line-height:1;}
+.fc-desc{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:4px;line-height:1.5;}
+.fc-items{display:flex;flex-direction:column;gap:5px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.fc-item{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;}
+.fc-item .fi-l{color:var(--muted);}
+.fc-item.fi-total{padding-top:6px;border-top:1px solid var(--border);margin-top:2px;}
+.fc-item.fi-total .fi-l{color:var(--text);font-weight:700;}
+
+/* CALENDAR */
+.cal-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;}
+.cal-day{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;min-width:95px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.cal-day:hover{border-color:var(--border2);}
+.cal-day.today{border-color:rgba(34,211,238,0.35);}
+.cal-day.peak{border-color:rgba(251,191,36,0.3);}
+.cal-day.high{border-color:rgba(251,113,133,0.3);}
+.cal-date{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:5px;}
+.cal-val{font-size:16px;font-weight:800;letter-spacing:-0.5px;}
+.cal-qty{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+
+/* AGING */
+.aging-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.aging-card{border-radius:10px;padding:14px;text-align:center;}
+.aging-val{font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.aging-label{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:5px;line-height:1.5;}
+.aging-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:8px;font-weight:700;font-family:'DM Mono',monospace;margin-top:5px;}
+
+/* INAD TABLE */
+.inad-table{width:100%;border-collapse:collapse;}
+.inad-table th{text-align:left;padding:8px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.inad-table td{padding:12px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.025);vertical-align:middle;}
+.inad-table tr:last-child td{border-bottom:none;}
+.inad-table tr.crit td{background:rgba(251,113,133,0.02);}
+.inad-table tr.writeof td{background:rgba(255,60,60,0.03);}
+.recov{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:4px;}
+.recov-bar{width:60px;height:5px;border-radius:2px;background:rgba(255,255,255,0.06);display:inline-block;position:relative;overflow:hidden;}
+.recov-fill{height:5px;border-radius:2px;position:absolute;left:0;top:0;}
+
+/* PRODUTO CARDS */
+.produto-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:10px;}
+.pc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.pc-name{font-size:14px;font-weight:800;}
+.pc-sub{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+.pc-kpis{display:flex;gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.pc-kpi{flex:1;padding:10px 12px;text-align:center;border-right:1px solid var(--border);}
+.pc-kpi:last-child{border-right:none;}
+.pc-kpi .pv{font-size:18px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.pc-kpi .pl{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+.pc-bar-wrap{background:rgba(255,255,255,0.04);border-radius:3px;height:5px;margin-top:14px;}
+.pc-bar{height:5px;border-radius:3px;}
+
+/* FORMAS EXPANDED */
+.forma-row{display:grid;grid-template-columns:140px 80px 80px 80px 1fr;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.025);font-size:11px;}
+.forma-row.header{font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;background:var(--surface2);padding:8px 14px;}
+
+/* SPEC */
+.spec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px;position:relative;overflow:hidden;}
+.spec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.spec-new::before{background:linear-gradient(90deg,var(--emerald),var(--cyan),transparent);}
+.spec-fix::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.spec h3{font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;}
+.spec .sdesc{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;}
+.spec-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.spec-col h4{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.spec-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.spec-col li{font-size:11px;line-height:1.5;display:flex;gap:7px;}
+.spec-col li::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.spec-col li .s{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);display:block;line-height:1.5;margin-top:1px;}
+
+/* PRIORITY TL */
+.tl{display:flex;flex-direction:column;gap:8px;}
+.tli{display:flex;align-items:flex-start;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.tli-n{font-family:'DM Mono',monospace;font-size:28px;font-weight:800;color:var(--surface3);min-width:32px;line-height:1;}
+.tli-b h4{font-size:13px;font-weight:800;margin-bottom:3px;letter-spacing:-0.3px;}
+.tli-b p{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.tli-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+
+/* SUMMARY TABLE */
+.st{width:100%;border-collapse:collapse;}
+.st th{text-align:left;padding:9px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.st td{padding:10px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;}
+.st td:first-child{font-weight:700;font-size:12px;width:210px;}
+.st td:nth-child(2){font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.st tr:last-child td{border-bottom:none;}
+
+footer{text-align:center;padding-top:36px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;}
+footer span{color:var(--amber);}
+
+@media(max-width:960px){
+  .spec-cols{grid-template-columns:1fr;}
+  .forecast-grid{grid-template-columns:1fr;}
+  .aging-grid{grid-template-columns:1fr 1fr;}
+  .ar{grid-template-columns:70px 1fr;}
+  .ar .ar-fix{grid-column:2;}
+}
+@media(max-width:600px){
+  .verdict{flex-direction:column;}
+  .vd{border-right:none;border-bottom:1px solid var(--border);}
+  .vd:last-child{border-bottom:none;}
+  .aging-grid{grid-template-columns:1fr;}
+  .pc-kpis{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="wrap">
+
+<!-- ══════ HEADER ══════ -->
+<header>
+  <div class="eyebrow">Dashboard Administrativo · Tela 3</div>
+  <h1>Expansão — <em>Financeiro</em></h1>
+  <p class="sub">A tela atual registra receita mas não mede saúde financeira. DRE, fluxo de caixa, margem operacional, breakdown de custos, aging de inadimplência, previsão 30/60/90 dias e receita por produto — tudo que transforma números em decisão.</p>
+</header>
+
+<!-- VERDICT -->
+<div class="verdict">
+  <div class="vd"><span class="vv" style="color:var(--ok)">8</span><span class="vl">KPIs atuais OK</span></div>
+  <div class="vd"><span class="vv" style="color:var(--crit)">7</span><span class="vl">gaps críticos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--violet)">9</span><span class="vl">blocos novos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--warn)">3</span><span class="vl">blocos expandidos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--req)">2</span><span class="vl">novos datasets</span></div>
+</div>
+
+<!-- ══════════════════════════
+     01 — ESTADO ATUAL
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <div>
+      <h2>Estado Atual — O que existe e o que falta</h2>
+      <div class="sec-sub">Análise bloco por bloco · o que manter · o que expandir · o que criar do zero</div>
+    </div>
+  </div>
+
+  <div class="callout c-crit">
+    <p><strong>O problema central:</strong> A tela de Financeiro atual registra <em>receita</em> — mas não mede a saúde financeira do negócio. R$43.200 realizados sem saber custos operacionais, margem líquida ou posição de caixa para os próximos 30 dias é como olhar apenas a linha de cima de um balanço. <strong>O Elias não sabe se o negócio está lucrando ou apenas faturando.</strong> A diferença pode ser R$17.000 de lucro — ou R$3.000 de prejuízo escondido no crescimento.</p>
+  </div>
+
+  <div class="audit">
+    <div class="ar ok-row">
+      <div class="ar-id">B01<br><span class="badge b-ok">Manter</span></div>
+      <div class="ar-name">6 KPIs de Receita (2 linhas)
+        <div class="an">Realizada R$43.2k (+12%) · Projetada 3M R$124.8k · Inadimplência R$12.4k · Recuperada R$3.8k (+22%) · Ticket R$2.580 (Low–High) · CPV R$283</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Bem executado</strong>Deltas vs mês anterior, range de ticket e breakdown Equipe/IA no CPV são dados valiosos. Manter tudo. Único ajuste: adicionar meta mensal configurável e % de atingimento em cada KPI relevante.</div>
+    </div>
+
+    <div class="ar warn-row">
+      <div class="ar-id">B02<br><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-name">Gráfico Últimos 6 Meses
+        <div class="an">Barras Realizada (verde) + Recuperada (âmbar) · Out a Mar</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Problema</strong>Mostra receita bruta mas sem linha de meta, sem custo sobreposto, sem margem visível. É gráfico de uma variável mascarando a complexidade.<br><strong>Fix →</strong> Adicionar linha tracejada de meta + segunda série de Custo Total + linha de Margem % no eixo Y direito (escala 0–100%)</div>
+    </div>
+
+    <div class="ar ok-row">
+      <div class="ar-id">B03<br><span class="badge b-ok">Expandir</span></div>
+      <div class="ar-name">Formas de Pagamento (donut + lista)
+        <div class="an">Cartão 31v 2.1% · Pix à vista 12v 0% · Pix 6x 24v 8.3% · Pix 12x 22v 18.2%</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Muito bom</strong>Inadimplência por forma (Pix 12x: 18.2%) é gold. Adicionar: receita em R$ por forma além do volume · tendência histórica de inadimplência por forma nos últimos 3 meses · ticket médio por forma.</div>
+    </div>
+
+    <div class="ar warn-row">
+      <div class="ar-id">B04<br><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-name">Tabela Inadimplência por Aluno
+        <div class="an">4 alunos · turma · valor · dias · tentativas · status · ordenado por valor em atraso</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Incompleto</strong>Sem aging categories (1–30d / 31–60d / 61–90d / +90d), sem probabilidade de recuperação, sem histórico de contato detalhado, sem ação rápida inline. Expandir com aging completo e recovery score.</div>
+    </div>
+
+    <div class="ar crit-row">
+      <div class="ar-id">G1<br><span class="badge b-crit">Ausente</span></div>
+      <div class="ar-name">DRE — Demonstrativo de Resultado
+        <div class="an">Receita → Deduções → Margem de Contribuição → Custos Fixos → Lucro Operacional</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap crítico</strong>Sem DRE, R$43.200 pode ser lucro R$17.000 ou prejuízo R$3.000. O único documento que responde "o negócio é lucrativo?" está completamente ausente.</div>
+    </div>
+
+    <div class="ar crit-row">
+      <div class="ar-id">G2<br><span class="badge b-crit">Ausente</span></div>
+      <div class="ar-name">Margem Operacional e Líquida (%)
+        <div class="an">% de lucro sobre receita · tendência histórica · comparativo vs meta de margem</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap crítico</strong>CPV R$283 existe mas é métrica unitária. Sem margem do negócio (%), o Elias não sabe se a empresa é eficiente ou está sangrando enquanto cresce.</div>
+    </div>
+
+    <div class="ar crit-row">
+      <div class="ar-id">G3<br><span class="badge b-crit">Ausente</span></div>
+      <div class="ar-name">Fluxo de Caixa + Previsão 30/60/90d
+        <div class="an">Entradas previstas (parcelas + novas vendas) vs saídas (custos fixos) por período</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap crítico</strong>Receita projetada 3M (R$124.8k) é só a linha de entrada. Sem saídas (folha, aluguel, plataformas), não há previsão de caixa real. O negócio pode crescer em receita e secar em caixa simultaneamente.</div>
+    </div>
+
+    <div class="ar crit-row">
+      <div class="ar-id">G4<br><span class="badge b-crit">Ausente</span></div>
+      <div class="ar-name">Breakdown de Custos por Categoria
+        <div class="an">Fixos vs Variáveis · folha · aluguel · SaaS · comissões · IA · material · tendência</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap crítico</strong>CPV agrega tudo. "Equipe R$18.4k + IA R$673" aparece no tooltip mas não em gráfico dedicado. Sem breakdown por categoria, é impossível saber onde cortar ou onde investir com segurança.</div>
+    </div>
+
+    <div class="ar warn-row">
+      <div class="ar-id">G5<br><span class="badge b-warn">Ausente</span></div>
+      <div class="ar-name">Receita e Margem por Produto / Turma
+        <div class="an">Qual produto gera mais lucro · CPV por produto · ticket vs custo · rentabilidade comparada</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap</strong>Com produtos de ticket diferente (R$2.400 vs R$4.800), a receita agregada esconde quais produtos são mais rentáveis. Decisão de qual turma abrir tem R$10.000+ de diferença sem esse dado.</div>
+    </div>
+
+    <div class="ar warn-row">
+      <div class="ar-id">G6<br><span class="badge b-warn">Ausente</span></div>
+      <div class="ar-name">Aging de Inadimplência com Recovery Score
+        <div class="an">1–30d / 31–60d / 61–90d / +90d · probabilidade de recuperação por faixa</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap</strong>Do R$12.400 inadimplente, quanto tem chance real de recuperação vs write-off? Sem aging categories e recovery score, a cobrança não tem priorização financeira — só operacional.</div>
+    </div>
+
+    <div class="ar warn-row">
+      <div class="ar-id">G7<br><span class="badge b-warn">Ausente</span></div>
+      <div class="ar-name">Calendário de Vencimentos (próximos 14 dias)
+        <div class="an">Parcelas a vencer por data · picos de entrada · programação de cobrança</div>
+      </div>
+      <div></div>
+      <div class="ar-fix"><strong>Gap</strong>Com 46 vendas parceladas (6x e 12x), há um calendário de entradas de caixa previsível. Sem visibilidade dos próximos vencimentos, o caixa é gerenciado de forma reativa, não preditiva.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     02 — DRE MOCKUP
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <div>
+      <h2>Mockup — DRE Simplificado</h2>
+      <div class="sec-sub">Bloco F1 · o coração da expansão financeira · único documento que responde "o negócio lucra?"</div>
+    </div>
+  </div>
+
+  <div class="callout c-new">
+    <p><strong>Por que DRE?</strong> R$43.200 de receita com custos totais de R$26.073 = <strong>R$17.127 de lucro operacional (39.6% de margem)</strong> — ou com custos de R$40.000 = prejuízo de R$3.200. Sem o DRE, ninguém sabe. É o único relatório que mostra a jornada completa do dinheiro: de onde veio, onde foi, e o que sobrou.</p>
+  </div>
+
+  <div class="dre-wrap">
+    <table class="dre-table">
+      <thead>
+        <tr>
+          <th style="width:38%">Linha do DRE</th>
+          <th>Mar/26</th>
+          <th>Fev/26</th>
+          <th>Jan/26</th>
+          <th>Δ M/M-1</th>
+          <th>% Receita</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- RECEITA -->
+        <tr class="dre-section"><td colspan="6">① RECEITA BRUTA</td></tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Matrículas realizadas</td>
+          <td class="dre-bold dre-pos">R$ 43.200</td><td>R$ 38.600</td><td>R$ 41.100</td>
+          <td class="dre-pos">▲ +12.0%</td><td class="dre-bold">100.0%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Receita recuperada (cobrança)</td>
+          <td class="dre-pos">R$ 3.800</td><td>R$ 3.100</td><td>R$ 2.900</td>
+          <td class="dre-pos">▲ +22.6%</td><td>8.8%</td>
+        </tr>
+        <tr class="dre-total">
+          <td>= RECEITA TOTAL</td>
+          <td class="dre-bold dre-pos">R$ 47.000</td><td>R$ 41.700</td><td>R$ 44.000</td>
+          <td class="dre-pos">▲ +12.7%</td><td class="dre-bold">108.8%</td>
+        </tr>
+
+        <!-- DEDUÇÕES -->
+        <tr class="dre-section"><td colspan="6">② DEDUÇÕES DA RECEITA</td></tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Taxas de processamento (Pix/Cartão)</td>
+          <td class="dre-neg">− R$ 1.073</td><td class="dre-neg">− R$ 960</td><td class="dre-neg">− R$ 1.020</td>
+          <td class="dre-neg">▼ −11.8%</td><td class="dre-neu">2.5%</td>
+        </tr>
+        <tr class="dre-subtotal">
+          <td>= RECEITA LÍQUIDA</td>
+          <td class="dre-bold">R$ 45.927</td><td>R$ 40.740</td><td>R$ 42.980</td>
+          <td class="dre-pos">▲ +12.7%</td><td>106.3%</td>
+        </tr>
+
+        <!-- CUSTOS VARIÁVEIS -->
+        <tr class="dre-section"><td colspan="6">③ CUSTOS VARIÁVEIS (por venda)</td></tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Comissões da equipe de vendas</td>
+          <td class="dre-neg">− R$ 8.640</td><td class="dre-neg">− R$ 7.720</td><td class="dre-neg">− R$ 8.220</td>
+          <td class="dre-neg">▼ −11.9%</td><td>20.0%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Agentes IA (tokens + infra)</td>
+          <td class="dre-neg">− R$ 673</td><td class="dre-neg">− R$ 610</td><td class="dre-neg">− R$ 590</td>
+          <td class="dre-neg">▼ −10.3%</td><td>1.6%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Material didático / entrega</td>
+          <td class="dre-neg">− R$ 2.100</td><td class="dre-neg">− R$ 1.880</td><td class="dre-neg">− R$ 2.000</td>
+          <td class="dre-neg">▼ −11.7%</td><td>4.9%</td>
+        </tr>
+        <tr class="dre-subtotal">
+          <td>= MARGEM DE CONTRIBUIÇÃO</td>
+          <td class="dre-bold dre-pos">R$ 34.514</td><td>R$ 30.530</td><td>R$ 32.170</td>
+          <td class="dre-pos">▲ +13.0%</td><td class="dre-bold dre-pos">79.9%</td>
+        </tr>
+
+        <!-- CUSTOS FIXOS -->
+        <tr class="dre-section"><td colspan="6">④ CUSTOS FIXOS OPERACIONAIS</td></tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Folha de pagamento (salários fixos)</td>
+          <td class="dre-neg">− R$ 10.000</td><td class="dre-neg">− R$ 10.000</td><td class="dre-neg">− R$ 10.000</td>
+          <td class="dre-neu">= 0%</td><td>23.1%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Aluguel e estrutura física</td>
+          <td class="dre-neg">− R$ 3.200</td><td class="dre-neg">− R$ 3.200</td><td class="dre-neg">− R$ 3.200</td>
+          <td class="dre-neu">= 0%</td><td>7.4%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Plataformas e SaaS (CRM, ferramentas)</td>
+          <td class="dre-neg">− R$ 2.400</td><td class="dre-neg">− R$ 2.200</td><td class="dre-neg">− R$ 2.200</td>
+          <td class="dre-neg">▼ −9.1%</td><td>5.6%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Marketing e conteúdo orgânico</td>
+          <td class="dre-neg">− R$ 1.787</td><td class="dre-neg">− R$ 1.590</td><td class="dre-neg">− R$ 1.500</td>
+          <td class="dre-neg">▼ −12.4%</td><td>4.1%</td>
+        </tr>
+        <tr class="dre-subtotal">
+          <td>TOTAL CUSTOS FIXOS</td>
+          <td class="dre-bold dre-neg">− R$ 17.387</td><td class="dre-neg">− R$ 16.990</td><td class="dre-neg">− R$ 16.900</td>
+          <td class="dre-neg">▼ −2.3%</td><td class="dre-bold">40.2%</td>
+        </tr>
+
+        <!-- RESULTADO -->
+        <tr class="dre-section"><td colspan="6">⑤ RESULTADO OPERACIONAL</td></tr>
+        <tr class="dre-result">
+          <td>= LUCRO OPERACIONAL</td>
+          <td class="dre-bold">R$ 17.127</td><td>R$ 13.540</td><td>R$ 15.270</td>
+          <td>▲ +26.5%</td><td class="dre-bold">39.7%</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;color:var(--muted)">Imposto estimado (~6% Simples)</td>
+          <td class="dre-neg">− R$ 2.820</td><td class="dre-neg">− R$ 2.502</td><td class="dre-neg">− R$ 2.640</td>
+          <td class="dre-neg">▼ −12.7%</td><td>6.5%</td>
+        </tr>
+        <tr class="dre-result" style="background:rgba(52,211,153,0.08);">
+          <td style="font-weight:800;">= LUCRO LÍQUIDO</td>
+          <td class="dre-bold" style="font-size:14px;">R$ 14.307</td><td>R$ 11.038</td><td>R$ 12.630</td>
+          <td>▲ +29.6%</td><td class="dre-bold">33.1%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Margem visual stack -->
+  <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;margin:14px 0 8px;">Composição de cada R$100 de receita bruta</p>
+  <div class="margem-stack">
+    <div class="ms" style="width:20%;background:rgba(251,113,133,0.45);">Comissões 20%</div>
+    <div class="ms" style="width:23.1%;background:rgba(251,113,133,0.35);">Folha 23.1%</div>
+    <div class="ms" style="width:7.4%;background:rgba(251,113,133,0.28);">Aluguel 7.4%</div>
+    <div class="ms" style="width:5.6%;background:rgba(251,113,133,0.22);">SaaS 5.6%</div>
+    <div class="ms" style="width:6.5%;background:rgba(251,191,36,0.3);color:rgba(0,0,0,0.7);">Imp. 6.5%</div>
+    <div class="ms" style="width:4.3%;background:rgba(107,114,128,0.3);">Outros</div>
+    <div class="ms" style="flex:1;background:rgba(52,211,153,0.4);">Lucro Líquido 33.1%</div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,113,133,0.4);margin-right:4px;vertical-align:middle;"></span>Custos variáveis 26.5%</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,113,133,0.28);margin-right:4px;vertical-align:middle;"></span>Custos fixos 40.2%</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,191,36,0.3);margin-right:4px;vertical-align:middle;"></span>Impostos 6.5%</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.4);margin-right:4px;vertical-align:middle;"></span>Lucro líquido 33.1%</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     03 — BREAKDOWN DE CUSTOS
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <div>
+      <h2>Mockup — Breakdown de Custos + Evolução 6M</h2>
+      <div class="sec-sub">Bloco F2 · onde vai cada real · fixos vs variáveis · alertas de compressão de margem</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+    <!-- Barras de custo -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;">
+      <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">Custo por categoria · Março 2026 · Total R$28.673</p>
+      <div class="custo-rows">
+        <div class="cr">
+          <div class="cr-label">Folha (fixo)</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:71%;background:rgba(251,113,133,0.45);"><span>R$10.000</span></div></div>
+          <div class="cr-pct">34.9%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Comissões (variável)</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:61%;background:rgba(251,113,133,0.32);"><span>R$8.640</span></div></div>
+          <div class="cr-pct">30.1%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Aluguel + estrutura</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:23%;background:rgba(251,191,36,0.45);"><span>R$3.200</span></div></div>
+          <div class="cr-pct">11.2%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Plataformas / SaaS</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:17%;background:rgba(251,191,36,0.32);"><span>R$2.400</span></div></div>
+          <div class="cr-pct">8.4%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Material didático</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:15%;background:rgba(96,165,250,0.45);"><span>R$2.100</span></div></div>
+          <div class="cr-pct">7.3%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Marketing orgânico</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:12%;background:rgba(167,139,250,0.4);"><span>R$1.787</span></div></div>
+          <div class="cr-pct">6.2%</div>
+        </div>
+        <div class="cr">
+          <div class="cr-label">Agentes IA (tokens)</div>
+          <div class="cr-bar-wrap"><div class="cr-fill" style="width:5%;background:rgba(34,211,238,0.4);"><span>R$673</span></div></div>
+          <div class="cr-pct">2.3%</div>
+        </div>
+      </div>
+      <div class="callout c-ok" style="margin-top:14px;padding:10px 14px;">
+        <p style="font-size:10px;"><strong>Alavancagem positiva:</strong> Custos fixos cresceram apenas +2.3% enquanto receita cresceu +12.7%. Cada R$ incremental de receita dilui os custos fixos — sinal de escalabilidade saudável.</p>
+      </div>
+    </div>
+
+    <!-- Gráfico histórico -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;">
+      <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">Receita vs Custos vs Margem — 6 meses</p>
+      <svg viewBox="0 0 340 130" style="width:100%;height:130px;">
+        <!-- Grid lines -->
+        <line x1="0" y1="20" x2="340" y2="20" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="50" x2="340" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="340" y2="80" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="108" x2="340" y2="108" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <!-- Área lucro (verde preenchida) -->
+        <polygon points="10,68 65,58 120,47 175,52 230,42 285,35 285,80 230,80 175,80 120,80 65,80 10,80"
+          fill="rgba(52,211,153,0.12)" stroke="none"/>
+        <!-- Receita (verde linha espessa) -->
+        <polyline points="10,68 65,58 120,47 175,52 230,42 285,35"
+          fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Custos variáveis (rose) -->
+        <polyline points="10,84 65,80 120,74 175,76 230,72 285,70"
+          fill="none" stroke="#fb7185" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="4,3"/>
+        <!-- Custos fixos (amber) -->
+        <polyline points="10,88 65,88 120,88 175,89 230,87 285,88"
+          fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linejoin="round"/>
+        <!-- Margem % (cyan, eixo direito) -->
+        <polyline points="10,76 65,72 120,66 175,69 230,64 285,60"
+          fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="2,2"/>
+        <!-- Meses -->
+        <text x="10"  y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Out</text>
+        <text x="62"  y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Nov</text>
+        <text x="115" y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Dez</text>
+        <text x="168" y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Jan</text>
+        <text x="221" y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Fev</text>
+        <text x="274" y="122" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace">Mar</text>
+        <!-- Mar ponto de destaque -->
+        <circle cx="285" cy="35" r="3.5" fill="#34d399"/>
+        <text x="272" y="30" font-size="8" fill="#34d399" font-family="monospace">R$43.2k</text>
+      </svg>
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+        <span style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);display:flex;align-items:center;gap:5px;"><span style="width:16px;height:2.5px;background:var(--ok);display:inline-block;border-radius:1px;"></span>Receita</span>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);display:flex;align-items:center;gap:5px;"><span style="width:16px;height:2px;background:var(--crit);display:inline-block;border-radius:1px;"></span>Var. variáveis</span>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);display:flex;align-items:center;gap:5px;"><span style="width:16px;height:2px;background:var(--amber);display:inline-block;border-radius:1px;"></span>Var. fixos</span>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);display:flex;align-items:center;gap:5px;"><span style="width:16px;height:2px;background:var(--cyan);display:inline-block;border-radius:1px;"></span>Margem %</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     04 — PREVISÃO DE CAIXA
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">04</span>
+    <div>
+      <h2>Mockup — Previsão de Caixa 30/60/90 dias</h2>
+      <div class="sec-sub">Bloco F3 · entradas previstas (parcelas recorrentes + novas vendas) minus saídas certas (custos fixos) = saldo projetado</div>
+    </div>
+  </div>
+
+  <div class="callout c-warn">
+    <p><strong>O dado-chave que está faltando:</strong> Com 46 vendas parceladas (Pix 6x e Pix 12x), existe um fluxo recorrente de parcelas entrando nos próximos meses que é <em>totalmente previsível</em>. Somando isso à projeção de novas matrículas e subtraindo os custos fixos conhecidos, é possível saber o saldo de caixa de Abril com ±15% de precisão — <strong>sem nenhum dado novo, só cruzando o que já existe no sistema.</strong></p>
+  </div>
+
+  <div class="forecast-grid">
+    <div class="fc-card" style="border-color:rgba(52,211,153,0.2);">
+      <div class="fc-period">Abril — 30 dias</div>
+      <div class="fc-val" style="color:var(--ok)">+ R$ 36.800</div>
+      <div class="fc-desc">Saldo projetado líquido<br>Cenário: pace atual de vendas mantido</div>
+      <div class="fc-items">
+        <div class="fc-item"><span class="fi-l">Novas matrículas (proj.)</span><span style="color:var(--ok);font-weight:600;">+ R$ 42.000</span></div>
+        <div class="fc-item"><span class="fi-l">Parcelas recorrentes</span><span style="color:var(--ok);font-weight:600;">+ R$ 14.200</span></div>
+        <div class="fc-item"><span class="fi-l">Recuperação inadimpl.</span><span style="color:var(--ok);font-weight:600;">+ R$ 4.200</span></div>
+        <div class="fc-item"><span class="fi-l">Custos fixos</span><span style="color:var(--crit);font-weight:600;">− R$ 17.400</span></div>
+        <div class="fc-item"><span class="fi-l">Custos variáveis est.</span><span style="color:var(--crit);font-weight:600;">− R$ 6.200</span></div>
+        <div class="fc-item fi-total"><span class="fi-l">SALDO LÍQUIDO</span><span style="color:var(--ok);font-size:14px;font-weight:800;">+ R$36.800</span></div>
+      </div>
+    </div>
+
+    <div class="fc-card" style="border-color:rgba(251,191,36,0.2);">
+      <div class="fc-period">Maio — 60 dias</div>
+      <div class="fc-val" style="color:var(--warn)">+ R$ 24.600</div>
+      <div class="fc-desc">Maio historicamente mais fraco<br>Feriados + início período de revisão</div>
+      <div class="fc-items">
+        <div class="fc-item"><span class="fi-l">Novas matrículas (proj.)</span><span style="color:var(--warn);font-weight:600;">+ R$ 38.000</span></div>
+        <div class="fc-item"><span class="fi-l">Parcelas recorrentes</span><span style="color:var(--ok);font-weight:600;">+ R$ 11.800</span></div>
+        <div class="fc-item"><span class="fi-l">Recuperação inadimpl.</span><span style="color:var(--ok);font-weight:600;">+ R$ 2.800</span></div>
+        <div class="fc-item"><span class="fi-l">Custos fixos + 13º est.</span><span style="color:var(--crit);font-weight:600;">− R$ 19.800</span></div>
+        <div class="fc-item"><span class="fi-l">Custos variáveis est.</span><span style="color:var(--crit);font-weight:600;">− R$ 8.200</span></div>
+        <div class="fc-item fi-total"><span class="fi-l">SALDO LÍQUIDO</span><span style="color:var(--warn);font-size:14px;font-weight:800;">+ R$24.600</span></div>
+      </div>
+    </div>
+
+    <div class="fc-card" style="border-color:rgba(167,139,250,0.2);">
+      <div class="fc-period">Junho — 90 dias</div>
+      <div class="fc-val" style="color:var(--violet)">+ R$ 18.400</div>
+      <div class="fc-desc">Junho é historicamente o mais fraco<br>Verificar sazonalidade do ano anterior</div>
+      <div class="fc-items">
+        <div class="fc-item"><span class="fi-l">Novas matrículas (proj.)</span><span style="color:var(--warn);font-weight:600;">+ R$ 34.000</span></div>
+        <div class="fc-item"><span class="fi-l">Parcelas recorrentes</span><span style="color:var(--ok);font-weight:600;">+ R$ 9.600</span></div>
+        <div class="fc-item"><span class="fi-l">Recuperação inadimpl.</span><span style="color:var(--ok);font-weight:600;">+ R$ 1.600</span></div>
+        <div class="fc-item"><span class="fi-l">Custos fixos</span><span style="color:var(--crit);font-weight:600;">− R$ 17.400</span></div>
+        <div class="fc-item"><span class="fi-l">Custos variáveis est.</span><span style="color:var(--crit);font-weight:600;">− R$ 9.400</span></div>
+        <div class="fc-item fi-total"><span class="fi-l">SALDO LÍQUIDO</span><span style="color:var(--violet);font-size:14px;font-weight:800;">+ R$18.400</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendário de vencimentos -->
+  <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin:20px 0 10px;">Vencimentos próximos 14 dias — parcelas a entrar por data</p>
+  <div class="cal-wrap">
+    <div class="cal-day today">
+      <div class="cal-date" style="color:var(--cyan)">Hoje · 12/03</div>
+      <div class="cal-val" style="color:var(--cyan)">R$4.8k</div>
+      <div class="cal-qty">3 parcelas</div>
+    </div>
+    <div class="cal-day">
+      <div class="cal-date">13/03</div>
+      <div class="cal-val">R$2.4k</div>
+      <div class="cal-qty">1 parcela</div>
+    </div>
+    <div class="cal-day">
+      <div class="cal-date">15/03</div>
+      <div class="cal-val">R$7.2k</div>
+      <div class="cal-qty">3 parcelas</div>
+    </div>
+    <div class="cal-day high">
+      <div class="cal-date" style="color:var(--crit)">17/03 🔴 pico</div>
+      <div class="cal-val" style="color:var(--crit)">R$14.4k</div>
+      <div class="cal-qty">6 parcelas · maior dia</div>
+    </div>
+    <div class="cal-day">
+      <div class="cal-date">19/03</div>
+      <div class="cal-val">R$2.4k</div>
+      <div class="cal-qty">1 parcela</div>
+    </div>
+    <div class="cal-day peak">
+      <div class="cal-date" style="color:var(--warn)">20/03 ⚠</div>
+      <div class="cal-val" style="color:var(--warn)">R$9.6k</div>
+      <div class="cal-qty">4 parcelas</div>
+    </div>
+    <div class="cal-day">
+      <div class="cal-date">22/03</div>
+      <div class="cal-val">R$2.4k</div>
+      <div class="cal-qty">1 parcela</div>
+    </div>
+    <div class="cal-day">
+      <div class="cal-date">25/03</div>
+      <div class="cal-val">R$4.8k</div>
+      <div class="cal-qty">2 parcelas</div>
+    </div>
+  </div>
+  <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);margin-top:8px;">Total previsto até 31/03: <span style="color:var(--ok)">R$ 47.900</span> em parcelas recorrentes + novas vendas</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     05 — RECEITA POR PRODUTO
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">05</span>
+    <div>
+      <h2>Mockup — Receita e Margem por Produto</h2>
+      <div class="sec-sub">Bloco F4 · qual produto gera mais lucro · decisão de qual turma abrir tem R$10.000+ de diferença</div>
+    </div>
+  </div>
+
+  <div class="callout c-info">
+    <p><strong>Por que isso importa:</strong> 1 aluno do Produto Premium (R$4.800) gera quase <strong>3× mais lucro</strong> que 1 aluno do Produto Básico (R$2.400) após custos. Mas o Premium tem inadimplência 18.2% no Pix 12x. A decisão de mix de produtos sem esses números é comercial — com eles é financeira.</p>
+  </div>
+
+  <div class="produto-card" style="border-color:rgba(52,211,153,0.2);">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">🏆 Produto Premium — Turmas 47 e 48 (presencial)</div>
+        <div class="pc-sub">Ticket R$4.800 · 22 alunos ativos · Forma predominante: Pix 12x · Inadimpl.: 18.2%</div>
+      </div>
+      <span class="badge b-ok">Margem 48.2%</span>
+    </div>
+    <div class="pc-kpis">
+      <div class="pc-kpi"><div class="pv" style="color:var(--ok)">R$105.6k</div><div class="pl">Receita potencial total</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--ok)">R$76.4k</div><div class="pl">Realizado até hoje</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--warn)">18.2%</div><div class="pl">Inadimpl. (Pix 12x)</div></div>
+      <div class="pc-kpi"><div class="pv">R$2.486</div><div class="pl">CPV unitário</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--ok)">R$2.314</div><div class="pl">Lucro/aluno</div></div>
+    </div>
+    <div class="pc-bar-wrap"><div class="pc-bar" style="width:72%;background:linear-gradient(90deg,var(--ok),rgba(52,211,153,0.35));"></div></div>
+  </div>
+
+  <div class="produto-card" style="border-color:rgba(56,189,248,0.2);">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">Produto Básico — Turma 50 (online)</div>
+        <div class="pc-sub">Ticket R$2.400 · 67 alunos ativos · Forma predominante: Pix 6x · Inadimpl.: 8.3%</div>
+      </div>
+      <span class="badge b-warn">Margem 34.7%</span>
+    </div>
+    <div class="pc-kpis">
+      <div class="pc-kpi"><div class="pv" style="color:var(--sky)">R$160.8k</div><div class="pl">Receita potencial total</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--sky)">R$108.2k</div><div class="pl">Realizado até hoje</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--ok)">8.3%</div><div class="pl">Inadimpl. (Pix 6x)</div></div>
+      <div class="pc-kpi"><div class="pv">R$1.566</div><div class="pl">CPV unitário</div></div>
+      <div class="pc-kpi"><div class="pv" style="color:var(--sky)">R$834</div><div class="pl">Lucro/aluno</div></div>
+    </div>
+    <div class="pc-bar-wrap"><div class="pc-bar" style="width:46%;background:linear-gradient(90deg,rgba(56,189,248,0.6),rgba(56,189,248,0.25));"></div></div>
+  </div>
+
+  <div class="callout c-warn" style="margin-top:4px;">
+    <p><strong>Insight de decisão:</strong> Premium tem margem 38.9% superior ao Básico. Mas o volume de alunos do Básico (67) é 3× maior. O Básico <em>gera mais receita total</em> mas o Premium <em>gera mais lucro por aluno</em>. A estratégia ideal: escalar volume no Básico (menor inadimplência) + mover os melhores leads para o Premium. Essa análise só existe com o Bloco F4 ativo.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     06 — INADIMPLÊNCIA EXPANDIDA
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">06</span>
+    <div>
+      <h2>Mockup — Inadimplência Expandida com Aging + Recovery Score</h2>
+      <div class="sec-sub">Bloco F5 · do R$12.400 inadimplente, quanto tem chance real de recuperação? · aging + probabilidade + ação programada</div>
+    </div>
+  </div>
+
+  <!-- Aging summary -->
+  <div class="aging-grid">
+    <div class="aging-card" style="background:var(--ok-g);border:1px solid rgba(52,211,153,0.2);">
+      <div class="aging-val" style="color:var(--ok)">R$2.400</div>
+      <div class="aging-label">1–30 dias<br>1 aluno (André)</div>
+      <div class="aging-badge" style="background:rgba(52,211,153,0.15);color:var(--ok);">Recup. ~82%</div>
+    </div>
+    <div class="aging-card" style="background:var(--warn-g);border:1px solid rgba(251,191,36,0.2);">
+      <div class="aging-val" style="color:var(--warn)">R$8.000</div>
+      <div class="aging-label">31–45 dias<br>2 alunos (Marcos + Rafael)</div>
+      <div class="aging-badge" style="background:rgba(251,191,36,0.15);color:var(--warn);">Recup. ~48%</div>
+    </div>
+    <div class="aging-card" style="background:var(--crit-g);border:1px solid rgba(251,113,133,0.2);">
+      <div class="aging-val" style="color:var(--crit)">R$2.000</div>
+      <div class="aging-label">+45 dias<br>1 aluno (Bruno)</div>
+      <div class="aging-badge" style="background:rgba(251,113,133,0.15);color:var(--crit);">Risco write-off</div>
+    </div>
+    <div class="aging-card" style="background:var(--surface2);border:1px solid var(--border);">
+      <div class="aging-val" style="color:var(--ok)">R$6.500</div>
+      <div class="aging-label">Recovery esperado<br>ponderado por probabilidade</div>
+      <div class="aging-badge" style="background:rgba(52,211,153,0.1);color:var(--ok);">52.4% do total</div>
+    </div>
+  </div>
+
+  <!-- Tabela expandida -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+    <table class="inad-table">
+      <thead>
+        <tr>
+          <th style="width:22%">Aluno / Turma / Produto</th>
+          <th>Aging</th>
+          <th>Valor / Parcela</th>
+          <th>Tentativas</th>
+          <th>Prob. Recup.</th>
+          <th>Próxima Ação</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div style="font-weight:700;">André Souza</div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">Turma 48 · Básico · Pix 6x · 1ª parcela</div>
+          </td>
+          <td><span class="badge b-warn">8 dias</span></td>
+          <td><div style="font-weight:700;color:var(--warn);">R$ 2.400</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">de 6</div></td>
+          <td style="font-family:'DM Mono',monospace;">1</td>
+          <td>
+            <div class="recov-bar"><div class="recov-fill" style="width:82%;background:var(--ok);"></div></div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--ok);margin-top:2px;">82%</div>
+          </td>
+          <td style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);">WhatsApp amanhã · Agente</td>
+          <td><span class="badge b-ok">Negociando</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="font-weight:700;">Marcos Oliveira</div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">Turma 47 · Premium · Pix 12x · 2ª parcela</div>
+          </td>
+          <td><span class="badge b-warn">12 dias</span></td>
+          <td><div style="font-weight:700;color:var(--crit);">R$ 4.800</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">de 12</div></td>
+          <td style="font-family:'DM Mono',monospace;">2</td>
+          <td>
+            <div class="recov-bar"><div class="recov-fill" style="width:61%;background:var(--warn);"></div></div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--warn);margin-top:2px;">61%</div>
+          </td>
+          <td style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);">Prometeu 14/03 · Monitorar</td>
+          <td><span class="badge b-warn">Prometeu pagar</span></td>
+        </tr>
+        <tr class="crit">
+          <td>
+            <div style="font-weight:700;">Rafael Santos</div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">Turma 50 · Básico · Pix 6x · 3ª parcela</div>
+          </td>
+          <td><span class="badge b-crit">34 dias</span></td>
+          <td><div style="font-weight:700;color:var(--crit);">R$ 3.200</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">de 6</div></td>
+          <td style="font-family:'DM Mono',monospace;color:var(--crit);">5</td>
+          <td>
+            <div class="recov-bar"><div class="recov-fill" style="width:32%;background:var(--crit);"></div></div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--crit);margin-top:2px;">32%</div>
+          </td>
+          <td style="font-size:10px;font-family:'DM Mono',monospace;color:var(--crit);">⚠ Escalar para Elias · Ligar</td>
+          <td><span class="badge b-crit">Sem resposta</span></td>
+        </tr>
+        <tr class="writeof">
+          <td>
+            <div style="font-weight:700;">Bruno Lima</div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">Turma 47 · Premium · Pix 12x · 5ª parcela</div>
+          </td>
+          <td><span class="badge b-crit" style="background:rgba(255,60,60,0.15);color:#ff4d4d;border-color:rgba(255,60,60,0.25);">45 dias</span></td>
+          <td><div style="font-weight:700;color:#ff4d4d;">R$ 2.000</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">de 12</div></td>
+          <td style="font-family:'DM Mono',monospace;color:#ff4d4d;">8</td>
+          <td>
+            <div class="recov-bar"><div class="recov-fill" style="width:8%;background:#ff4d4d;"></div></div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:#ff4d4d;margin-top:2px;">8% · Write-off</div>
+          </td>
+          <td style="font-size:10px;font-family:'DM Mono',monospace;color:#ff4d4d;">Jurídico ou cancelamento</td>
+          <td><span class="badge b-crit" style="background:rgba(255,60,60,0.12);color:#ff4d4d;border-color:rgba(255,60,60,0.25);">Escalado</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formas de pagamento expandidas -->
+  <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin:20px 0 10px;">Formas de Pagamento — Visão Financeira Completa</p>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+    <div class="forma-row header">
+      <div>Forma</div><div>Vendas</div><div>Receita R$</div><div>Ticket Médio</div><div>Inadiml. % / Tendência</div>
+    </div>
+    <div class="forma-row">
+      <div style="font-weight:700;">Cartão de crédito</div>
+      <div style="font-family:'DM Mono',monospace;">31</div>
+      <div style="font-family:'DM Mono',monospace;color:var(--ok);">R$ 79.980</div>
+      <div style="font-family:'DM Mono',monospace;">R$ 2.580</div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="badge b-ok">2.1%</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--ok);">▼ −0.3% vs mês ant.</span></div>
+    </div>
+    <div class="forma-row">
+      <div style="font-weight:700;">Pix à vista</div>
+      <div style="font-family:'DM Mono',monospace;">12</div>
+      <div style="font-family:'DM Mono',monospace;color:var(--ok);">R$ 30.960</div>
+      <div style="font-family:'DM Mono',monospace;">R$ 2.580</div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="badge b-ok">0.0%</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--ok);">= estável · melhor forma</span></div>
+    </div>
+    <div class="forma-row">
+      <div style="font-weight:700;">Pix parcelado 6x</div>
+      <div style="font-family:'DM Mono',monospace;">24</div>
+      <div style="font-family:'DM Mono',monospace;color:var(--warn);">R$ 57.600</div>
+      <div style="font-family:'DM Mono',monospace;">R$ 2.400</div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="badge b-warn">8.3%</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--warn);">▲ +1.1% vs mês ant.</span></div>
+    </div>
+    <div class="forma-row" style="border-bottom:none;background:rgba(251,113,133,0.02);">
+      <div style="font-weight:700;">Pix parcelado 12x</div>
+      <div style="font-family:'DM Mono',monospace;">22</div>
+      <div style="font-family:'DM Mono',monospace;color:var(--crit);">R$ 52.800</div>
+      <div style="font-family:'DM Mono',monospace;">R$ 2.400</div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="badge b-crit">18.2%</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--crit);">▲ +2.4% · atenção crítica</span></div>
+    </div>
+  </div>
+  <div class="callout c-crit" style="margin-top:8px;">
+    <p><strong>Alerta:</strong> Pix 12x cresce +2.4% de inadimplência por mês — se não for corrigido, em 3 meses passará de 18.2% para ~24%. Ação sugerida: <strong>aumentar o ticket do Pix 12x</strong> para compensar o risco, ou limitar o Pix 12x apenas para o Produto Premium onde o aluno já demonstrou maior comprometimento.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     07 — ESPECIFICAÇÕES TÉCNICAS
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">07</span>
+    <div>
+      <h2>Especificações Técnicas — Todos os Blocos</h2>
+      <div class="sec-sub">Dados necessários · lógica de cálculo · componentes · datasets novos</div>
+    </div>
+  </div>
+
+  <!-- F1: DRE -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · F1</span><span class="badge b-p1">P1 · Crítico</span></div>
+    <h3>DRE — Demonstrativo de Resultado do Exercício</h3>
+    <p class="sdesc">Tabela que mostra a jornada completa da receita até o lucro líquido. Receita Bruta → Deduções → Receita Líquida → Margem de Contribuição → Custos Fixos → Lucro Operacional → Imposto → Lucro Líquido. Três meses lado a lado com delta e % da receita por linha.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Linhas do DRE</h4>
+        <ul>
+          <li>Receita Bruta (matrículas + recuperada)<span class="s">Base: RECEITA_MENSAL.realizada + recuperada</span></li>
+          <li>Deduções: taxas de processamento<span class="s">Cartão: ~2.5% · Pix: ~0.8% · calculado sobre formaPag volumes</span></li>
+          <li>Receita Líquida = Bruta − Deduções</li>
+          <li>Custos Variáveis (comissões + IA + material)<span class="s">VENDEDORES.custo + AGENTES.custoMes + material/aluno configurável</span></li>
+          <li>Margem de Contribuição = Liq. − CV</li>
+          <li>Custos Fixos (folha + aluguel + SaaS + mkt)<span class="s">Novo dataset: CUSTOS_FIXOS</span></li>
+          <li>Lucro Operacional · Imposto estimado · Lucro Líquido</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Colunas e interações</h4>
+        <ul>
+          <li>3 meses: corrente + 2 anteriores<span class="s">Contexto de tendência sem ocupar muito espaço</span></li>
+          <li>Delta M/M-1 em % por linha<span class="s">Verde se melhora (receita sobe / custo cai) · Vermelho se piora</span></li>
+          <li>% da Receita Bruta por linha<span class="s">Normaliza e permite comparar eficiência entre meses de volumes diferentes</span></li>
+          <li>Toggle: Mensal / Trimestral / Acumulado do Ano<span class="s">YTD útil para comparar com meta anual</span></li>
+          <li>Export CSV/Excel para envio ao contador</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Novos datasets necessários</h4>
+        <ul>
+          <li>CUSTOS_FIXOS: { mes, categoria, valor }<span class="s">Entrada manual pelo Elias todo mês (ou integração bancária futura)</span></li>
+          <li>CUSTOS_VARIAVEIS: { mes, comissoes, material, outros }<span class="s">Parcialmente calculado de VENDEDORES · resto manual</span></li>
+          <li>CONFIG_FISCAL: { regimeTributario, aliquota }<span class="s">Simples Nacional ~6% · configurável</span></li>
+          <li>Taxas de processamento por forma<span class="s">Constantes configuráveis em settings</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F2: Custos -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · F2</span><span class="badge b-p1">P1</span></div>
+    <h3>Breakdown de Custos + Gráfico Histórico Receita vs Custos</h3>
+    <p class="sdesc">Barras horizontais por categoria de custo com % do total e % da receita. Gráfico de 3 linhas (Receita / Custos Fixos / Custos Variáveis) nos últimos 6 meses com área de lucro sombreada. Alertas automáticos de compressão de margem.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Barras de custo</h4>
+        <ul>
+          <li>7 categorias com barra proporcional ao total<span class="s">Folha · Comissões · Aluguel · SaaS · Material · Mkt · IA</span></li>
+          <li>Dupla perspectiva: % do total de custos + % da receita<span class="s">Permite ver peso absoluto e peso relativo sobre a receita</span></li>
+          <li>Cor por tipo: rose=variável · amber=fixo · blue=infra · violet=mkt · cyan=IA</li>
+          <li>Clique na categoria abre drill-down com histórico mensal daquela linha</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Gráfico histórico</h4>
+        <ul>
+          <li>3 linhas: Receita (verde) · CF (âmbar) · CV (rose)<span class="s">6 meses · área sombreada entre receita e custos totais = lucro visual</span></li>
+          <li>2º eixo Y direito: Margem % como linha ciano<span class="s">Mostra se margem está crescendo, estável ou comprimindo</span></li>
+          <li>Annotation de eventos: nova campanha, aumento de folha, novo SaaS<span class="s">Contextualiza saltos no gráfico</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Alertas automáticos</h4>
+        <ul>
+          <li>Custos totais crescendo mais que receita por 2 meses seguidos<span class="s">"⚠ Margem em compressão — custos crescem mais rápido que receita"</span></li>
+          <li>Categoria ultrapassando % configurado da receita<span class="s">Ex: "Folha ultrapassou 35% da receita" → badge vermelho</span></li>
+          <li>Custo de IA crescendo &gt;20% MoM<span class="s">Sinal de escalonamento não planejado de tokens</span></li>
+          <li>Custo por venda (CPV) subindo há 3 meses<span class="s">Indica perda de eficiência comercial</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F3: Caixa -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · F3</span><span class="badge b-p1">P1</span></div>
+    <h3>Previsão de Caixa 30/60/90d + Calendário de Vencimentos</h3>
+    <p class="sdesc">3 cards de projeção mensal (entradas − saídas = saldo) + mini-calendário com vencimentos de parcelas nos próximos 14 dias com destaque de picos e dias críticos.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Cálculo do saldo projetado</h4>
+        <ul>
+          <li>Entradas = Novas matrículas proj. + Parcelas recorrentes + Recuperação<span class="s">Novas: pace diário × dias restantes do mês · Parcelas: cruzar ALUNOS com datas de vencimento</span></li>
+          <li>Saídas = CUSTOS_FIXOS (certos) + Variáveis estimados (% histórico da receita)</li>
+          <li>Saldo = Entradas − Saídas<span class="s">Verde &gt;R$10k · Âmbar R$0–R$10k · Vermelho &lt;R$0 (caixa negativo)</span></li>
+          <li>Label dinâmico: "Caixa saudável ✓" / "Atenção ⚠" / "🚨 Risco de caixa negativo"</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Calendário de vencimentos</h4>
+        <ul>
+          <li>Próximos 14 dias com parcelas a entrar<span class="s">Hoje destacado em ciano · picos em âmbar/vermelho</span></li>
+          <li>Threshold de pico: dia com &gt;5 parcelas ou &gt;R$10k<span class="s">Pico = âmbar · Pico com inadimplentes entre os vencedores = vermelho</span></li>
+          <li>Hover no dia: lista dos alunos que vencem naquela data<span class="s">Nome · produto · valor · status de pagamento atual</span></li>
+          <li>Total da quinzena visível abaixo do calendário</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados necessários</h4>
+        <ul>
+          <li>Datas de vencimento por parcela de cada aluno<span class="s">Novo campo: ALUNOS.parcelasDatas[] · calculado de mes_inicio + n_parcela × 30 dias</span></li>
+          <li>CUSTOS_FIXOS com mês de competência<span class="s">Mesmo dataset do DRE — compartilhado</span></li>
+          <li>Taxa histórica de recuperação de inadimplência<span class="s">Calculada de histórico de ALERTAS + ALUNOS.status_pag</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F4: Produto -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · F4</span><span class="badge b-p1">P1</span></div>
+    <h3>Receita e Margem por Produto / Turma</h3>
+    <p class="sdesc">Cards por produto com receita potencial total, realizado, CPV, margem %, inadimplência específica da forma de pagamento predominante e lucro por aluno. Permite decisão financeira sobre mix de produtos e abertura de turmas.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Por produto exibir</h4>
+        <ul>
+          <li>Ticket médio + forma de pagamento predominante + inadimplência daquela forma</li>
+          <li>Receita potencial total = alunos × ticket<span class="s">O teto de receita se todos pagarem</span></li>
+          <li>Receita realizada até hoje = parcelas já pagas</li>
+          <li>CPV unitário = custos variáveis ÷ alunos</li>
+          <li>Margem % = (Ticket − CPV) ÷ Ticket</li>
+          <li>Lucro por aluno = Ticket − CPV − Inadimplência estimada</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Comparativo entre produtos</h4>
+        <ul>
+          <li>Ranking automático por lucro total gerado<span class="s">Badge "Mais lucrativo" no produto vencedor</span></li>
+          <li>Alerta quando inadimplência de um produto ultrapassa threshold<span class="s">Ex: "Pix 12x do Premium em 18.2% — acima do limite de 15%"</span></li>
+          <li>Barra de receita realizada vs potencial<span class="s">Mostra % já capturado do total disponível</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>Produto por aluno já existe em ALUNOS.produto<span class="s">Cruzar com ALUNOS.faturamento e ALUNOS.status_pag</span></li>
+          <li>CPV por produto requer novo campo: custoUnitario por produto<span class="s">Ou calcular: CUSTOS_VARIAVEIS.material ÷ alunos por produto</span></li>
+          <li>Forma de pagamento predominante por produto<span class="s">Calculado agrupando ALUNOS por produto + contando formas de pagamento</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F5: Inadimplência expandida -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Expandir · F5</span><span class="badge b-p1">P1</span></div>
+    <h3>Inadimplência Expandida — Aging + Recovery Score + Ações</h3>
+    <p class="sdesc">Expansão da tabela atual para incluir aging categories (1–30d / 31–60d / 61–90d / +90d), probabilidade de recuperação por faixa, histórico de todas as tentativas de contato e botão de ação rápida por aluno.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Aging categories</h4>
+        <ul>
+          <li>4 faixas com valor total e volume por faixa<span class="s">Cards de resumo no topo antes da tabela</span></li>
+          <li>Recovery score por faixa (histórico)<span class="s">1–30d: ~80% · 31–60d: ~50% · 61–90d: ~25% · +90d: ~8%</span></li>
+          <li>Recovery esperado ponderado total<span class="s">"Do R$12.400, esperamos recuperar R$6.500 (52%)"</span></li>
+          <li>Alerta quando +90d ultrapassa 10% do total inadimplente<span class="s">Sinal de que write-off pode ser necessário</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Tabela expandida</h4>
+        <ul>
+          <li>Todas colunas atuais mantidas + aging badge colorido</li>
+          <li>Coluna Recovery Score: barra visual + % estimado<span class="s">Calculado com base na faixa de aging e tentativas</span></li>
+          <li>Histórico de contatos inline: ícone de expansão<span class="s">Log: "12/03 WhatsApp sem resposta · 10/03 Ligação sem resposta · 08/03 Prometeu pagar"</span></li>
+          <li>Botões de ação rápida por aluno<span class="s">WhatsApp direto · Agendar follow-up · Marcar write-off</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>inadPorAluno já tem: nome, turma, valor, dias, tentativas, status</li>
+          <li>Adicionar: aging category calculada<span class="s">Calculada de .dias: &lt;30 / 30–60 / 60–90 / &gt;90</span></li>
+          <li>Recovery score: constante por faixa de aging × fator de tentativas<span class="s">Mais tentativas sem resposta = score mais baixo</span></li>
+          <li>Histórico de contatos: novo array em inadPorAluno<span class="s">[{ data, canal, resultado }]</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F6: Gráfico expandido -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Expandir · F6</span><span class="badge b-p2">P2</span></div>
+    <h3>Gráfico de Barras — Adicionar Linha de Meta + Custo Total</h3>
+    <p class="sdesc">O gráfico de 6 meses atual mostra só receita. Adicionar linha de meta mensal configurável, segunda série de custo total e linha de margem no eixo Y direito. Transforma o gráfico de registro em diagnóstico.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Adições ao gráfico</h4>
+        <ul>
+          <li>Linha tracejada de meta mensal<span class="s">Âmbar · perpassa todas as barras · label "Meta R$58k"</span></li>
+          <li>Barra do mês atual com parte projetada<span class="s">Sólido = realizado · Tracejado/opaco = projetado até fim do mês</span></li>
+          <li>Segunda série: Custo Total (linha fina rose)<span class="s">Mostra se custo acompanha, fica abaixo ou ultrapassa a receita</span></li>
+          <li>Linha de Margem % no eixo Y direito (0–100%)<span class="s">Linha ciano · mostra tendência de margem independente do volume</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Comportamento</h4>
+        <ul>
+          <li>Hover no mês: tooltip com Receita / Custo / Margem / Meta / Δ<span class="s">Tooltip rico com todas as dimensões do mês</span></li>
+          <li>Quando barra projetada fica abaixo da meta → fica âmbar<span class="s">Alerta visual de underperformance antes de fechar o mês</span></li>
+          <li>Quando custo ultrapassa receita em algum mês → barra fica com borda vermelha<span class="s">Sinal de mês deficitário</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>RECEITA_MENSAL já tem realizada + recuperada<span class="s">Adicionar campo: meta, custoTotal</span></li>
+          <li>METAS dataset (criado para Visão Geral)<span class="s">Reutilizar — { mesAno, metaReceita } · mesmo dataset compartilhado</span></li>
+          <li>Custo total: soma de CUSTOS_FIXOS + CUSTOS_VARIAVEIS por mês</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- F7: KPIs com meta -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Melhorar · F7</span><span class="badge b-p2">P2</span></div>
+    <h3>KPIs de Receita — Adicionar Meta + % de Atingimento</h3>
+    <p class="sdesc">Os 6 KPIs atuais já são bons. O único ajuste necessário: cada KPI relevante (Receita Realizada, Inadimplência) ganha uma mini progress bar de meta abaixo do valor. Consistência com o Health Banner da Visão Geral.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Por KPI adicionar</h4>
+        <ul>
+          <li>Receita Realizada: progress bar de meta mensal<span class="s">R$43.2k de R$58k = 74% · barra verde/âmbar/vermelha</span></li>
+          <li>Inadimplência: threshold máximo aceitável<span class="s">R$12.4k = 4.2% da carteira · meta: manter abaixo de 5%</span></li>
+          <li>Receita Recuperada: meta de recuperação do mês<span class="s">R$3.8k · meta configurável · % atingido</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Dados</h4>
+        <ul>
+          <li>METAS dataset: metaReceita, maxInadimplencia, metaRecuperacao<span class="s">Mesmo dataset compartilhado com Visão Geral · campos adicionais</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Consistência</h4>
+        <ul>
+          <li>Mesmo visual do Health Banner<span class="s">Progress bar idêntica ao bloco A3 da Visão Geral · mesmos colores de status</span></li>
+          <li>Compartilhar componente MetaProgress()<span class="s">Reutilizável em toda a aplicação</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════
+     08 — PRIORIDADES
+══════════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">08</span>
+    <div>
+      <h2>Ordem de Implementação</h2>
+      <div class="sec-sub">Ordenado por impacto financeiro + dependências de dados</div>
+    </div>
+  </div>
+
+  <div class="tl">
+    <div class="tli" style="border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.02);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.2);">01</div>
+      <div class="tli-b">
+        <h4>CUSTOS_FIXOS dataset + DRE (F1) + Breakdown de Custos (F2)</h4>
+        <p>Implementar juntos porque compartilham o mesmo novo dataset (CUSTOS_FIXOS). O DRE é o bloco mais crítico de toda a expansão — sem ele, R$43.200 é um número sem contexto. O Breakdown de Custos é a visualização que torna o DRE navegável. São 3–4h de input manual para popular os dados + 1 sprint de desenvolvimento.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo dataset</span><span class="badge b-p1">P1 Crítico</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Cria: CUSTOS_FIXOS + CUSTOS_VARIAVEIS · Reutiliza: RECEITA_MENSAL + VENDEDORES</span></div>
+      </div>
+    </div>
+
+    <div class="tli" style="border-color:rgba(248,113,113,0.15);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.18);">02</div>
+      <div class="tli-b">
+        <h4>Receita por Produto / Turma (F4)</h4>
+        <p>Usa apenas dados já existentes (ALUNOS.produto + faturamento + status_pag). É o menor esforço de desenvolvimento com o maior impacto em decisões estratégicas. 1 aluno Premium = 2.78 alunos Básicos em lucro — essa análise muda a priorização de abertura de turmas.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Sem novo dataset · apenas cruzamento de ALUNOS + CUSTOS_VARIAVEIS</span></div>
+      </div>
+    </div>
+
+    <div class="tli" style="border-color:rgba(251,191,36,0.15);">
+      <div class="tli-n" style="color:rgba(251,191,36,0.15);">03</div>
+      <div class="tli-b">
+        <h4>Inadimplência Expandida com Aging (F5) + Formas de Pagamento Expandidas</h4>
+        <p>A tabela atual existe — é adicionar aging category calculada, recovery score e o histórico de contatos. Junto com a expansão das formas de pagamento (tabela financeira completa + tendência), fecha o ciclo de visibilidade da inadimplência que hoje é o maior risco financeiro da tela.</p>
+        <div class="tli-tags"><span class="badge b-warn">Expandir</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Adicionar aging + recovery score + log de contatos ao inadPorAluno</span></div>
+      </div>
+    </div>
+
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.14);">04</div>
+      <div class="tli-b">
+        <h4>Previsão de Caixa 30/60/90d (F3) + Calendário de Vencimentos</h4>
+        <p>Requer o novo campo ALUNOS.parcelasDatas[] — único dado que não existe ainda. Uma vez que as datas de vencimento de parcelas estejam disponíveis, o resto é cálculo puro sobre dados existentes. O calendário de vencimentos é a feature que mais muda o comportamento diário: o Elias saberá na terça que 17/03 é pico de entrada de R$14.4k.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Novo campo: ALUNOS.parcelasDatas[] · calculado de mes_inicio + parcelas</span></div>
+      </div>
+    </div>
+
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.1);">05</div>
+      <div class="tli-b">
+        <h4>Gráfico com Meta + Custo (F6) + KPIs com Meta (F7)</h4>
+        <p>Adições ao que já existe — menor esforço, completam a cobertura visual. O gráfico com linha de meta e custo total fecha a narrativa financeira histórica. Os KPIs com progress bar de meta criam consistência com o Health Banner da Visão Geral.</p>
+        <div class="tli-tags"><span class="badge b-warn">Expandir</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Editar componentes existentes · adicionar campo meta ao RECEITA_MENSAL</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TABELA RESUMO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:40px;overflow-x:auto;">
+  <h3 style="font-size:14px;font-weight:800;letter-spacing:-0.3px;margin-bottom:18px;">Resumo — Tela Financeiro após Expansão Completa</h3>
+  <table class="st">
+    <thead><tr><th>Bloco</th><th>Tipo</th><th>Pergunta que responde</th><th>Prioridade</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>F1 — DRE</td>
+        <td>Novo · tabela financeira completa</td>
+        <td>O negócio lucra? Quanto sobra depois de tudo? Onde vai o dinheiro?</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>F2 — Breakdown de Custos</td>
+        <td>Novo · barras + gráfico histórico</td>
+        <td>Quais categorias de custo crescem mais rápido que a receita?</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>F3 — Previsão de Caixa</td>
+        <td>Novo · 3 cards + calendário</td>
+        <td>Quanto entra e sai nos próximos 30/60/90 dias?</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>F4 — Receita por Produto</td>
+        <td>Novo · cards por produto</td>
+        <td>Qual produto gera mais lucro? Qual turma priorizar na abertura?</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>F5 — Inadimplência Expandida</td>
+        <td>Expandir existente · aging + recovery</td>
+        <td>Quanto do R$12.400 inadimplente vamos recuperar de fato?</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>F6 — Gráfico com Meta + Custo</td>
+        <td>Expandir existente</td>
+        <td>A receita está crescendo mais que os custos historicamente?</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>F7 — KPIs com Meta</td>
+        <td>Melhorar existente</td>
+        <td>R$43.200 de receita é suficiente? Estamos dentro da meta?</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>Formas de Pagamento Expandidas</td>
+        <td>Expandir existente</td>
+        <td>Qual forma de pagamento tem melhor e pior performance financeira?</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  Gerado por <span>Tria Company</span> · Dashboard Administrativo — Tela Financeiro · dashelias.vercel.app
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Administrativo — Análise & Melhorias</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04050c;
+  --surface:#0a0c18;
+  --surface2:#0f1120;
+  --surface3:#141728;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#eceef8;
+  --muted:#6e7294;
+  --dim:#353757;
+  --amber:#fbbf24;
+  --emerald:#34d399;
+  --rose:#fb7185;
+  --violet:#a78bfa;
+  --cyan:#22d3ee;
+  --sky:#38bdf8;
+  --r:14px;--r-sm:9px;
+  --ok:#34d399;   --ok-g:rgba(52,211,153,0.08);
+  --warn:#fbbf24; --warn-g:rgba(251,191,36,0.08);
+  --crit:#fb7185; --crit-g:rgba(251,113,133,0.08);
+  --new:#a78bfa;  --new-g:rgba(167,139,250,0.08);
+  --req:#22d3ee;  --req-g:rgba(34,211,238,0.08);
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+
+/* atmosphere */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(251,191,36,0.035),transparent 70%);top:-200px;left:50%;transform:translateX(-50%);}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(167,139,250,0.04),transparent 70%);bottom:-80px;right:-60px;}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(34,211,238,0.03),transparent 70%);top:30%;left:-60px;}
+
+.wrap{max-width:1360px;margin:0 auto;padding:60px 28px 100px;position:relative;z-index:1;}
+
+/* header */
+header{text-align:center;margin-bottom:64px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);padding:6px 18px;border-radius:100px;margin-bottom:20px;}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--amber);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(30px,4.5vw,54px);font-weight:800;letter-spacing:-2.5px;line-height:1.08;margin-bottom:14px;}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--amber) 0%,var(--rose) 50%,var(--violet) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:13px;max-width:560px;margin:0 auto 16px;font-family:'DM Mono',monospace;font-weight:300;line-height:1.8;}
+
+/* the 5s thesis */
+.thesis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:48px;}
+.thesis-card{padding:22px 24px;border-radius:var(--r);border:1px solid var(--border);}
+.thesis-card.t-ok{background:var(--ok-g);border-color:rgba(52,211,153,0.14);}
+.thesis-card.t-fail{background:var(--crit-g);border-color:rgba(251,113,133,0.14);}
+.thesis-card h3{font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.thesis-card ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.thesis-card li{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);display:flex;gap:7px;line-height:1.5;}
+.thesis-card li::before{flex-shrink:0;font-size:10px;margin-top:1px;}
+.t-ok li::before{content:'✓';color:var(--ok);}
+.t-fail li::before{content:'✗';color:var(--crit);}
+
+/* verdict bar */
+.verdict{display:flex;align-items:center;gap:0;margin-bottom:52px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.vd{flex:1;padding:14px 20px;text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1px;border-right:1px solid var(--border);}
+.vd:last-child{border-right:none;}
+.vd .vv{font-size:26px;font-weight:800;letter-spacing:-1px;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;}
+.vd .vl{color:var(--muted);}
+.vd.green .vv{color:var(--ok);}
+.vd.amber .vv{color:var(--warn);}
+.vd.red .vv{color:var(--crit);}
+
+/* divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:52px 0;}
+
+/* section */
+.sec{margin-bottom:56px;}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.sec-n{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:var(--dim);min-width:28px;}
+.sec-head h2{font-size:20px;font-weight:800;letter-spacing:-0.5px;flex:1;}
+.sec-head .sd{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;line-height:1.6;}
+
+/* badge */
+.badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.b-ok{background:var(--ok-g);color:var(--ok);border:1px solid rgba(52,211,153,0.18);}
+.b-warn{background:var(--warn-g);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-crit{background:var(--crit-g);color:var(--crit);border:1px solid rgba(251,113,133,0.18);}
+.b-new{background:var(--new-g);color:var(--new);border:1px solid rgba(167,139,250,0.18);}
+.b-req{background:var(--req-g);color:var(--req);border:1px solid rgba(34,211,238,0.18);}
+.b-p1{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.18);}
+.b-p2{background:rgba(251,191,36,0.08);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-p3{background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.18);}
+
+/* audit row */
+.audit{display:flex;flex-direction:column;gap:8px;}
+.ar{display:grid;grid-template-columns:100px 1fr 100px 200px;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:11px;}
+.ar.crit-row{border-color:rgba(251,113,133,0.2);background:rgba(251,113,133,0.03);}
+.ar.warn-row{border-color:rgba(251,191,36,0.15);}
+.ar.ok-row{border-color:rgba(52,211,153,0.12);}
+.ar-id{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--dim);padding-top:2px;}
+.ar-name{font-weight:700;font-size:12px;}
+.ar-name .an{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.5;}
+.ar-v{text-align:center;padding-top:2px;}
+.ar-fix{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+.ar-fix strong{color:var(--text);display:block;margin-bottom:2px;font-size:10px;}
+
+/* the 5s mock */
+.fivesec-mock{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:24px;position:relative;overflow:hidden;}
+.fivesec-mock::before{content:'VISÃO GERAL — MOCKUP PROPOSTO';position:absolute;top:10px;right:14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;}
+
+/* health banner */
+.health-banner{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:10px;margin-bottom:16px;}
+.hb-green{background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.2);}
+.hb-amber{background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,191,36,0.03));border:1px solid rgba(251,191,36,0.2);}
+.hb-red{background:linear-gradient(135deg,rgba(251,113,133,0.1),rgba(251,113,133,0.03));border:1px solid rgba(251,113,133,0.25);}
+.hb-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.hb-green .hb-dot{background:var(--ok);box-shadow:0 0 12px rgba(52,211,153,0.5);}
+.hb-amber .hb-dot{background:var(--warn);box-shadow:0 0 12px rgba(251,191,36,0.5);}
+.hb-red .hb-dot{background:var(--crit);box-shadow:0 0 12px rgba(251,113,133,0.6);animation:pulse-crit 1.5s ease-in-out infinite;}
+@keyframes pulse-crit{0%,100%{box-shadow:0 0 12px rgba(251,113,133,0.6);}50%{box-shadow:0 0 24px rgba(251,113,133,0.9);}}
+.hb-status{font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.hb-green .hb-status{color:var(--ok);}
+.hb-amber .hb-status{color:var(--warn);}
+.hb-red .hb-status{color:var(--crit);}
+.hb-sub{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;line-height:1.5;}
+.hb-pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+.hb-pill{display:flex;align-items:center;gap:5px;font-size:9px;font-family:'DM Mono',monospace;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:4px 10px;border-radius:5px;white-space:nowrap;}
+.hb-pill .dot{width:5px;height:5px;border-radius:50%;}
+
+/* daily row mock */
+.daily-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.dr-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;}
+.dr-card .dl{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.dr-card .dv{font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.dr-card .dd{font-size:9px;font-family:'DM Mono',monospace;margin-top:3px;}
+.dd.up{color:var(--ok);}
+.dd.dn{color:var(--crit);}
+.dd.neu{color:var(--muted);}
+
+/* alerts mock */
+.alerts-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.alert-card{border-radius:9px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+.ac-crit{background:rgba(251,113,133,0.07);border:1px solid rgba(251,113,133,0.2);}
+.ac-warn{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.18);}
+.ac-info{background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.ac-crit .alert-dot{background:var(--crit);}
+.ac-warn .alert-dot{background:var(--warn);}
+.ac-info .alert-dot{background:var(--cyan);}
+.alert-text{font-size:11px;font-weight:700;line-height:1.4;}
+.alert-sub{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* mini charts mock */
+.mini-charts{display:grid;grid-template-columns:7fr 5fr;gap:8px;}
+.mc{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
+.mc-label{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+
+/* meta progress */
+.meta-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:12px;}
+.meta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.meta-title{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;}
+.meta-vals{font-size:11px;font-family:'DM Mono',monospace;}
+.meta-bar-wrap{background:rgba(255,255,255,0.05);border-radius:4px;height:8px;position:relative;}
+.meta-bar{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--ok),rgba(52,211,153,0.5));}
+.meta-bar-needle{position:absolute;top:-3px;width:2px;height:14px;background:var(--text);border-radius:1px;}
+.meta-sub{display:flex;justify-content:space-between;margin-top:5px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);}
+
+/* agents status mock */
+.agents-row{display:flex;gap:6px;margin-bottom:12px;}
+.agent-pill{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;border:1px solid var(--border);background:var(--surface2);}
+.agent-pill .ap-dot{width:6px;height:6px;border-radius:50%;}
+.ap-ok{background:var(--ok);}
+.ap-warn{background:var(--warn);}
+.ap-crit{background:var(--crit);}
+
+/* spec block */
+.spec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:16px;position:relative;overflow:hidden;}
+.spec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.spec-new::before{background:linear-gradient(90deg,var(--violet),var(--cyan),transparent);}
+.spec-fix::before{background:linear-gradient(90deg,var(--warn),transparent);}
+.spec h3{font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;}
+.spec .sdesc{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.spec-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.spec-col h4{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.spec-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.spec-col li{font-size:11px;line-height:1.5;display:flex;gap:7px;}
+.spec-col li::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.spec-col li .s{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);display:block;line-height:1.5;margin-top:1px;}
+
+/* callout */
+.callout{background:linear-gradient(135deg,rgba(34,211,238,0.04),rgba(167,139,250,0.04));border:1px solid rgba(34,211,238,0.12);border-radius:10px;padding:16px 20px;margin-top:12px;}
+.callout p{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;}
+.callout strong{color:var(--text);}
+.callout-crit{background:rgba(251,113,133,0.04);border-color:rgba(251,113,133,0.14);}
+.callout-warn{background:rgba(251,191,36,0.04);border-color:rgba(251,191,36,0.14);}
+
+/* screen map */
+.screen-map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px;}
+.sm{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
+.sm .sm-n{font-family:'DM Mono',monospace;font-size:8px;font-weight:700;color:var(--dim);margin-bottom:5px;letter-spacing:1px;}
+.sm .sm-name{font-size:12px;font-weight:800;margin-bottom:5px;}
+.sm .sm-desc{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.5;}
+.sm.crit{border-color:rgba(251,113,133,0.2);}
+.sm.warn{border-color:rgba(251,191,36,0.18);}
+.sm.ok{border-color:rgba(52,211,153,0.15);}
+
+/* priority timeline */
+.tl{display:flex;flex-direction:column;gap:8px;}
+.tli{display:flex;align-items:flex-start;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.tli-n{font-family:'DM Mono',monospace;font-size:28px;font-weight:800;color:var(--surface3);min-width:32px;line-height:1;}
+.tli-b h4{font-size:13px;font-weight:800;margin-bottom:3px;letter-spacing:-0.3px;}
+.tli-b p{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.tli-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+
+/* summary table */
+.st{width:100%;border-collapse:collapse;}
+.st th{text-align:left;padding:9px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.st td{padding:10px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;}
+.st td:first-child{font-weight:700;font-size:12px;width:220px;}
+.st td:nth-child(2){font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.st tr:last-child td{border-bottom:none;}
+
+footer{text-align:center;padding-top:36px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;}
+footer span{color:var(--amber);}
+
+@media(max-width:960px){.thesis,.spec-cols{grid-template-columns:1fr;}.screen-map{grid-template-columns:repeat(2,1fr);}.daily-row{grid-template-columns:repeat(3,1fr);}.alerts-row,.mini-charts{grid-template-columns:1fr;}.ar{grid-template-columns:80px 1fr;}.ar-v,.ar-fix{grid-column:2;}}
+@media(max-width:600px){.screen-map{grid-template-columns:1fr 1fr;}.daily-row{grid-template-columns:1fr 1fr;}.verdict{flex-direction:column;}.vd{border-right:none;border-bottom:1px solid var(--border);}.vd:last-child{border-bottom:none;}}
+</style>
+</head>
+<body>
+
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="eyebrow">Dashboard Administrativo · Análise</div>
+  <h1>O Teste dos <em>5 Segundos</em></h1>
+  <p class="sub">Elias abre o dashboard toda manhã. Em 5 segundos ele decide: empresa saudável ou precisa agir. Essa análise mapeia onde o dashboard atual falha nesse teste — e o que construir para corrigi-lo.</p>
+</header>
+
+<!-- O QUE FUNCIONA / O QUE FALHA -->
+<div class="thesis">
+  <div class="thesis-card t-ok">
+    <h3 style="color:var(--ok)">✓ O que o dashboard atual entrega bem</h3>
+    <ul>
+      <li>8 telas com cobertura completa das áreas do negócio</li>
+      <li>4 KPIs principais visíveis na Visão Geral (receita, vendas, conversão, inadimplência)</li>
+      <li>3 cards de alerta clicáveis que navegam para a tela correta</li>
+      <li>Feed de atividade recente com 8 eventos</li>
+      <li>Monitoramento de 5 agentes IA com status online/degradado</li>
+      <li>Gráfico de receita dos últimos 6 meses visível no home</li>
+      <li>Mini funil presente na Visão Geral</li>
+      <li>Turmas com barra de ocupação OccBar</li>
+    </ul>
+  </div>
+  <div class="thesis-card t-fail">
+    <h3 style="color:var(--crit)">✗ O que o teste dos 5 segundos falha</h3>
+    <ul>
+      <li>Nenhum indicador único de saúde geral — zero sinal verde/âmbar/vermelho consolidado</li>
+      <li>Nenhuma meta do mês visível — R$43.200 sem contexto: é 80% ou 120% da meta?</li>
+      <li>Nenhum resumo do dia de hoje — quantas vendas ontem? Leads hoje?</li>
+      <li>Nenhuma projeção de fechamento do mês com base no ritmo atual</li>
+      <li>Agentes IA na tela 5 — Elias só sabe se um agente caiu se clicar na aba</li>
+      <li>Inadimplência em valor absoluto sem tendência — está crescendo ou caindo?</li>
+      <li>Caixa do dia invisível — cobranças vencendo hoje, parcelas em aberto hoje</li>
+      <li>Nenhum alerta de urgência temporal — "turma fecha em 3 dias com 2 vagas"</li>
+    </ul>
+  </div>
+</div>
+
+<!-- VERDICT BAR -->
+<div class="verdict">
+  <div class="vd"><span class="vv">8</span><span class="vl">telas mapeadas</span></div>
+  <div class="vd"><span class="vv green">5</span><span class="vl">telas bem estruturadas</span></div>
+  <div class="vd"><span class="vv amber">2</span><span class="vl">telas incompletas</span></div>
+  <div class="vd"><span class="vv red">1</span><span class="vl">tela crítica (home)</span></div>
+  <div class="vd"><span class="vv" style="color:var(--violet)">7</span><span class="vl">adições propostas</span></div>
+</div>
+
+<!-- ═══════════════════
+     01 — AUDITORIA HOME
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <div>
+      <h2>Auditoria — Tela 1 / Visão Geral</h2>
+      <div class="sd">A tela que Elias abre toda manhã · análise bloco por bloco</div>
+    </div>
+  </div>
+
+  <div class="callout callout-crit" style="margin-bottom:18px;">
+    <p><strong>O problema central:</strong> A Visão Geral atual exige que Elias faça 4 leituras independentes, interprete gráficos e relacione contextos antes de entender o estado do negócio. Isso leva 30–60 segundos, não 5. O dashboard informa — mas não decide por ele. A solução é inverter: o dashboard deve <strong>concluir primeiro, evidenciar depois</strong>.</p>
+  </div>
+
+  <div class="audit">
+    <div class="ar crit-row">
+      <div class="ar-id">B01<br><span class="badge b-crit">Crítico</span></div>
+      <div class="ar-name">4 KPIs Principais
+        <div class="an">Receita R$43.200 · Vendas 89 · Conversão 36% · Inadimplência R$12.400</div>
+      </div>
+      <div class="ar-v"><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-fix"><strong>Problema</strong>Valores sem contexto de meta. R$43.200 é bom ou ruim? Sem meta mensal exibida, o número é inútil para a decisão matinal.<br><strong>Fix →</strong> Adicionar progress bar de meta abaixo de cada KPI + projeção de fechamento do mês</div>
+    </div>
+    <div class="ar crit-row">
+      <div class="ar-id">B02<br><span class="badge b-crit">Crítico</span></div>
+      <div class="ar-name">Status Geral da Empresa
+        <div class="an">Não existe — essa seção está faltando completamente</div>
+      </div>
+      <div class="ar-v"><span class="badge b-new">Criar</span></div>
+      <div class="ar-fix"><strong>Gap</strong>O dashboard não tem um indicador unificado de saúde. Elias precisa ler 4 KPIs, 3 alertas e um gráfico antes de ter uma impressão geral.<br><strong>Fix →</strong> Criar Health Banner (verde/âmbar/vermelho) no topo da tela como primeiro elemento visual</div>
+    </div>
+    <div class="ar crit-row">
+      <div class="ar-id">B03<br><span class="badge b-crit">Crítico</span></div>
+      <div class="ar-name">Resumo do Dia de Hoje
+        <div class="an">Não existe — o dashboard não tem nenhum dado do dia corrente</div>
+      </div>
+      <div class="ar-v"><span class="badge b-new">Criar</span></div>
+      <div class="ar-fix"><strong>Gap</strong>A manhã começa com dúvidas: vendas ontem, leads hoje, agentes operando, caixa de hoje. Nenhuma dessas perguntas é respondida na Visão Geral.<br><strong>Fix →</strong> Faixa de 5 KPIs diários logo abaixo do Health Banner</div>
+    </div>
+    <div class="ar warn-row">
+      <div class="ar-id">B04<br><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-name">3 Cards de Alerta
+        <div class="an">Inadimplentes +30d · Turma 47 com poucas vagas · Agente Cobrança degradado</div>
+      </div>
+      <div class="ar-v"><span class="badge b-warn">Melhorar</span></div>
+      <div class="ar-fix"><strong>Problema</strong>3 alertas estáticos. Sem ordenação por urgência, sem timestamp ("desde quando"), sem ação rápida no card.<br><strong>Fix →</strong> Alertas dinâmicos ordenados por severidade + indicador de tempo ("há 2h") + botão de ação inline</div>
+    </div>
+    <div class="ar warn-row">
+      <div class="ar-id">B05<br><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-name">Status dos Agentes IA
+        <div class="an">Atualmente só visível na Tela 5 — Agentes</div>
+      </div>
+      <div class="ar-v"><span class="badge b-new">Trazer</span></div>
+      <div class="ar-fix"><strong>Problema</strong>Se o Agente Cobrança cair às 3h da manhã, Elias só descobre se abrir a tela 5 especificamente. Uma barra de status de agentes no home resolveria isso em 1 glance.<br><strong>Fix →</strong> Row de pills de status de agentes (verde/vermelho) no topo da Visão Geral</div>
+    </div>
+    <div class="ar warn-row">
+      <div class="ar-id">B06<br><span class="badge b-warn">Expandir</span></div>
+      <div class="ar-name">Receita Mensal (gráfico barras 6 meses)
+        <div class="an">Realizada + Projetada + Recuperada · dataset RECEITA_MENSAL[6]</div>
+      </div>
+      <div class="ar-v"><span class="badge b-warn">Melhorar</span></div>
+      <div class="ar-fix"><strong>Problema</strong>Histórico bom mas sem linha de meta visível no gráfico. Também não mostra projeção do mês atual baseada no ritmo diário.<br><strong>Fix →</strong> Adicionar linha tracejada de meta + barra de projeção do mês corrente com base no pace atual</div>
+    </div>
+    <div class="ar ok-row">
+      <div class="ar-id">B07<br><span class="badge b-ok">Manter</span></div>
+      <div class="ar-name">Mini Funil
+        <div class="an">5 etapas · barras coloridas · % de conversão · card de perdidos</div>
+      </div>
+      <div class="ar-v"><span class="badge b-ok">OK</span></div>
+      <div class="ar-fix"><strong>Funciona bem</strong>Visualização clara do funil no home. Manter estrutura. Único ajuste: adicionar delta vs período anterior por etapa para detectar degradação.</div>
+    </div>
+    <div class="ar ok-row">
+      <div class="ar-id">B08<br><span class="badge b-ok">Manter</span></div>
+      <div class="ar-name">Próximas Turmas + Atividade Recente
+        <div class="an">OccBar · 3 turmas · feed de 8 eventos</div>
+      </div>
+      <div class="ar-v"><span class="badge b-ok">OK</span></div>
+      <div class="ar-fix"><strong>Funciona bem</strong>Feed de atividade é valioso. Turmas com OccBar são leitura rápida. Adição: badge de urgência em turmas que fecham em menos de 7 dias.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     02 — MOCKUP DA NOVA VISÃO GERAL
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <div>
+      <h2>Mockup — Nova Visão Geral Proposta</h2>
+      <div class="sd">Como a tela deve parecer para passar no teste dos 5 segundos · layout top-down de decisão</div>
+    </div>
+  </div>
+
+  <div class="fivesec-mock">
+
+    <!-- LINHA 0: Health Banner -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">① HEALTH BANNER — 1 glance, 0 segundos</p>
+    <div class="health-banner hb-green" style="margin-bottom:8px;">
+      <div class="hb-dot"></div>
+      <div>
+        <div class="hb-status">Empresa Saudável</div>
+        <div class="hb-sub">Todos os indicadores dentro do esperado · quinta-feira 12/03 · 08:14</div>
+      </div>
+      <div class="hb-pills">
+        <div class="hb-pill"><div class="dot" style="background:var(--ok)"></div>Meta: 74%</div>
+        <div class="hb-pill"><div class="dot" style="background:var(--ok)"></div>5 agentes online</div>
+        <div class="hb-pill"><div class="dot" style="background:var(--warn)"></div>Inadimpl.: R$12.4k</div>
+        <div class="hb-pill"><div class="dot" style="background:var(--ok)"></div>3 turmas abertas</div>
+      </div>
+    </div>
+    <!-- Exemplo vermelho comentado -->
+    <div class="health-banner hb-red" style="margin-bottom:16px;opacity:.55;">
+      <div class="hb-dot"></div>
+      <div>
+        <div class="hb-status">Ação Necessária</div>
+        <div class="hb-sub">Agente Cobrança offline há 3h · Meta do mês em risco · 2 alunos críticos</div>
+      </div>
+      <div class="hb-pills">
+        <div class="hb-pill"><div class="dot" style="background:var(--crit)"></div>Meta: 42%</div>
+        <div class="hb-pill"><div class="dot" style="background:var(--crit)"></div>1 agente offline</div>
+        <div class="hb-pill"><div class="dot" style="background:var(--crit)"></div>Inadimpl.: R$31k</div>
+      </div>
+    </div>
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);text-align:center;margin-bottom:16px;">↑ estado vermelho (exemplo)</p>
+
+    <!-- LINHA 1: Agentes -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">② AGENTES IA — status em tempo real</p>
+    <div class="agents-row" style="margin-bottom:16px;">
+      <div class="agent-pill"><div class="ap-dot ap-ok"></div>Enriquecimento · Online</div>
+      <div class="agent-pill"><div class="ap-dot ap-ok"></div>SDR · Online · 47 exec hoje</div>
+      <div class="agent-pill"><div class="ap-dot ap-ok"></div>Agendamento · Online</div>
+      <div class="agent-pill"><div class="ap-dot ap-warn"></div>Cobrança · Degradado</div>
+      <div class="agent-pill"><div class="ap-dot ap-ok"></div>Pós-venda · Online</div>
+    </div>
+
+    <!-- LINHA 2: Meta do Mês -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">③ META DO MÊS + PROJEÇÃO</p>
+    <div class="meta-box" style="margin-bottom:8px;">
+      <div class="meta-header">
+        <div class="meta-title">Receita Março / Meta R$58.000</div>
+        <div class="meta-vals" style="color:var(--ok)">R$ 43.200 <span style="color:var(--muted);font-size:9px;">de R$58.000 · 74%</span></div>
+      </div>
+      <div class="meta-bar-wrap">
+        <div class="meta-bar" style="width:74%"></div>
+        <div class="meta-bar-needle" style="left:88%;background:rgba(251,191,36,0.7);" title="Projeção de fechamento: R$51.200 (88%)"></div>
+      </div>
+      <div class="meta-sub">
+        <span>R$ 0</span>
+        <span style="color:var(--warn)">Projeção: R$51.200 (88%) — ritmo atual insuficiente</span>
+        <span>Meta R$58.000</span>
+      </div>
+    </div>
+
+    <!-- LINHA 3: KPIs do Dia -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">④ HOJE — números do dia · atualiza em tempo real</p>
+    <div class="daily-row" style="margin-bottom:16px;">
+      <div class="dr-card">
+        <div class="dl">Vendas ontem</div>
+        <div class="dv" style="color:var(--ok)">7</div>
+        <div class="dd up">▲ +2 vs dia ant.</div>
+      </div>
+      <div class="dr-card">
+        <div class="dl">Leads hoje</div>
+        <div class="dv" style="color:var(--cyan)">34</div>
+        <div class="dd up">▲ +8 vs média</div>
+      </div>
+      <div class="dr-card">
+        <div class="dl">Cobranças hoje</div>
+        <div class="dv" style="color:var(--warn)">R$4.8k</div>
+        <div class="dd neu">3 parcelas vencendo</div>
+      </div>
+      <div class="dr-card">
+        <div class="dl">Inadimplência</div>
+        <div class="dv" style="color:var(--crit)">R$12.4k</div>
+        <div class="dd dn">▲ +R$800 esta semana</div>
+      </div>
+      <div class="dr-card">
+        <div class="dl">Negociações abertas</div>
+        <div class="dv">18</div>
+        <div class="dd up">▲ 5 para fechar hoje</div>
+      </div>
+    </div>
+
+    <!-- LINHA 4: Alertas dinâmicos -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">⑤ ALERTAS — ordenados por urgência · clique navega para tela</p>
+    <div class="alerts-row" style="margin-bottom:16px;">
+      <div class="alert-card ac-crit">
+        <div class="alert-dot"></div>
+        <div>
+          <div class="alert-text" style="color:var(--crit)">Agente Cobrança degradado</div>
+          <div class="alert-sub">Há 3 horas · 12 cobranças não enviadas · → Tela Agentes</div>
+        </div>
+      </div>
+      <div class="alert-card ac-warn">
+        <div class="alert-dot"></div>
+        <div>
+          <div class="alert-text" style="color:var(--warn)">Turma 47 · 2 vagas restantes</div>
+          <div class="alert-sub">Fecha em 5 dias · 3 leads em negociação · → Tela Turmas</div>
+        </div>
+      </div>
+      <div class="alert-card ac-info">
+        <div class="alert-dot"></div>
+        <div>
+          <div class="alert-text" style="color:var(--cyan)">4 inadimplentes há +30 dias</div>
+          <div class="alert-sub">Total R$9.200 · Última tentativa: há 4 dias · → Tela Financeiro</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINHA 5: Gráficos -->
+    <p style="font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">⑥ HISTÓRICO + FUNIL — contexto visual</p>
+    <div class="mini-charts">
+      <div class="mc">
+        <div class="mc-label">Receita últimos 6 meses · com linha de meta</div>
+        <svg viewBox="0 0 400 80" style="width:100%;height:80px;">
+          <!-- Bars -->
+          <rect x="10" y="50" width="40" height="30" rx="3" fill="rgba(52,211,153,0.25)"/>
+          <rect x="70" y="38" width="40" height="42" rx="3" fill="rgba(52,211,153,0.3)"/>
+          <rect x="130" y="30" width="40" height="50" rx="3" fill="rgba(52,211,153,0.35)"/>
+          <rect x="190" y="22" width="40" height="58" rx="3" fill="rgba(52,211,153,0.4)"/>
+          <rect x="250" y="18" width="40" height="62" rx="3" fill="rgba(52,211,153,0.45)"/>
+          <!-- Current month partial -->
+          <rect x="310" y="28" width="40" height="52" rx="3" fill="rgba(52,211,153,0.55)"/>
+          <rect x="310" y="16" width="40" height="12" rx="3" fill="rgba(52,211,153,0.15)" stroke-dasharray="2,2"/>
+          <!-- Meta line -->
+          <line x1="5" y1="18" x2="395" y2="18" stroke="rgba(251,191,36,0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="360" y="14" font-size="7" fill="rgba(251,191,36,0.8)" font-family="monospace">Meta</text>
+        </svg>
+      </div>
+      <div class="mc">
+        <div class="mc-label">Mini funil + delta vs semana ant.</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;">
+            <div style="background:rgba(34,211,238,0.3);border-radius:3px;height:12px;width:100%;"></div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--cyan);min-width:30px;">1.240</span>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Capt.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;">
+            <div style="background:rgba(96,165,250,0.3);border-radius:3px;height:12px;width:75%;"></div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--sky);min-width:30px;">930</span>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Qual.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;">
+            <div style="background:rgba(167,139,250,0.3);border-radius:3px;height:12px;width:45%;"></div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--violet);min-width:30px;">465</span>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Prop.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;">
+            <div style="background:rgba(251,191,36,0.3);border-radius:3px;height:12px;width:14%;"></div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--warn);min-width:30px;">89</span>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Fech.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fivesec-mock -->
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     03 — ESPECIFICAÇÕES DETALHADAS
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <div>
+      <h2>Especificações — 7 Adições Propostas</h2>
+      <div class="sd">Cada adição detalhada com lógica, dados e comportamento esperado</div>
+    </div>
+  </div>
+
+  <!-- A1: Health Banner -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-new">Novo · A1</span>
+      <span class="badge b-p1">P1 Crítico</span>
+    </div>
+    <h3>Health Banner — Score Consolidado de Saúde</h3>
+    <p class="sdesc">Primeiro elemento visual da tela. Uma barra de status que sintetiza o estado de todos os indicadores em um único sinal verde/âmbar/vermelho. É a resposta para a pergunta das 8h: "preciso agir hoje?"</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Lógica do status</h4>
+        <ul>
+          <li>🟢 Verde — "Empresa Saudável"<span class="s">Meta &gt;60% · Inadimplência &lt;5% da receita · Todos agentes online · Sem alertas críticos</span></li>
+          <li>🟡 Âmbar — "Atenção"<span class="s">Meta entre 40–60% · Inadimplência 5–10% · 1 agente degradado · Alertas não críticos</span></li>
+          <li>🔴 Vermelho — "Ação Necessária"<span class="s">Meta &lt;40% · Inadimplência &gt;10% · Agente offline · Alerta crítico ativo</span></li>
+          <li>Dot pulsante no vermelho<span class="s">Animação de pulso mais rápida para urgência</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Conteúdo do banner</h4>
+        <ul>
+          <li>Label de status grande + descrição do motivo<span class="s">Ex: "Ação Necessária · Agente offline + meta em risco"</span></li>
+          <li>Data e hora atual<span class="s">Confirma que os dados são do dia corrente</span></li>
+          <li>4 pills resumo à direita<span class="s">Meta %, agentes ativos, inadimplência, turmas abertas — cada um com sua cor de saúde</span></li>
+          <li>Clique expande para detalhe<span class="s">Modal com breakdown de cada fator que gerou o status</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Implementação</h4>
+        <ul>
+          <li>Novo componente: HealthBanner()<span class="s">Recebe score calculado via função healthScore(dados)</span></li>
+          <li>healthScore() retorna: 'green' | 'amber' | 'red'<span class="s">Com array de reasons para o detalhe modal</span></li>
+          <li>Thresholds configuráveis<span class="s">Permitir ajuste dos limites por settings do Elias</span></li>
+          <li>Atualiza a cada 5 minutos<span class="s">Sem reload manual necessário</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2: Status Agentes no Home -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-new">Novo · A2</span>
+      <span class="badge b-p1">P1 Crítico</span>
+    </div>
+    <h3>Barra de Status dos Agentes — Home</h3>
+    <p class="sdesc">Row de pills logo abaixo do Health Banner. 5 agentes em uma linha. Status online/degradado/offline visível sem clicar na tela 5. Um agente vermelho é visível em 0.5 segundos.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Por agente exibir</h4>
+        <ul>
+          <li>Nome do agente<span class="s">Enriquecimento · SDR · Agendamento · Cobrança · Pós-venda</span></li>
+          <li>Dot de status colorido<span class="s">Verde = online · Âmbar = degradado · Vermelho = offline</span></li>
+          <li>Execuções nas últimas 24h<span class="s">Número pequeno ao lado: "47 exec"</span></li>
+          <li>Clique → navega para Tela 5 com agente selecionado</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Comportamento</h4>
+        <ul>
+          <li>Pill vermelho com borda pulsante quando offline<span class="s">Não passa despercebido</span></li>
+          <li>Tooltip no hover: última execução + taxa de sucesso<span class="s">Ex: "Última exec: 08:12 · Sucesso: 98.2%"</span></li>
+          <li>Atualização em tempo real<span class="s">Polling a cada 2 minutos</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>Reutiliza dataset AGENTES[5] existente<span class="s">Sem novo dataset necessário — só novo componente AgentStatusBar()</span></li>
+          <li>Campo necessário: timestamp da última execução<span class="s">Se não existe no AGENTES — adicionar ao dataset</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A3: Meta do Mês -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-new">Novo · A3</span>
+      <span class="badge b-p1">P1 Crítico</span>
+    </div>
+    <h3>Meta Mensal + Projeção de Fechamento</h3>
+    <p class="sdesc">A ausência mais grave do dashboard. R$43.200 sem contexto de meta é um número inútil para a decisão. Este bloco transforma o valor em % de progresso + projeção de onde o mês vai fechar com base no ritmo atual.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Componente visual</h4>
+        <ul>
+          <li>Progress bar horizontal com % do mês concluído<span class="s">Ex: "R$43.200 de R$58.000 · 74%"</span></li>
+          <li>Barra de cor: verde (&gt;60%), âmbar (40–60%), vermelho (&lt;40%)</li>
+          <li>Agulha de projeção na barra<span class="s">Mostra onde vai fechar o mês se o ritmo atual continuar</span></li>
+          <li>Label de projeção com cor de alerta<span class="s">Ex: "Projeção: R$51.200 (88%) — ritmo insuficiente"</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Lógica de projeção</h4>
+        <ul>
+          <li>Pace diário = Receita acumulada ÷ Dia do mês atual<span class="s">Ex: R$43.200 ÷ 12 dias = R$3.600/dia</span></li>
+          <li>Projeção = Pace diário × Dias totais do mês<span class="s">R$3.600 × 31 = R$111.600 projetado</span></li>
+          <li>Label dinâmico: "No caminho ✓" / "Ritmo insuficiente ⚠" / "Em risco 🚨"</li>
+          <li>Dias úteis restantes com vendas esperadas<span class="s">Ex: "12 dias úteis restantes · precisa vender R$1.232/dia para bater a meta"</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados necessários</h4>
+        <ul>
+          <li>METAS dataset — novo, não existe<span class="s">{ mesAno, metaReceita, metaVendas, metaLeads } — configurável pelo admin</span></li>
+          <li>Receita acumulada do mês corrente<span class="s">Já existe em RECEITA_MENSAL — usar o mês mais recente</span></li>
+          <li>Dia atual do mês<span class="s">new Date().getDate() — trivial</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A4: KPIs do Dia -->
+  <div class="spec spec-new" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-new">Novo · A4</span>
+      <span class="badge b-p1">P1 Crítico</span>
+    </div>
+    <h3>Faixa de KPIs Diários — "O Hoje"</h3>
+    <p class="sdesc">5 números do dia corrente em uma linha compacta. É a primeira coisa que Elias quer saber: o que aconteceu ontem e o que vai acontecer hoje. Contexto temporal que o dashboard atual não tem.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">5 KPIs da faixa</h4>
+        <ul>
+          <li>Vendas ontem<span class="s">Com delta vs dia anterior e vs média dos últimos 7d</span></li>
+          <li>Leads hoje (acumulado do dia)<span class="s">Atualiza em tempo real · delta vs média</span></li>
+          <li>Cobranças vencendo hoje (R$)<span class="s">Parcelas com vencimento hoje · quantas são e valor total</span></li>
+          <li>Inadimplência total (R$) com trend<span class="s">▲ crescendo ou ▼ caindo esta semana</span></li>
+          <li>Negociações abertas + críticas<span class="s">"18 abertas · 5 com follow-up hoje"</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Visual</h4>
+        <ul>
+          <li>5 cards lado a lado em grid<span class="s">grid-cols-5 · compactos · sem gráficos internos</span></li>
+          <li>Número grande + delta colorido<span class="s">Verde = positivo · Vermelho = negativo · Âmbar = atenção</span></li>
+          <li>Atualização a cada 5 minutos<span class="s">Timestamp de última atualização visível</span></li>
+          <li>Clique em cada card filtra tela relevante<span class="s">Ex: clicar em "Cobranças" abre Tela 3 (Financeiro) filtrado por hoje</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>Vendas ontem → FUNIL_DATA filtrado por data<span class="s">Novo campo data necessário</span></li>
+          <li>Leads hoje → FUNIL_EVOLUCAO com data atual</li>
+          <li>Cobranças hoje → ALUNOS cruzando parcelas com data atual<span class="s">status_pag + data de vencimento da parcela</span></li>
+          <li>Inadimplência → cálculo sobre ALUNOS com status_pag=atrasada</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A5: Alertas melhorados -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-warn">Melhorar · A5</span>
+      <span class="badge b-p1">P1</span>
+    </div>
+    <h3>Sistema de Alertas — Dinâmico e Priorizado</h3>
+    <p class="sdesc">Os 3 alertas atuais são estáticos (hardcoded no ALERTAS[3]). Um alerta sem timestamp e sem ação rápida é decoração. O sistema precisa ser dinâmico, ordenado por severidade e acionável em 1 clique.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Melhorias nos alertas</h4>
+        <ul>
+          <li>Ordenação por severidade: vermelho → âmbar → info<span class="s">Alertas críticos sempre no topo</span></li>
+          <li>Timestamp relativo em cada card<span class="s">"Há 3 horas" · "Desde ontem" · "Nova agora"</span></li>
+          <li>Descrição contextual<span class="s">Não só "Inadimplentes +30 dias" mas "4 alunos · R$9.200 · Última tentativa: 4 dias atrás"</span></li>
+          <li>Botão de ação inline<span class="s">"→ Ver alunos" / "→ Agentes" / "→ Turmas"</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Alertas automáticos (novos)</h4>
+        <ul>
+          <li>Agente IA offline por mais de X minutos<span class="s">Crítico — gerado automaticamente pelo monitoramento</span></li>
+          <li>Meta do mês abaixo de 40% no dia 20+<span class="s">Sinal de que o mês não vai fechar na meta</span></li>
+          <li>Turma com menos de 3 vagas e fecha em &lt;7 dias<span class="s">Urgência comercial</span></li>
+          <li>Aluno com 3+ parcelas atrasadas<span class="s">Escalada automática para inadimplência crítica</span></li>
+          <li>Zero vendas nas últimas 48h<span class="s">Sinal de problema no funil ou agente SDR</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Implementação</h4>
+        <ul>
+          <li>Substituir ALERTAS[3] estático por alertas computados<span class="s">Função generateAlerts(data) que varre todos os datasets e retorna alertas com prioridade</span></li>
+          <li>Estrutura: { id, type, severity, title, context, since, action, screen }<span class="s">severity: 'critical' | 'warning' | 'info'</span></li>
+          <li>Máximo de 5 alertas visíveis na home<span class="s">"Ver todos" se tiver mais</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A6: Turmas com urgência -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-warn">Melhorar · A6</span>
+      <span class="badge b-p2">P2</span>
+    </div>
+    <h3>Próximas Turmas — Urgência Temporal</h3>
+    <p class="sdesc">As turmas já têm OccBar. Falta o componente de urgência: quando a turma fecha, quanto tempo resta, e qual o risco de fechar sem preencher.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Adicionar por turma</h4>
+        <ul>
+          <li>Badge "Fecha em X dias" com cor por urgência<span class="s">&lt;7 dias = vermelho · 7–14 = âmbar · &gt;14 = neutro</span></li>
+          <li>Projeção de preenchimento<span class="s">Com base no ritmo de vendas dos últimos 7 dias: "Projeção: 28/30 vagas no fechamento"</span></li>
+          <li>Leads em negociação para essa turma<span class="s">Quantos estão na etapa de negociação com produto dessa turma</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Comportamento</h4>
+        <ul>
+          <li>Turma com &lt;7 dias + &lt;5 vagas → card com borda vermelha pulsante</li>
+          <li>Botão rápido "Enviar para negociação" → abre lista de leads qualificados</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>TURMAS já tem fim, total, ocupadas<span class="s">Calcular dias restantes: new Date(turma.fim) - today</span></li>
+          <li>Projeção requer histórico de vendas por turma<span class="s">Novo campo em VENDEDORES ou FUNIL_DATA: turma_id</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A7: Receita + linha de meta -->
+  <div class="spec spec-fix" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span class="badge b-warn">Melhorar · A7</span>
+      <span class="badge b-p2">P2</span>
+    </div>
+    <h3>Gráfico de Receita — Linha de Meta + Barra de Projeção</h3>
+    <p class="sdesc">O gráfico de barras dos 6 meses existe e é bom. Faltam dois elementos visuais: a linha de meta mensal e a barra projetada do mês atual com base no pace.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Adições ao gráfico</h4>
+        <ul>
+          <li>Linha tracejada horizontal de meta<span class="s">Cor âmbar · Perpassa todas as barras · Label "Meta R$58k"</span></li>
+          <li>Barra do mês atual dividida em 2 partes<span class="s">Parte cheia = realizado · Parte tracejada = projeção até fim do mês</span></li>
+          <li>Label de projeção acima da barra do mês atual<span class="s">"Proj. R$51.2k" com cor de alerta se abaixo da meta</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Visual</h4>
+        <ul>
+          <li>Barra projetada: mesma cor mas com opacidade 30%<span class="s">Diferencia visualmente do realizado</span></li>
+          <li>Quando projeção bate a meta → barra projetada fica verde<span class="s">Quando não bate → fica âmbar/vermelha</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>RECEITA_MENSAL já tem realizada e projetada<span class="s">Verificar se o campo projetada está sendo calculado corretamente ou é fixo</span></li>
+          <li>Adicionar campo meta ao RECEITA_MENSAL<span class="s">{ mes, realizada, projetada, recuperada, meta }</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     04 — ANÁLISE DAS OUTRAS TELAS
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">04</span>
+    <div>
+      <h2>Análise — Telas 2 a 8</h2>
+      <div class="sd">Gaps identificados nas telas de detalhe</div>
+    </div>
+  </div>
+
+  <div class="screen-map">
+    <div class="sm ok">
+      <div class="sm-n">TELA 2 · Funil</div>
+      <div class="sm-name" style="color:var(--ok)">✓ Bem estruturado</div>
+      <div class="sm-desc">Funil interativo + 3 KPIs + evolução 30d. Adição: separar funil SDR / Closer conforme spec comercial já desenvolvida.</div>
+    </div>
+    <div class="sm warn">
+      <div class="sm-n">TELA 3 · Financeiro</div>
+      <div class="sm-name" style="color:var(--warn)">⚠ Inadimplência rasa</div>
+      <div class="sm-desc">Tabela mostra 4 inadimplentes mas sem tendência histórica. Falta: gráfico de evolução da inadimplência mês a mês + previsão de caixa dos próximos 30 dias.</div>
+    </div>
+    <div class="sm ok">
+      <div class="sm-n">TELA 4 · Equipe</div>
+      <div class="sm-name" style="color:var(--ok)">✓ Bem estruturado</div>
+      <div class="sm-desc">Ranking + IA vs Humano + performance semanal. Solid. Adição menor: meta individual por vendedor e % de atingimento.</div>
+    </div>
+    <div class="sm warn">
+      <div class="sm-n">TELA 5 · Agentes</div>
+      <div class="sm-name" style="color:var(--warn)">⚠ Sem histórico de falhas</div>
+      <div class="sm-desc">Status atual e execuções do dia — bom. Falta: log de incidentes histórico. Quantas vezes cada agente caiu no último mês? Qual o impacto (cobranças perdidas, leads não contactados)?</div>
+    </div>
+    <div class="sm crit">
+      <div class="sm-n">TELA 6 · Alunos</div>
+      <div class="sm-name" style="color:var(--crit)">🚨 Score sem critério</div>
+      <div class="sm-desc">Score exibido por cor mas sem critério visível de cálculo. Falta: tooltip "Score 82 = Alta probabilidade de recompra · Frequência de engajamento acima da média". Também falta ação de reengajamento rápida para score baixo.</div>
+    </div>
+    <div class="sm ok">
+      <div class="sm-n">TELA 7 · Turmas</div>
+      <div class="sm-name" style="color:var(--ok)">✓ Funcional</div>
+      <div class="sm-desc">Boa cobertura. Adição: projeção de preenchimento por turma (conforme A6) + histórico de ocupação das turmas anteriores como referência.</div>
+    </div>
+    <div class="sm warn">
+      <div class="sm-n">TELA 8 · Marketing</div>
+      <div class="sm-name" style="color:var(--warn)">⚠ Somente orgânico</div>
+      <div class="sm-desc">O dashboard hoje é 100% orgânico (custo por lead R$0). Quando o Elias ativar tráfego pago, essa tela precisará receber os blocos do dashboard marketing (B13–B16) que já estão especificados.</div>
+    </div>
+    <div class="sm" style="border-style:dashed;">
+      <div class="sm-n">TELA 9 · Nova</div>
+      <div class="sm-name" style="color:var(--violet)">+ Financeiro Operacional</div>
+      <div class="sm-desc">Gap detectado: sem visão de caixa do negócio. Contas a pagar, custos fixos, margem operacional, DRE simplificado. Diferente da tela de receita de alunos.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════
+     05 — PRIORIDADES
+═══════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">05</span>
+    <div>
+      <h2>Ordem de Implementação</h2>
+      <div class="sd">Ordenado pela regra: o que mais impacta o ritual matinal do Elias primeiro</div>
+    </div>
+  </div>
+
+  <div class="tl">
+    <div class="tli" style="border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.02);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.2);">01</div>
+      <div class="tli-b">
+        <h4>Health Banner (A1) + Barra de Status dos Agentes (A2)</h4>
+        <p>Implementar juntos — são os dois elementos que mudam o ritual de 30 segundos para 5 segundos. O Health Banner é a resposta, a barra de agentes é a primeira exceção crítica que pode invalidar o "verde". Sem esses dois o dashboard continua sendo uma tela de leitura, não uma tela de decisão.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1 Crítico</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Componentes: HealthBanner() + AgentStatusBar() + healthScore()</span></div>
+      </div>
+    </div>
+    <div class="tli" style="border-color:rgba(248,113,113,0.15);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.18);">02</div>
+      <div class="tli-b">
+        <h4>Meta Mensal + Projeção (A3) + METAS dataset</h4>
+        <p>É a segunda pergunta da manhã: "vou bater a meta esse mês?" Sem esse bloco, os R$43.200 não têm contexto. Requer criar o dataset METAS — simples mas necessário. A projeção de pace é cálculo trivial sobre dados já existentes.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1 Crítico</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Novo dataset: METAS · Novo componente: MetaProgress()</span></div>
+      </div>
+    </div>
+    <div class="tli" style="border-color:rgba(251,191,36,0.15);">
+      <div class="tli-n" style="color:rgba(251,191,36,0.15);">03</div>
+      <div class="tli-b">
+        <h4>Faixa de KPIs Diários (A4) + Alertas Dinâmicos (A5)</h4>
+        <p>Implementar juntos pois ambos dependem de dados com granularidade diária. Os alertas dinâmicos dependem de parte da mesma lógica dos KPIs do dia. Juntos respondem "o que aconteceu ontem" e "o que precisa de atenção hoje".</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Novo componente: DailyKpis() · Refatorar: generateAlerts(data)</span></div>
+      </div>
+    </div>
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.15);">04</div>
+      <div class="tli-b">
+        <h4>Gráfico de Receita com Meta (A7) + Turmas com Urgência (A6)</h4>
+        <p>Adições ao que já existe — menor esforço, alto impacto visual. O gráfico de receita com linha de meta muda completamente a narrativa do mês. As turmas com badge de urgência criam pressão comercial visível.</p>
+        <div class="tli-tags"><span class="badge b-warn">Melhoria</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Edições nos componentes existentes · Adicionar campo meta ao RECEITA_MENSAL</span></div>
+      </div>
+    </div>
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.1);">05</div>
+      <div class="tli-b">
+        <h4>Tela 5 — Log de incidentes dos Agentes + Tela 6 — Score com critério</h4>
+        <p>Melhorias nas telas de detalhe. O log de incidentes dos agentes é operacional — permite Elias entender se um agente que caiu é recorrente ou isolado. O score de alunos com critério transforma um número mágico em diagnóstico acionável.</p>
+        <div class="tli-tags"><span class="badge b-warn">Melhoria</span><span class="badge b-p2">P2</span></div>
+      </div>
+    </div>
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.07);">06</div>
+      <div class="tli-b">
+        <h4>Tela 9 — Financeiro Operacional (caixa, DRE, margem)</h4>
+        <p>Tela nova que cobre o gap de visão de negócio (custos, margem, caixa). Maior escopo e requer dados que provavelmente não estão no sistema ainda. Ideal para o segundo ciclo de desenvolvimento.</p>
+        <div class="tli-tags"><span class="badge b-new">Nova tela</span><span class="badge b-p3">P3</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TABELA RESUMO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:40px;overflow-x:auto;">
+  <h3 style="font-size:14px;font-weight:800;letter-spacing:-0.3px;margin-bottom:18px;">Resumo — Todas as Adições Propostas</h3>
+  <table class="st">
+    <thead>
+      <tr>
+        <th>Adição</th>
+        <th>Tipo</th>
+        <th>Impacto no teste dos 5s</th>
+        <th>Prioridade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A1 — Health Banner</td>
+        <td>Novo componente · Visão Geral</td>
+        <td>Elimina 80% do tempo de leitura. É a única resposta que o Elias precisa na manhã.</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>A2 — Status Agentes (Home)</td>
+        <td>Trazer da Tela 5 para Home</td>
+        <td>Um agente offline era invisível por 8 horas. Agora é visível em 1 segundo.</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>A3 — Meta Mensal + Projeção</td>
+        <td>Novo bloco + novo dataset METAS</td>
+        <td>Transforma R$43.200 de número solto em "74% da meta · ritmo insuficiente".</td>
+        <td><span class="badge b-p1">P1 Crítico</span></td>
+      </tr>
+      <tr>
+        <td>A4 — KPIs Diários (O Hoje)</td>
+        <td>Novo componente · 5 cards</td>
+        <td>Responde as perguntas das 8h: vendas ontem, leads hoje, cobranças.</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>A5 — Alertas Dinâmicos</td>
+        <td>Refatorar ALERTAS[3] → computado</td>
+        <td>Alertas automáticos com timestamp e ação — elimina falsos tranquilos.</td>
+        <td><span class="badge b-p1">P1</span></td>
+      </tr>
+      <tr>
+        <td>A6 — Turmas com Urgência</td>
+        <td>Melhorar componente existente</td>
+        <td>Badge "Fecha em 5 dias" cria pressão comercial visível.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>A7 — Gráfico com Linha de Meta</td>
+        <td>Editar gráfico existente</td>
+        <td>Linha de meta transforma o histórico em contexto de performance.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>Score de Alunos com Critério</td>
+        <td>Melhorar Tela 6</td>
+        <td>Score com explicação vira diagnóstico, não decoração.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>Log de Incidentes dos Agentes</td>
+        <td>Melhorar Tela 5</td>
+        <td>Diferencia falha recorrente de episódio isolado.</td>
+        <td><span class="badge b-p2">P2</span></td>
+      </tr>
+      <tr>
+        <td>Tela 9 — Financeiro Operacional</td>
+        <td>Nova tela · caixa + DRE + margem</td>
+        <td>Fecha o gap de visão de negócio — custos e margem ausentes hoje.</td>
+        <td><span class="badge b-p3">P3</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  Gerado por <span>Tria Company</span> · Dashboard Administrativo — Análise & Melhorias · dashelias.vercel.app
+</footer>
+
+</div>
+</body>
+</html>

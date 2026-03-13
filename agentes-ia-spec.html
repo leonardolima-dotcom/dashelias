@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentes IA — Análise & Especificação Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04050c;--surface:#0a0c18;--surface2:#0f1120;--surface3:#141728;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#eceef8;--muted:#6e7294;--dim:#353757;
+  --amber:#fbbf24;--emerald:#34d399;--rose:#fb7185;
+  --violet:#a78bfa;--cyan:#22d3ee;--sky:#38bdf8;
+  --r:14px;
+  --ok:#34d399;  --ok-g:rgba(52,211,153,0.08);
+  --warn:#fbbf24;--warn-g:rgba(251,191,36,0.08);
+  --crit:#fb7185;--crit-g:rgba(251,113,133,0.08);
+  --new:#a78bfa; --new-g:rgba(167,139,250,0.08);
+  --req:#22d3ee; --req-g:rgba(34,211,238,0.08);
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(130px);}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(34,211,238,0.03),transparent 70%);top:-200px;left:50%;transform:translateX(-50%);}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(167,139,250,0.035),transparent 70%);bottom:-80px;right:-60px;}
+.o3{width:280px;height:280px;background:radial-gradient(circle,rgba(52,211,153,0.025),transparent 70%);top:35%;left:-50px;}
+.wrap{max-width:1380px;margin:0 auto;padding:60px 28px 100px;position:relative;z-index:1;}
+
+header{text-align:center;margin-bottom:60px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);background:rgba(34,211,238,0.07);border:1px solid rgba(34,211,238,0.2);padding:6px 18px;border-radius:100px;margin-bottom:20px;}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--cyan);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-2.5px;line-height:1.08;margin-bottom:14px;}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--cyan) 0%,var(--violet) 50%,var(--emerald) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:13px;max-width:580px;margin:0 auto;font-family:'DM Mono',monospace;font-weight:300;line-height:1.8;}
+
+.verdict{display:flex;align-items:stretch;margin-bottom:48px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.vd{flex:1;padding:14px 18px;text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1px;border-right:1px solid var(--border);}
+.vd:last-child{border-right:none;}
+.vd .vv{font-size:24px;font-weight:800;letter-spacing:-1px;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;}
+.vd .vl{color:var(--muted);font-size:9px;}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:52px 0;}
+
+.sec{margin-bottom:56px;}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.sec-n{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:var(--dim);min-width:28px;}
+.sec-head h2{font-size:20px;font-weight:800;letter-spacing:-0.5px;flex:1;}
+.sec-sub{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.6;}
+
+.badge{display:inline-flex;align-items:center;font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.b-ok{background:var(--ok-g);color:var(--ok);border:1px solid rgba(52,211,153,0.18);}
+.b-warn{background:var(--warn-g);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-crit{background:var(--crit-g);color:var(--crit);border:1px solid rgba(251,113,133,0.18);}
+.b-new{background:var(--new-g);color:var(--new);border:1px solid rgba(167,139,250,0.18);}
+.b-req{background:var(--req-g);color:var(--req);border:1px solid rgba(34,211,238,0.18);}
+.b-p1{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.18);}
+.b-p2{background:rgba(251,191,36,0.08);color:var(--warn);border:1px solid rgba(251,191,36,0.18);}
+.b-p3{background:rgba(167,139,250,0.08);color:var(--violet);border:1px solid rgba(167,139,250,0.18);}
+
+.callout{border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.callout p{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.8;}
+.callout strong{color:var(--text);}
+.c-info{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);}
+.c-crit{background:rgba(251,113,133,0.04);border:1px solid rgba(251,113,133,0.14);}
+.c-warn{background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.14);}
+.c-new{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.14);}
+.c-ok{background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.14);}
+
+/* AUDIT ROWS */
+.ar{display:grid;grid-template-columns:90px 1fr 90px 220px;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:11px;margin-bottom:8px;}
+.ar.crit-row{border-color:rgba(251,113,133,0.2);background:rgba(251,113,133,0.025);}
+.ar.warn-row{border-color:rgba(251,191,36,0.14);}
+.ar.ok-row{border-color:rgba(52,211,153,0.12);}
+.ar-id{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--dim);line-height:1.7;}
+.ar-name{font-weight:700;font-size:12px;}
+.ar-name .an{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.5;}
+.ar-fix{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.ar-fix strong{color:var(--text);display:block;margin-bottom:2px;font-size:10px;}
+
+/* AGENTE CARD MOCKUP */
+.agent-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.agent-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.agent-card.online{border-color:rgba(52,211,153,0.2);}
+.agent-card.degraded{border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.02);}
+.agent-card.offline{border-color:rgba(251,113,133,0.25);background:rgba(251,113,133,0.02);}
+.ac-icon{font-size:18px;margin-bottom:8px;}
+.ac-name{font-size:11px;font-weight:800;margin-bottom:5px;}
+.ac-status{display:flex;align-items:center;gap:5px;font-size:9px;font-family:'DM Mono',monospace;margin-bottom:8px;}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sd-ok{background:var(--ok);box-shadow:0 0 6px rgba(52,211,153,0.6);}
+.sd-warn{background:var(--warn);box-shadow:0 0 6px rgba(251,191,36,0.5);animation:pulse 2s infinite;}
+.sd-crit{background:var(--crit);box-shadow:0 0 6px rgba(251,113,133,0.6);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ac-metrics{display:flex;flex-direction:column;gap:4px;}
+.ac-m{display:flex;justify-content:space-between;font-size:9px;font-family:'DM Mono',monospace;}
+.ac-m .ml{color:var(--muted);}
+.ac-m .mv{font-weight:600;}
+.ac-uptime{position:absolute;top:10px;right:10px;}
+
+/* EXPANDED AGENT CARD MOCKUP */
+.agent-exp{background:var(--surface);border:1px solid rgba(34,211,238,0.2);border-radius:var(--r);padding:22px;margin-top:14px;}
+.ae-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+.ae-title{font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.ae-sub{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+.ae-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+.ae-kpi{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;}
+.ae-kpi .kv{font-size:20px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.ae-kpi .kl{font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px;}
+.ae-kpi .kd{font-size:9px;font-family:'DM Mono',monospace;margin-top:2px;}
+
+/* UPTIME MINI CALENDAR */
+.uptime-grid{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;}
+.uptime-day{width:14px;height:14px;border-radius:3px;}
+.ud-ok{background:rgba(52,211,153,0.5);}
+.ud-warn{background:rgba(251,191,36,0.5);}
+.ud-crit{background:rgba(251,113,133,0.5);}
+.ud-off{background:rgba(255,255,255,0.06);}
+
+/* ROI TABLE */
+.roi-table{width:100%;border-collapse:collapse;}
+.roi-table th{text-align:left;padding:8px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2);}
+.roi-table th:not(:first-child){text-align:right;}
+.roi-table td{padding:10px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.025);vertical-align:middle;}
+.roi-table td:not(:first-child){text-align:right;font-family:'DM Mono',monospace;font-size:10px;}
+.roi-table tr:last-child td{border-bottom:none;}
+.roi-total td{background:rgba(52,211,153,0.05);font-weight:800;font-size:13px;}
+
+/* INCIDENT LOG */
+.incident-row{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.025);}
+.incident-row:last-child{border-bottom:none;}
+.inc-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+.inc-body{flex:1;}
+.inc-title{font-size:11px;font-weight:700;margin-bottom:2px;}
+.inc-meta{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.5;}
+.inc-dur{font-family:'DM Mono',monospace;font-size:10px;min-width:60px;text-align:right;}
+
+/* HEATMAP */
+.heatmap-wrap{display:flex;flex-direction:column;gap:3px;}
+.hm-row{display:flex;gap:3px;align-items:center;}
+.hm-label{font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);min-width:24px;}
+.hm-cell{width:28px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:rgba(255,255,255,0.6);}
+
+/* DEFLEXÃO EXPANDED */
+.defl-main{display:grid;grid-template-columns:1fr 2fr;gap:14px;}
+.defl-left{background:var(--surface2);border:1px solid rgba(52,211,153,0.2);border-radius:var(--r);padding:24px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.defl-number{font-size:72px;font-weight:800;letter-spacing:-4px;line-height:1;color:var(--ok);text-shadow:0 0 60px rgba(52,211,153,0.3);}
+.defl-right{display:flex;flex-direction:column;gap:8px;}
+.defl-agent-row{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.dar-name{font-size:11px;font-weight:700;min-width:120px;}
+.dar-bar-wrap{flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:16px;overflow:hidden;}
+.dar-bar{height:16px;border-radius:4px;display:flex;align-items:center;padding-left:8px;}
+.dar-bar span{font-size:8px;font-weight:700;color:rgba(255,255,255,0.8);}
+.dar-pct{min-width:40px;text-align:right;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;}
+.dar-esc{min-width:70px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+
+/* SPEC */
+.spec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px;position:relative;overflow:hidden;}
+.spec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.spec-new::before{background:linear-gradient(90deg,var(--cyan),var(--violet),transparent);}
+.spec-fix::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.spec h3{font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;}
+.spec .sdesc{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.75;margin-bottom:16px;}
+.spec-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.spec-col h4{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.spec-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.spec-col li{font-size:11px;line-height:1.5;display:flex;gap:7px;}
+.spec-col li::before{content:'→';font-family:'DM Mono',monospace;color:var(--dim);flex-shrink:0;font-size:10px;margin-top:1px;}
+.spec-col li .s{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);display:block;line-height:1.5;margin-top:1px;}
+
+/* PRIORITY TL */
+.tl{display:flex;flex-direction:column;gap:8px;}
+.tli{display:flex;align-items:flex-start;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.tli-n{font-family:'DM Mono',monospace;font-size:28px;font-weight:800;color:var(--surface3);min-width:32px;line-height:1;}
+.tli-b h4{font-size:13px;font-weight:800;margin-bottom:3px;letter-spacing:-0.3px;}
+.tli-b p{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);line-height:1.65;}
+.tli-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+
+/* SUMMARY */
+.st{width:100%;border-collapse:collapse;}
+.st th{text-align:left;padding:9px 14px;font-size:8px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.st td{padding:10px 14px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;}
+.st td:first-child{font-weight:700;font-size:12px;width:210px;}
+.st td:nth-child(2){font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.st tr:last-child td{border-bottom:none;}
+
+footer{text-align:center;padding-top:36px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;}
+footer span{color:var(--amber);}
+
+@media(max-width:1100px){.agent-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:760px){.agent-grid{grid-template-columns:repeat(2,1fr);}.spec-cols{grid-template-columns:1fr;}.ae-kpis{grid-template-columns:1fr 1fr;}.defl-main{grid-template-columns:1fr;}}
+@media(max-width:500px){.ar{grid-template-columns:70px 1fr;}.ar .ar-fix{grid-column:2;}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="eyebrow">Dashboard Administrativo · Tela 5</div>
+  <h1>Expansão — <em>Agentes IA</em></h1>
+  <p class="sub">A tela atual monitora saúde superficial dos agentes. ROI real por agente, histórico de incidentes, deflexão por agente, custo por execução, uptime histórico e painel de diagnóstico em tempo real — o que transforma status em gestão.</p>
+</header>
+
+<!-- VERDICT -->
+<div class="verdict">
+  <div class="vd"><span class="vv" style="color:var(--ok)">4</span><span class="vl">blocos atuais</span></div>
+  <div class="vd"><span class="vv" style="color:var(--crit)">8</span><span class="vl">gaps críticos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--violet)">8</span><span class="vl">blocos novos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--warn)">3</span><span class="vl">blocos expandidos</span></div>
+  <div class="vd"><span class="vv" style="color:var(--req)">R$9.200</span><span class="vl">economia/mês atual</span></div>
+</div>
+
+<!-- ══════════════════════
+     01 — ESTADO ATUAL
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <div>
+      <h2>Estado Atual — Leitura Completa da Tela</h2>
+      <div class="sec-sub">O que existe · dados reais extraídos da screenshot · o que está faltando</div>
+    </div>
+  </div>
+
+  <div class="callout c-warn">
+    <p><strong>O problema central:</strong> A tela atual responde "os agentes estão ligados?" — mas não responde "os agentes estão valendo o investimento?" SDR custa R$445/mês e faz 189 execuções. Mas qual é a taxa de conversão gerada por ele? Quantos leads ele qualifica que se tornam vendas? Cobrança está <em>Degradado</em> — mas o Elias não sabe <strong>há quanto tempo, por qual motivo, ou qual impacto financeiro isso representa</strong> por dia de degradação.</p>
+  </div>
+
+  <!-- CARDS ATUAIS MOCKUP (com dados reais da screenshot) -->
+  <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Estado atual dos 5 agentes — dados da screenshot 13/03/2026 12:49</p>
+  <div class="agent-grid">
+    <div class="agent-card online">
+      <div class="ac-icon">🔍</div>
+      <div class="ac-name">Enriquecimento</div>
+      <div class="ac-status"><span class="status-dot sd-ok"></span><span style="color:var(--ok)">Online</span></div>
+      <div class="ac-metrics">
+        <div class="ac-m"><span class="ml">24h</span><span class="mv">47</span></div>
+        <div class="ac-m"><span class="ml">Sucesso</span><span class="mv" style="color:var(--ok)">97.8%</span></div>
+        <div class="ac-m"><span class="ml">Tokens</span><span class="mv">124k</span></div>
+        <div class="ac-m"><span class="ml">Custo/mês</span><span class="mv" style="color:var(--ok)">R$62</span></div>
+      </div>
+    </div>
+    <div class="agent-card online">
+      <div class="ac-icon">💬</div>
+      <div class="ac-name">SDR</div>
+      <div class="ac-status"><span class="status-dot sd-ok"></span><span style="color:var(--ok)">Online</span></div>
+      <div class="ac-metrics">
+        <div class="ac-m"><span class="ml">24h</span><span class="mv">189</span></div>
+        <div class="ac-m"><span class="ml">Sucesso</span><span class="mv" style="color:var(--warn)">91.2%</span></div>
+        <div class="ac-m"><span class="ml">Tokens</span><span class="mv">890k</span></div>
+        <div class="ac-m"><span class="ml">Custo/mês</span><span class="mv" style="color:var(--warn)">R$445</span></div>
+      </div>
+    </div>
+    <div class="agent-card online">
+      <div class="ac-icon">📅</div>
+      <div class="ac-name">Agendamento</div>
+      <div class="ac-status"><span class="status-dot sd-ok"></span><span style="color:var(--ok)">Online</span></div>
+      <div class="ac-metrics">
+        <div class="ac-m"><span class="ml">24h</span><span class="mv">23</span></div>
+        <div class="ac-m"><span class="ml">Sucesso</span><span class="mv" style="color:var(--ok)">95.6%</span></div>
+        <div class="ac-m"><span class="ml">Tokens</span><span class="mv">45k</span></div>
+        <div class="ac-m"><span class="ml">Custo/mês</span><span class="mv" style="color:var(--ok)">R$22</span></div>
+      </div>
+    </div>
+    <div class="agent-card degraded">
+      <div class="ac-icon">💰</div>
+      <div class="ac-name">Cobrança</div>
+      <div class="ac-status"><span class="status-dot sd-warn"></span><span style="color:var(--warn)">Degradado ⚠</span></div>
+      <div class="ac-metrics">
+        <div class="ac-m"><span class="ml">24h</span><span class="mv">56</span></div>
+        <div class="ac-m"><span class="ml">Sucesso</span><span class="mv" style="color:var(--warn)">87.3%</span></div>
+        <div class="ac-m"><span class="ml">Tokens</span><span class="mv">210k</span></div>
+        <div class="ac-m"><span class="ml">Custo/mês</span><span class="mv">R$105</span></div>
+      </div>
+    </div>
+    <div class="agent-card online">
+      <div class="ac-icon">👁️</div>
+      <div class="ac-name">Pós-venda</div>
+      <div class="ac-status"><span class="status-dot sd-ok"></span><span style="color:var(--ok)">Online</span></div>
+      <div class="ac-metrics">
+        <div class="ac-m"><span class="ml">24h</span><span class="mv">34</span></div>
+        <div class="ac-m"><span class="ml">Sucesso</span><span class="mv" style="color:var(--ok)">98.1%</span></div>
+        <div class="ac-m"><span class="ml">Tokens</span><span class="mv">78k</span></div>
+        <div class="ac-m"><span class="mv" style="color:var(--ok)">R$39</span><span class="ml">/mês</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Análise bloco por bloco -->
+  <div class="ar ok-row">
+    <div class="ar-id">B01<br><span class="badge b-ok">Manter</span></div>
+    <div class="ar-name">5 Cards de Agentes
+      <div class="an">Status Online/Degradado · exec 24h · sucesso % · tokens · custo mensal · dot colorido com glow</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Bem executado</strong>Visual de status com glow é excelente para ritual matinal. Informação densa e legível. Manter tudo. Adições: mini gráfico sparkline de 7 dias no hover · uptime % do mês · custo por execução (não só mensal) · última execução há X minutos.</div>
+  </div>
+
+  <div class="ar ok-row">
+    <div class="ar-id">B02<br><span class="badge b-ok">Expandir</span></div>
+    <div class="ar-name">Deflexão Geral — 73%
+      <div class="an">256 pela IA · 95 escaladas · ~2 vendedores · economia R$9.200/mês · destaque visual com glow verde</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Muito bom</strong>O número de R$9.200/mês economizado é uma das melhores métricas do dashboard inteiro. Expandir: deflexão POR agente (SDR deflecte 68%, Cobrança deflecte 80%) · tendência semanal da deflexão · motivos de escalação mais comuns.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">B03<br><span class="badge b-warn">Expandir</span></div>
+    <div class="ar-name">Gráfico de Execuções (Sucesso vs Erro por dia)
+      <div class="an">Seg 62 · Ter 58 · Qua 71 · Qui 65 · Sex 55 · Sáb 32 · Dom 18</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Problema</strong>Gráfico mostra volume e erro totais — mas não por agente. Qua teve 71 execuções mas não sabemos se os erros foram todos do Cobrança (que está degradado) ou distribuídos. Expandir: toggle por agente · linha de taxa de erro % · eixo Y duplo.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">B04<br><span class="badge b-warn">Expandir</span></div>
+    <div class="ar-name">Custo por Agente vs Vendedor Humano
+      <div class="an">SDR R$445 · Cobrança R$105 · Enriquecimento R$62 · Pós-venda R$39 · Agendamento R$22 · Total R$673 = 15% de um vendedor</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Bom visual</strong>Comparação com vendedor humano (R$4.600) é poderosa. Falta: custo por execução (R$445 ÷ 189 exec/dia = R$2,35/exec do SDR) · custo por lead qualificado · custo por venda fechada · ROI real em R$ por agente.</div>
+  </div>
+
+  <div class="ar crit-row">
+    <div class="ar-id">G1<br><span class="badge b-crit">Ausente</span></div>
+    <div class="ar-name">Diagnóstico do Cobrança Degradado
+      <div class="an">"Degradado" visível na tela — mas sem causa, duração, impacto financeiro ou ação</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap crítico</strong>O agente de Cobrança está Degradado — isso significa que R$12.400 em inadimplência está sendo recuperado 12.7% menos eficientemente. Qual é o erro? Há quanto tempo? Qual é o impacto em R$ por dia de degradação? Nada disso está acessível na tela.</div>
+  </div>
+
+  <div class="ar crit-row">
+    <div class="ar-id">G2<br><span class="badge b-crit">Ausente</span></div>
+    <div class="ar-name">Histórico de Incidentes por Agente
+      <div class="an">Log de downtime · duração de cada incidente · causa · resolução · impacto</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap crítico</strong>Sem log histórico, o Elias não sabe se o Cobrança degradado é um evento novo (hoje) ou se ele degradou 3 vezes esse mês. Padrão de instabilidade é invisível sem esse dado — e sem padrão, não há gestão de SLA.</div>
+  </div>
+
+  <div class="ar crit-row">
+    <div class="ar-id">G3<br><span class="badge b-crit">Ausente</span></div>
+    <div class="ar-name">ROI Real por Agente
+      <div class="an">Custo mensal (existe) vs valor gerado (não existe) = ROI% (não existe)</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap crítico</strong>SDR custa R$445/mês mas gera como resultado direto a qualificação que leva a R$X em vendas fechadas. Cobrança custa R$105 mas recuperou R$3.800 esse mês. Sem ROI por agente, o orçamento de IA é um custo — não um investimento mensurável.</div>
+  </div>
+
+  <div class="ar crit-row">
+    <div class="ar-id">G4<br><span class="badge b-crit">Ausente</span></div>
+    <div class="ar-name">Deflexão por Agente (individualizado)
+      <div class="an">73% global existe · mas qual agente contribui quanto? · qual agente mais escala para humano?</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap crítico</strong>Se o SDR escala 40% dos leads para humano mas o Pós-venda escala apenas 5%, são problemas completamente diferentes que exigem ações opostas. A deflexão global de 73% esconde essa distribuição.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">G5<br><span class="badge b-warn">Ausente</span></div>
+    <div class="ar-name">Custo por Execução e por Resultado
+      <div class="an">R$/exec · R$/lead qualificado · R$/venda fechada (via SDR) · R$/cobrança recuperada</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap</strong>R$445/mês para o SDR é abstrato. R$2,35/execução ou R$22,25/lead qualificado é comparável com alternativas (ex: SDR humano custa R$X por lead). Esse número transforma o custo de IA em benchmark de eficiência.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">G6<br><span class="badge b-warn">Ausente</span></div>
+    <div class="ar-name">Uptime Histórico (SLA de disponibilidade)
+      <div class="an">% de tempo disponível por agente · últimos 30 dias · dias com incidente marcados</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap</strong>Um agente com 99.5% de uptime é muito diferente de um com 94% (6 horas de indisponibilidade/mês). Sem uptime histórico, degradações pontuais são invisíveis e não existe base para SLA com a equipe de desenvolvimento.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">G7<br><span class="badge b-warn">Ausente</span></div>
+    <div class="ar-name">selAgent completo — Painel de Detalhe por Agente
+      <div class="an">useState selAgent existe no código mas o painel expandido não tem informação suficiente</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap</strong>Clicar num agente deveria abrir um painel rico com: logs recentes, motivos de erro, sparkline de performance, custo por resultado, incidentes históricos, distribuição de tarefas. Hoje provavelmente só repete os dados do card.</div>
+  </div>
+
+  <div class="ar warn-row">
+    <div class="ar-id">G8<br><span class="badge b-warn">Ausente</span></div>
+    <div class="ar-name">Heatmap de Atividade por Hora e Dia da Semana
+      <div class="an">Quando os agentes mais trabalham · picos de carga · horários de maior taxa de erro</div>
+    </div>
+    <div></div>
+    <div class="ar-fix"><strong>Gap</strong>HEATMAP_DATA[126] já existe no dataset (7 dias × 18 horas)! Os dados estão prontos mas não são usados na tela de Agentes — estão provavelmente na Visão Geral. Replicar aqui com filtro por agente seria de alto valor.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     02 — CARDS EXPANDIDOS
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <div>
+      <h2>Mockup — Cards de Agentes Expandidos (selAgent)</h2>
+      <div class="sec-sub">Bloco A1 expandido · ao clicar num agente, o painel lateral abre com diagnóstico completo · exemplo: Agente Cobrança (Degradado)</div>
+    </div>
+  </div>
+
+  <div class="callout c-crit">
+    <p><strong>Caso de uso crítico:</strong> O Cobrança está "Degradado" desde quando? O Elias abre o dashboard às 12:49 de 13/03/2026 e vê a bolinha amarela. Mas não sabe se é há 2h ou há 2 dias. Se for há 2 dias, a inadimplência de R$12.400 está sendo gerenciada com 12.7% menos eficiência por 48 horas — o que representa ~R$380 de recuperação perdida que poderia ter sido acionada por um humano. <strong>Este painel existe para que o Elias tome essa decisão em 5 segundos, não 5 minutos.</strong></p>
+  </div>
+
+  <div class="agent-exp">
+    <div class="ae-header">
+      <div>
+        <div class="ae-title">💰 Agente de Cobrança</div>
+        <div class="ae-sub">Recuperação de inadimplência via WhatsApp automatizado · OpenAI GPT-4o · n8n workflow</div>
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <span class="badge b-warn">⚠ Degradado</span>
+        <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);align-self:center;">há 4h 23min</span>
+      </div>
+    </div>
+
+    <div class="ae-kpis">
+      <div class="ae-kpi">
+        <div class="kv" style="color:var(--warn)">87.3%</div>
+        <div class="kl">Taxa de Sucesso hoje</div>
+        <div class="kd" style="color:var(--crit)">▼ −6.2% vs semana ant.</div>
+      </div>
+      <div class="ae-kpi">
+        <div class="kv">56</div>
+        <div class="kl">Execuções 24h</div>
+        <div class="kd" style="color:var(--ok)">▲ +8 vs média</div>
+      </div>
+      <div class="ae-kpi">
+        <div class="kv" style="color:var(--ok)">R$1.876</div>
+        <div class="kl">Recuperado este mês</div>
+        <div class="kd" style="color:var(--muted)">de R$3.800 total</div>
+      </div>
+      <div class="ae-kpi">
+        <div class="kv">R$1,88</div>
+        <div class="kl">Custo por execução</div>
+        <div class="kd" style="color:var(--ok)">R$105 ÷ 56/dia</div>
+      </div>
+    </div>
+
+    <!-- ROI deste agente -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+      <div>
+        <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">ROI do Agente Cobrança — Março</p>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-family:'DM Mono',monospace;">
+            <span style="color:var(--muted)">Custo mensal</span><span style="color:var(--crit);">− R$ 105</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-family:'DM Mono',monospace;">
+            <span style="color:var(--muted)">Recuperação gerada</span><span style="color:var(--ok);">+ R$ 3.800</span>
+          </div>
+          <div style="height:1px;background:var(--border);"></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;">
+            <span>ROI</span><span style="color:var(--ok)">36.2×</span>
+          </div>
+          <div style="font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">Para cada R$1 investido no Cobrança, R$36,19 de volta em inadimplência recuperada</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Uptime Histórico — últimos 30 dias</p>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;">
+          <div style="font-size:22px;font-weight:800;color:var(--warn);margin-bottom:6px;">97.1% <span style="font-size:11px;color:var(--muted);font-weight:400;">disponibilidade</span></div>
+          <div class="uptime-grid">
+            <!-- Representação de 30 dias de uptime (verde = ok, amarelo = degradado, vermelho = offline) -->
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div>
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-warn"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div>
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-crit"></div>
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div>
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-warn"></div><div class="uptime-day ud-ok"></div>
+            <div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-ok"></div><div class="uptime-day ud-warn"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.5);margin-right:3px;vertical-align:middle;"></span>OK</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,191,36,0.5);margin-right:3px;vertical-align:middle;"></span>Degradado (3×)</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(251,113,133,0.5);margin-right:3px;vertical-align:middle;"></span>Offline (1×)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log de incidentes -->
+    <p style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Log de Incidentes — últimos 30 dias</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div class="incident-row">
+        <div class="inc-dot" style="background:var(--warn);"></div>
+        <div class="inc-body">
+          <div class="inc-title">Degradação atual — Taxa de erro subiu para 12.7%</div>
+          <div class="inc-meta">13/03/2026 08:26 · Causa provável: timeout na API do WhatsApp Business · 7 execuções falharam com erro 504 · Agente ainda operacional mas lento</div>
+        </div>
+        <div class="inc-dur" style="color:var(--warn);">Em curso<br><span style="font-size:8px;">4h 23min</span></div>
+      </div>
+      <div class="incident-row">
+        <div class="inc-dot" style="background:var(--ok);"></div>
+        <div class="inc-body">
+          <div class="inc-title">Degradação resolvida — Taxa de erro voltou ao normal</div>
+          <div class="inc-meta">24/02/2026 14:10 → 16:45 · Causa: rate limit da OpenAI atingido · 18 execuções falharam · Resolvido com aumento de quota</div>
+        </div>
+        <div class="inc-dur" style="color:var(--ok);">Resolvido<br><span style="font-size:8px;">2h 35min</span></div>
+      </div>
+      <div class="incident-row">
+        <div class="inc-dot" style="background:var(--crit);"></div>
+        <div class="inc-body">
+          <div class="inc-title">Offline — Workflow n8n parou de executar</div>
+          <div class="inc-meta">14/02/2026 09:15 → 11:00 · Causa: credencial do WhatsApp expirou · 0 execuções em 1h 45min · Impacto estimado: R$280 em recuperação não acionada</div>
+        </div>
+        <div class="inc-dur" style="color:var(--crit);">Resolvido<br><span style="font-size:8px;">1h 45min</span></div>
+      </div>
+      <div class="incident-row">
+        <div class="inc-dot" style="background:var(--warn);"></div>
+        <div class="inc-body">
+          <div class="inc-title">Degradação — Taxa de sucesso caiu para 84%</div>
+          <div class="inc-meta">07/03/2026 20:40 → 21:55 · Causa: instabilidade no Supabase (timeout nas queries de inadimplentes) · Resolvido automaticamente</div>
+        </div>
+        <div class="inc-dur" style="color:var(--ok);">Resolvido<br><span style="font-size:8px;">1h 15min</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     03 — ROI POR AGENTE
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <div>
+      <h2>Mockup — Tabela de ROI por Agente</h2>
+      <div class="sec-sub">Bloco A2 · transforma custo em investimento · custo mensal vs valor gerado vs ROI · por execução · por resultado</div>
+    </div>
+  </div>
+
+  <div class="callout c-new">
+    <p><strong>A métrica que muda a conversa:</strong> R$673/mês em total de IA parece um custo. Quando você divide por resultado — SDR: R$22,25/lead qualificado, Cobrança: R$36,19 de retorno por R$1 investido — é um investimento com ROI documentado. <strong>Essa tabela é o argumento para aumentar o orçamento de IA, não para cortar.</strong></p>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+    <table class="roi-table">
+      <thead>
+        <tr>
+          <th style="width:18%">Agente</th>
+          <th>Custo/mês</th>
+          <th>Execuções/dia</th>
+          <th>R$/execução</th>
+          <th>Resultado principal</th>
+          <th>Valor gerado/mês</th>
+          <th>ROI</th>
+          <th>Equiv. humano</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div style="font-weight:700;">🔍 Enriquecimento</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">97.8% sucesso</div></td>
+          <td style="color:var(--warn);">R$ 62</td>
+          <td>47</td>
+          <td>R$ 1,32</td>
+          <td style="font-size:10px;color:var(--muted);">Leads enriquecidos com dados (aumenta taxa de contato do SDR)</td>
+          <td style="color:var(--ok);">+ R$ 4.200 <div style="font-size:8px;color:var(--muted);">impacto em conv. SDR</div></td>
+          <td style="color:var(--ok);font-weight:800;font-size:14px;">67.7×</td>
+          <td style="font-size:10px;color:var(--muted);">Analyst júnior R$2.500</td>
+        </tr>
+        <tr style="background:rgba(251,191,36,0.02);border-color:rgba(251,191,36,0.1);">
+          <td><div style="font-weight:700;">💬 SDR</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">91.2% sucesso · maior volume</div></td>
+          <td style="color:var(--crit);">R$ 445</td>
+          <td>189</td>
+          <td>R$ 2,35</td>
+          <td style="font-size:10px;color:var(--muted);">Leads qualificados que passam para Closer · qualificou 178 SQLs esse mês</td>
+          <td style="color:var(--ok);">+ R$ 28.400 <div style="font-size:8px;color:var(--muted);">receita gerada via SQLs</div></td>
+          <td style="color:var(--ok);font-weight:800;font-size:14px;">63.8×</td>
+          <td style="font-size:10px;color:var(--muted);">SDR humano R$3.200</td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:700;">📅 Agendamento</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">95.6% sucesso</div></td>
+          <td style="color:var(--ok);">R$ 22</td>
+          <td>23</td>
+          <td>R$ 0,96</td>
+          <td style="font-size:10px;color:var(--muted);">Reuniões agendadas com Closer · 23 reuniões/dia · evita no-show com confirmação</td>
+          <td style="color:var(--ok);">+ R$ 6.900 <div style="font-size:8px;color:var(--muted);">reuniões convertidas</div></td>
+          <td style="color:var(--ok);font-weight:800;font-size:14px;">313.6×</td>
+          <td style="font-size:10px;color:var(--muted);">Assistente admin R$1.800</td>
+        </tr>
+        <tr style="background:rgba(251,191,36,0.02);">
+          <td><div style="font-weight:700;">💰 Cobrança</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--warn);">87.3% sucesso ⚠ Degradado</div></td>
+          <td>R$ 105</td>
+          <td>56</td>
+          <td>R$ 1,88</td>
+          <td style="font-size:10px;color:var(--muted);">Inadimplência recuperada via follow-up automatizado</td>
+          <td style="color:var(--ok);">+ R$ 3.800 <div style="font-size:8px;color:var(--muted);">recuperação confirmada</div></td>
+          <td style="color:var(--ok);font-weight:800;font-size:14px;">36.2×</td>
+          <td style="font-size:10px;color:var(--muted);">Analista cobrança R$2.200</td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:700;">👁️ Pós-venda</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);">98.1% sucesso · mais eficiente</div></td>
+          <td style="color:var(--ok);">R$ 39</td>
+          <td>34</td>
+          <td>R$ 1,15</td>
+          <td style="font-size:10px;color:var(--muted);">Retenção de alunos · NPS automatizado · reativação de at-risk</td>
+          <td style="color:var(--ok);">+ R$ 5.200 <div style="font-size:8px;color:var(--muted);">LTV preservado</div></td>
+          <td style="color:var(--ok);font-weight:800;font-size:14px;">133.3×</td>
+          <td style="font-size:10px;color:var(--muted);">CS humano R$2.800</td>
+        </tr>
+        <tr class="roi-total">
+          <td>⚡ TOTAL — 5 Agentes</td>
+          <td style="color:var(--warn);">R$ 673</td>
+          <td style="color:var(--text);">349 /dia</td>
+          <td>R$ 1,93 <div style="font-size:8px;color:var(--muted);">média ponderada</div></td>
+          <td style="color:var(--muted);font-size:10px;">Qualificação + Agendamento + Recuperação + Retenção</td>
+          <td style="color:var(--ok);font-size:16px;">+ R$ 48.500</td>
+          <td style="color:var(--ok);font-size:18px;">72.1×</td>
+          <td style="color:var(--ok);font-size:11px;">= R$15.500 em equipe<br>IA custa 4.3% disso</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout c-ok" style="margin-top:10px;">
+    <p><strong>Leitura direta:</strong> Os 5 agentes custam R$673/mês e geram R$48.500 de valor mensurável. A equipe humana equivalente custaria ~R$15.500/mês. <strong>A IA opera por 4.3% do custo da alternativa humana com ROI de 72×.</strong> Esse número merece estar na primeira linha da tela, não no rodapé do gráfico de custos.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     04 — DEFLEXÃO POR AGENTE
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">04</span>
+    <div>
+      <h2>Mockup — Deflexão por Agente + Motivos de Escalação</h2>
+      <div class="sec-sub">Bloco A3 · expandir 73% global para visão por agente · quem deflecte mais · quem escala mais · por quê</div>
+    </div>
+  </div>
+
+  <div class="defl-main">
+    <div class="defl-left">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Deflexão Geral</div>
+      <div class="defl-number">73%</div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:10px;">256 resolvidos pela IA<br>95 escalados para humano</div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);width:100%;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;margin-bottom:5px;"><span style="color:var(--muted)">Economia mensal</span><span style="color:var(--ok);font-weight:700;">R$ 9.200</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;margin-bottom:5px;"><span style="color:var(--muted)">Equiv. a</span><span style="font-weight:700;">~2 vendedores</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;"><span style="color:var(--muted)">Tendência</span><span style="color:var(--ok);font-weight:700;">▲ +2.3% vs mês ant.</span></div>
+      </div>
+    </div>
+
+    <div class="defl-right">
+      <div class="defl-agent-row" style="border-color:rgba(52,211,153,0.2);">
+        <div class="dar-name">📅 Agendamento</div>
+        <div class="dar-bar-wrap"><div class="dar-bar" style="width:92%;background:linear-gradient(90deg,rgba(52,211,153,0.6),rgba(52,211,153,0.3));"><span>92% deflectido</span></div></div>
+        <div class="dar-pct" style="color:var(--ok)">92%</div>
+        <div class="dar-esc">2 escalações</div>
+      </div>
+      <div class="defl-agent-row" style="border-color:rgba(52,211,153,0.16);">
+        <div class="dar-name">👁️ Pós-venda</div>
+        <div class="dar-bar-wrap"><div class="dar-bar" style="width:88%;background:linear-gradient(90deg,rgba(52,211,153,0.5),rgba(52,211,153,0.25));"><span>88% deflectido</span></div></div>
+        <div class="dar-pct" style="color:var(--ok)">88%</div>
+        <div class="dar-esc">4 escalações</div>
+      </div>
+      <div class="defl-agent-row" style="border-color:rgba(52,211,153,0.13);">
+        <div class="dar-name">💰 Cobrança</div>
+        <div class="dar-bar-wrap"><div class="dar-bar" style="width:79%;background:linear-gradient(90deg,rgba(52,211,153,0.4),rgba(52,211,153,0.2));"><span>79% deflectido</span></div></div>
+        <div class="dar-pct" style="color:var(--ok)">79%</div>
+        <div class="dar-esc">11 escalações</div>
+      </div>
+      <div class="defl-agent-row">
+        <div class="dar-name">🔍 Enriquecimento</div>
+        <div class="dar-bar-wrap"><div class="dar-bar" style="width:75%;background:linear-gradient(90deg,rgba(34,211,238,0.4),rgba(34,211,238,0.2));"><span>75% deflectido</span></div></div>
+        <div class="dar-pct" style="color:var(--cyan)">75%</div>
+        <div class="dar-esc">12 escalações</div>
+      </div>
+      <div class="defl-agent-row" style="border-color:rgba(251,191,36,0.2);background:rgba(251,191,36,0.02);">
+        <div class="dar-name">💬 SDR</div>
+        <div class="dar-bar-wrap"><div class="dar-bar" style="width:58%;background:linear-gradient(90deg,rgba(251,191,36,0.5),rgba(251,191,36,0.25));"><span>58% deflectido</span></div></div>
+        <div class="dar-pct" style="color:var(--warn)">58%</div>
+        <div class="dar-esc" style="color:var(--crit)">66 escalações ⚠</div>
+      </div>
+
+      <!-- Motivos de escalação -->
+      <div style="background:var(--surface2);border:1px solid rgba(251,191,36,0.15);border-radius:10px;padding:14px;">
+        <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;">Top motivos de escalação — SDR (66 escalações)</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;"><div style="width:120px;height:10px;border-radius:3px;background:rgba(251,113,133,0.5);"></div><span style="font-family:'DM Mono',monospace;color:var(--muted);">Pergunta fora do escopo — 38%</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;"><div style="width:85px;height:10px;border-radius:3px;background:rgba(251,191,36,0.5);"></div><span style="font-family:'DM Mono',monospace;color:var(--muted);">Lead pediu falar com humano — 26%</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;"><div style="width:55px;height:10px;border-radius:3px;background:rgba(167,139,250,0.5);"></div><span style="font-family:'DM Mono',monospace;color:var(--muted);">Objeção de preço — 17%</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;"><div style="width:38px;height:10px;border-radius:3px;background:rgba(96,165,250,0.5);"></div><span style="font-family:'DM Mono',monospace;color:var(--muted);">Lead agressivo — 12%</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;"><div style="width:20px;height:10px;border-radius:3px;background:rgba(255,255,255,0.15);"></div><span style="font-family:'DM Mono',monospace;color:var(--muted);">Outros — 7%</span></div>
+        </div>
+        <div class="callout c-info" style="margin-top:10px;padding:10px 14px;">
+          <p style="font-size:10px;"><strong>Ação:</strong> 38% das escalações são por "pergunta fora do escopo" — isso significa que o prompt do SDR precisa ser atualizado com mais perguntas coberturas. Reduzir para 20% = −19 escalações/dia = ~R$800/mês a menos em tempo de vendedor humano.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     05 — HEATMAP + EXECUÇÕES EXPANDIDO
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">05</span>
+    <div>
+      <h2>Mockup — Execuções por Agente + Heatmap de Atividade</h2>
+      <div class="sec-sub">Bloco A4 · gráfico atual expandido com toggle por agente · heatmap hora×dia mostrando picos de carga e erros</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+    <!-- Gráfico expandido com toggle -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;">Execuções · taxa de sucesso</div>
+        <div style="display:flex;gap:4px;">
+          <span class="badge b-req">Todos</span>
+          <span class="badge" style="background:transparent;border-color:var(--border);color:var(--muted);">SDR</span>
+          <span class="badge" style="background:transparent;border-color:var(--border);color:var(--muted);">Cobrança</span>
+        </div>
+      </div>
+      <svg viewBox="0 0 300 110" style="width:100%;height:110px;">
+        <!-- Grid -->
+        <line x1="0" y1="90" x2="300" y2="90" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="65" x2="300" y2="65" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <!-- Barras sucesso -->
+        <rect x="8"  y="32" width="28" height="58" rx="3" fill="rgba(52,211,153,0.6)"/>
+        <rect x="51" y="38" width="28" height="52" rx="3" fill="rgba(52,211,153,0.6)"/>
+        <rect x="94" y="24" width="28" height="66" rx="3" fill="rgba(52,211,153,0.6)"/>
+        <rect x="137" y="28" width="28" height="62" rx="3" fill="rgba(52,211,153,0.6)"/>
+        <rect x="180" y="40" width="28" height="50" rx="3" fill="rgba(52,211,153,0.6)"/>
+        <rect x="223" y="58" width="28" height="32" rx="3" fill="rgba(52,211,153,0.45)"/>
+        <rect x="266" y="75" width="28" height="15" rx="3" fill="rgba(52,211,153,0.35)"/>
+        <!-- Barras erro (acima das barras de sucesso visualmente como topo) -->
+        <rect x="8"  y="28" width="28" height="4" rx="1" fill="rgba(251,113,133,0.8)"/>
+        <rect x="51" y="34" width="28" height="4" rx="1" fill="rgba(251,113,133,0.8)"/>
+        <rect x="94" y="19" width="28" height="5" rx="1" fill="rgba(251,191,36,0.9)"/>
+        <rect x="137" y="23" width="28" height="5" rx="1" fill="rgba(251,113,133,0.8)"/>
+        <rect x="180" y="36" width="28" height="4" rx="1" fill="rgba(251,113,133,0.8)"/>
+        <rect x="223" y="55" width="28" height="3" rx="1" fill="rgba(251,113,133,0.7)"/>
+        <rect x="266" y="73" width="28" height="2" rx="1" fill="rgba(251,113,133,0.6)"/>
+        <!-- Labels valores -->
+        <text x="22"  y="26" font-size="8.5" fill="white" font-family="monospace" text-anchor="middle">62</text>
+        <text x="65"  y="32" font-size="8.5" fill="white" font-family="monospace" text-anchor="middle">58</text>
+        <text x="108" y="18" font-size="8.5" fill="white" font-family="monospace" text-anchor="middle">71</text>
+        <text x="151" y="22" font-size="8.5" fill="white" font-family="monospace" text-anchor="middle">65</text>
+        <text x="194" y="34" font-size="8.5" fill="white" font-family="monospace" text-anchor="middle">55</text>
+        <text x="237" y="53" font-size="8.5" fill="rgba(255,255,255,0.7)" font-family="monospace" text-anchor="middle">32</text>
+        <text x="280" y="71" font-size="8.5" fill="rgba(255,255,255,0.6)" font-family="monospace" text-anchor="middle">18</text>
+        <!-- Linha taxa sucesso % -->
+        <polyline points="22,82 65,80 108,74 151,78 194,82 237,84 280,86"
+          fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <!-- Dias -->
+        <text x="22"  y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Seg</text>
+        <text x="65"  y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Ter</text>
+        <text x="108" y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Qua</text>
+        <text x="151" y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Qui</text>
+        <text x="194" y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Sex</text>
+        <text x="237" y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Sáb</text>
+        <text x="280" y="103" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="monospace" text-anchor="middle">Dom</text>
+      </svg>
+      <div style="display:flex;gap:10px;margin-top:6px;font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.6);display:inline-block;"></span>Sucesso</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:rgba(251,113,133,0.8);display:inline-block;"></span>Erro</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:2px;background:var(--cyan);display:inline-block;border-radius:1px;"></span>Taxa sucesso % (eixo direito)</span>
+      </div>
+      <div class="callout c-warn" style="margin-top:10px;padding:10px 14px;">
+        <p style="font-size:10px;"><strong>Insight:</strong> Qua teve pico de volume (71 exec.) mas a taxa de erro também foi a maior da semana. Filtrar por agente revelaria se os erros são do Cobrança (degradado) ou distribuídos.</p>
+      </div>
+    </div>
+
+    <!-- Heatmap hora x dia -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;">
+      <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">Heatmap de atividade — hora × dia da semana</div>
+      <div class="heatmap-wrap">
+        <!-- Linha de horas header -->
+        <div class="hm-row">
+          <div class="hm-label"></div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">08h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">10h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">12h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">14h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">16h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">18h</div>
+          <div class="hm-cell" style="font-size:7px;color:var(--dim);background:transparent;width:28px;">20h</div>
+        </div>
+        <!-- Seg -->
+        <div class="hm-row">
+          <div class="hm-label">Seg</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.25);">4</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.5);">9</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.7);">14</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.85);">18</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.7);">14</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.4);">8</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.15);">3</div>
+        </div>
+        <!-- Ter -->
+        <div class="hm-row">
+          <div class="hm-label">Ter</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.2);">3</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.4);">7</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.6);">12</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.75);">15</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.55);">11</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.35);">7</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.1);">2</div>
+        </div>
+        <!-- Qua — pico -->
+        <div class="hm-row">
+          <div class="hm-label" style="color:var(--warn);">Qua ▲</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.3);">5</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.6);">11</div>
+          <div class="hm-cell" style="background:rgba(251,191,36,0.7);">17</div>
+          <div class="hm-cell" style="background:rgba(251,113,133,0.6);">22</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.75);">15</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.45);">9</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.2);">4</div>
+        </div>
+        <!-- Qui -->
+        <div class="hm-row">
+          <div class="hm-label">Qui</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.25);">4</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.45);">8</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.65);">13</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.8);">16</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.65);">13</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.35);">7</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.15);">3</div>
+        </div>
+        <!-- Sex -->
+        <div class="hm-row">
+          <div class="hm-label">Sex</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.2);">3</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.45);">8</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.6);">11</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.7);">14</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.5);">10</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.3);">6</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.1);">2</div>
+        </div>
+        <!-- Sáb -->
+        <div class="hm-row">
+          <div class="hm-label">Sáb</div>
+          <div class="hm-cell" style="background:rgba(255,255,255,0.05);">1</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.2);">3</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.35);">6</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.45);">8</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.3);">5</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.15);">2</div>
+          <div class="hm-cell" style="background:rgba(255,255,255,0.04);">1</div>
+        </div>
+        <!-- Dom -->
+        <div class="hm-row">
+          <div class="hm-label">Dom</div>
+          <div class="hm-cell" style="background:rgba(255,255,255,0.04);">0</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.1);">2</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.2);">3</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.25);">4</div>
+          <div class="hm-cell" style="background:rgba(52,211,153,0.15);">2</div>
+          <div class="hm-cell" style="background:rgba(255,255,255,0.04);">1</div>
+          <div class="hm-cell" style="background:rgba(255,255,255,0.04);">0</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:8px;font-family:'DM Mono',monospace;color:var(--muted);">Escala: verde claro = baixa carga · <span style="color:var(--warn);">âmbar = alta carga</span> · <span style="color:var(--crit);">vermelho = pico com erros</span></div>
+      <div class="callout c-crit" style="margin-top:10px;padding:10px 14px;">
+        <p style="font-size:10px;"><strong>Pico crítico:</strong> Qua 14h = 22 execuções simultâneas com <span style="color:var(--crit);">alta taxa de erro</span> — possivelmente saturação de rate limit. Sugestão: distribuir execuções do SDR nesse horário ou aumentar quota na OpenAI/Azure para Qua 13–15h.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     06 — ESPECIFICAÇÕES
+══════════════════════ -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">06</span>
+    <div>
+      <h2>Especificações Técnicas — Todos os Blocos</h2>
+      <div class="sec-sub">8 blocos novos + 3 expansões · dados necessários · lógica · novos datasets</div>
+    </div>
+  </div>
+
+  <!-- A1: Painel selAgent -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Expandir · A1</span><span class="badge b-p1">P1 · Crítico</span></div>
+    <h3>Painel de Detalhe por Agente (selAgent completo)</h3>
+    <p class="sdesc">Ao clicar em qualquer card de agente, um painel lateral ou modal expandido abre com: ROI, uptime histórico, log de incidentes, distribuição de tarefas, custo por resultado e sparkline de 7 dias da taxa de sucesso.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Seções do painel</h4>
+        <ul>
+          <li>Header: nome, status atual, há quanto tempo nesse status<span class="s">Calcular: Date.now() − ultimoStatusChange</span></li>
+          <li>4 KPIs: taxa sucesso · execuções 24h · custo/execução · valor gerado mês</li>
+          <li>ROI card: custo mês vs valor gerado vs múltiplo<span class="s">ROI = (valorGerado − custoMes) / custoMes × 100</span></li>
+          <li>Uptime histórico: grid de 30 dias com cores por estado<span class="s">Verde=ok · âmbar=degradado · vermelho=offline</span></li>
+          <li>Log de incidentes: tabela com causa, duração, resolução, impacto R$</li>
+          <li>Sparkline: taxa de sucesso % nos últimos 7 dias</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Por agente — especificidades</h4>
+        <ul>
+          <li>SDR: adicionar taxa de qualificação (leads qualificados ÷ leads contactados)<span class="s">Requer cruzamento com FUNIL_DATA</span></li>
+          <li>Cobrança: adicionar R$ recuperado este mês + taxa de recuperação por status<span class="s">Requer cruzamento com inadPorAluno</span></li>
+          <li>Agendamento: adicionar show rate (reuniões que aconteceram ÷ agendadas)<span class="s">Requer dado do Closer sobre comparecimento</span></li>
+          <li>Pós-venda: adicionar NPS coletado + alunos em risco de churn identificados</li>
+          <li>Enriquecimento: campos enriquecidos por lead + % de melhoria de conversão atribuída</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados novos necessários</h4>
+        <ul>
+          <li>AGENTES adicionar campos:<span class="s">ultimoStatusChange · uptimeHistorico[30] · custoExecucao · valorGerado · deflexao%</span></li>
+          <li>Novo dataset: INCIDENT_LOG<span class="s">{ agente, inicio, fim, causa, resolucao, impactoR$ } · alimentado de webhook n8n</span></li>
+          <li>Novo dataset: AGENT_PERF_7D<span class="s">{ agente, dia, taxaSucesso, execucoes, tokens } · série histórica</span></li>
+          <li>Custo por execução calculado: custoMes ÷ (execucoes24h × 30)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2: ROI table -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · A2</span><span class="badge b-p1">P1</span></div>
+    <h3>Tabela de ROI por Agente</h3>
+    <p class="sdesc">Tabela comparativa mostrando custo mensal, execuções/dia, custo/execução, resultado principal, valor gerado e ROI multiplicador para cada agente. Linha de total com comparativo de custo equivalente em equipe humana.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Colunas da tabela</h4>
+        <ul>
+          <li>Agente (nome + ícone + taxa de sucesso atual)</li>
+          <li>Custo/mês (existe em AGENTES.custoMes)</li>
+          <li>Execuções/dia (existe em AGENTES.exec24h)</li>
+          <li>R$/execução = custoMes ÷ (exec24h × 30)</li>
+          <li>Resultado principal: texto descritivo do que o agente produz</li>
+          <li>Valor gerado/mês: R$ estimado do output do agente<span class="s">Novo campo manual: AGENTES.valorGerado</span></li>
+          <li>ROI = valorGerado ÷ custoMes</li>
+          <li>Equivalente humano: cargo + custo estimado</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Linha de total</h4>
+        <ul>
+          <li>Total IA: soma dos custos mensais (R$673 atual)</li>
+          <li>Total valor gerado: soma dos valores gerados</li>
+          <li>ROI total consolidado</li>
+          <li>Custo equivalente humano: soma dos salários equivalentes</li>
+          <li>Economia total = equivalente humano − custo IA</li>
+          <li>Badge "IA opera por X% do custo humano equivalente"<span class="s">Dado de impacto máximo para apresentações</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Metodologia de valorGerado</h4>
+        <ul>
+          <li>SDR: SQLs gerados × ticket médio × taxa de fechamento<span class="s">178 SQLs × R$2.580 × 19.1% = R$28.400</span></li>
+          <li>Cobrança: recuperação mensal confirmada<span class="s">Direto de RECEITA_MENSAL.recuperada = R$3.800</span></li>
+          <li>Agendamento: reuniões realizadas × ticket × taxa de fechamento<span class="s">Reuniões de Closer × R$2.580 × conversão Closer</span></li>
+          <li>Enriquecimento: impacto atribuído na taxa de contato do SDR<span class="s">Estimativa: % de aumento de contato × valor SDR</span></li>
+          <li>Pós-venda: LTV preservado por retenção<span class="s">Alunos em risco retidos × ticket × meses restantes</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A3: Deflexão por agente -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · A3</span><span class="badge b-p1">P1</span></div>
+    <h3>Deflexão por Agente + Motivos de Escalação</h3>
+    <p class="sdesc">Expandir o 73% global para mostrar deflexão individual de cada agente com barras horizontais + ranking de motivos de escalação do agente com maior volume de escalações (SDR). Permite otimização de prompt direcionada.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Layout</h4>
+        <ul>
+          <li>Coluna esquerda: número global 73% (mantido) com mini-stats<span class="s">256 pela IA · 95 escaladas · economia · tendência MoM</span></li>
+          <li>Coluna direita: 5 barras horizontais por agente<span class="s">Ordenadas por deflexão decrescente · âmbar quando agente &lt;70%</span></div></li>
+          <li>Abaixo: painel de motivos de escalação do agente mais crítico<span class="s">Toggle para ver motivos de qualquer agente</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Motivos de escalação</h4>
+        <ul>
+          <li>Barras horizontais por categoria de motivo</li>
+          <li>Categorias: Fora do escopo · Pediu humano · Objeção preço · Lead agressivo · Outros</li>
+          <li>Callout de ação: "Reduzir X% de escalações por Y motivo = R$Z de economia"<span class="s">Calcula impacto financeiro de cada melhoria de prompt</span></li>
+          <li>Toggle por agente para ver motivos específicos de cada um</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados necessários</h4>
+        <ul>
+          <li>AGENTES adicionar: deflexao%, escalacoes, motivosEscalacao[]<span class="s">{ motivo, count, pct } para cada agente</span></li>
+          <li>Motivos coletados automaticamente pelo agente no momento da escalação<span class="s">n8n webhook → Supabase → dashboard em tempo real</span></li>
+          <li>Deflexão calculada: 1 − (escalacoes ÷ execucoes_que_exigiam_decisao)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A4: Log incidentes -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · A4</span><span class="badge b-p1">P1 · Crítico</span></div>
+    <h3>Log de Incidentes Histórico + Diagnóstico em Tempo Real</h3>
+    <p class="sdesc">Dataset INCIDENT_LOG com histórico de todas as degradações e downtimes. Quando um agente está Degradado, mostra diagnóstico em tempo real: causa provável, impacto financeiro por hora e ação recomendada.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Log histórico</h4>
+        <ul>
+          <li>Tabela por agente: data, duração, causa, resolução, impacto R$</li>
+          <li>Causa categorizada: rate limit · timeout API · credencial expirada · instabilidade banco · outro<span class="s">Classificação automática por padrão de erro</span></li>
+          <li>Impacto R$ calculado: execuções perdidas × valor médio/execução durante o período</li>
+          <li>SLA mensal: % do tempo disponível + quantas horas de incidente no mês</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Diagnóstico em tempo real (agente Degradado)</h4>
+        <ul>
+          <li>Banner vermelho/âmbar no card do agente degradado<span class="s">Expandível com diagnóstico completo sem clicar</span></li>
+          <li>Causa provável detectada automaticamente<span class="s">Analisar mensagem de erro do n8n · match com padrões conhecidos</span></li>
+          <li>Impacto financeiro/hora: execuções normais/hora × custo de não execução</li>
+          <li>Ação recomendada: link para workflow no n8n · contato do responsável técnico</li>
+          <li>Contador: "Degradado há X min" piscando em âmbar</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dataset INCIDENT_LOG</h4>
+        <ul>
+          <li>{ id, agente, inicio, fim, duracao, status: 'degradado'|'offline', causa, causaCategoria, resolucao, impactoExecucoes, impactoR$ }</li>
+          <li>Alimentado por webhook do n8n<span class="s">Quando workflow falha → envia POST para Supabase · quando volta → atualiza fim e resolucao</span></li>
+          <li>Alertas automáticos: WhatsApp/email para Elias quando agente offline &gt;15min</li>
+          <li>Retenção: 90 dias de histórico</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A5: Heatmap -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · A5</span><span class="badge b-p2">P2</span></div>
+    <h3>Heatmap de Atividade por Hora × Dia da Semana</h3>
+    <p class="sdesc">Grid 7 dias × 18 horas mostrando volume de execuções e taxa de erro por célula. Identifica picos de carga, horários de maior erro e oportunidades de redistribuição de carga para reduzir rate limits.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Layout e cores</h4>
+        <ul>
+          <li>Grid 7×18 com células coloridas por intensidade<span class="s">Verde claro=baixa · Verde intenso=alta · Âmbar=alta com alerta · Vermelho=pico com erro &gt;10%</span></li>
+          <li>Toggle: volume de execuções / taxa de erro / tokens consumidos</li>
+          <li>Toggle por agente: todos os agentes combinados ou individual</li>
+          <li>Hover: tooltip com execuções, erros, agente predominante naquela hora</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Insights esperados</h4>
+        <ul>
+          <li>Qua 14h = pico de carga com maior taxa de erro<span class="s">Distribuir execuções nesse horário → reduz rate limit hits</span></li>
+          <li>Noite e madrugada = oportunidade de execuções em batch<span class="s">Agentes que não precisam ser síncronos podem rodar 02h–06h</span></li>
+          <li>Weekend = SDR tem volume muito baixo (32 Sáb / 18 Dom)<span class="s">Avaliar se vale ter o agente ligado com custo × retorno no weekend</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>HEATMAP_DATA[126] JÁ EXISTE no dataset<span class="s">7 dias × 18 horas já calculado como IIFE · só precisa ser conectado à tela de Agentes</span></li>
+          <li>Adicionar campo: erros por célula (hoje só tem valor de execuções)</li>
+          <li>Adicionar: agente predominante por célula para o toggle por agente</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A6: Custo/execução expandido -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Expandir · A6</span><span class="badge b-p2">P2</span></div>
+    <h3>Custo por Agente — Adicionar Custo por Resultado</h3>
+    <p class="sdesc">O gráfico atual de barras horizontais compara custo mensal com o vendedor humano. Adicionar uma segunda camada: custo por resultado (por lead qualificado, por cobrança enviada, por reunião agendada) ao lado do custo total.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Métricas adicionais por agente</h4>
+        <ul>
+          <li>SDR: R$/lead qualificado = custoMes ÷ SQLs gerados<span class="s">R$445 ÷ 20 SQLs/mês = R$22,25/lead qualificado</span></li>
+          <li>Cobrança: R$/cobrança enviada + R$/recuperado<span class="s">R$105 ÷ 56 exec/dia ÷ 30 = R$1,88 · e R$3.800 recuperado</span></li>
+          <li>Agendamento: R$/reunião agendada<span class="s">R$22 ÷ 23 exec/dia ÷ 30 = R$0,96</span></li>
+          <li>Pós-venda: R$/aluno acompanhado<span class="s">R$39 ÷ base de alunos ativos</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Toggle de visualização</h4>
+        <ul>
+          <li>Custo mensal (atual): barras vs vendedor humano</li>
+          <li>Custo por execução: R$/exec de cada agente<span class="s">SDR R$2,35 vs outros — contexto de eficiência</span></li>
+          <li>Custo por resultado: R$/output específico de cada agente<span class="s">A métrica mais útil para decisão de orçamento</span></li>
+          <li>ROI: múltiplo por agente (gráfico de barras com escala diferente)</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Nota sobre metodologia</h4>
+        <ul>
+          <li>Valores de "resultado" dependem de rastreabilidade<span class="s">SDR → SQL precisa de atribuição no FUNIL_DATA: qual SQL foi gerado pelo agente vs manualmente</span></li>
+          <li>Cobrança → recuperação é o mais fácil: RECEITA_MENSAL.recuperada diretamente atribuível</li>
+          <li>Iniciar com Cobrança e Agendamento (mais diretos) antes de SDR e Enriquecimento</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A7: Cards hover expandido -->
+  <div class="spec spec-fix">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-warn">Expandir · A7</span><span class="badge b-p2">P2</span></div>
+    <h3>Cards de Agentes — Hover/Tooltip Enriquecido</h3>
+    <p class="sdesc">Os 5 cards atuais são excelentes visualmente. Adicionar: tooltip no hover com sparkline de 7 dias da taxa de sucesso + custo por execução + última execução há X minutos + uptime do mês.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Adições ao card</h4>
+        <ul>
+          <li>"Última exec. há X min" abaixo do status dot<span class="s">Date.now() − ultimaExecucao em tempo real</span></li>
+          <li>Uptime % do mês como segundo badge<span class="s">Ao lado do "Online" · verde se &gt;99% · âmbar 95–99% · vermelho &lt;95%</span></li>
+          <li>Mini sparkline 7d de taxa de sucesso no rodapé do card<span class="s">7 pontos de linha · verde se estável · vermelho se em queda</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Tooltip no hover</h4>
+        <ul>
+          <li>Custo por execução calculado em tempo real</li>
+          <li>Tokens por execução = tokens24h ÷ exec24h</li>
+          <li>Comparativo vs semana anterior (taxa de sucesso e custo)</li>
+          <li>Ação rápida: "Ver detalhes" → abre painel selAgent completo</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Dados</h4>
+        <ul>
+          <li>ultimaExecucao: timestamp · já deveria existir no n8n<span class="s">Adicionar ao AGENTES ou buscar do AGENT_EXEC_DIARIO</span></li>
+          <li>AGENT_PERF_7D: série histórica de 7 dias por agente<span class="s">{ agente, dia, taxaSucesso } · novo dataset simples</span></li>
+          <li>Uptime calculado de INCIDENT_LOG: (720h − horas_incidente) ÷ 720h</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- A8: Alertas proativos -->
+  <div class="spec spec-new">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge b-new">Novo · A8</span><span class="badge b-p1">P1</span></div>
+    <h3>Alertas Proativos de Agentes — Integração com Health Banner</h3>
+    <p class="sdesc">Alertas automáticos gerados quando agente degrada ou apresenta anomalia, integrados ao sistema de alertas da Visão Geral (A5 do Health Banner). O Elias não deve descobrir o problema ao abrir o dashboard — deve ser avisado antes.</p>
+    <div class="spec-cols">
+      <div class="spec-col">
+        <h4 style="color:var(--cyan)">Triggers de alerta</h4>
+        <ul>
+          <li>Taxa de sucesso cai &gt;5% em relação à média 7d<span class="s">"SDR: taxa de sucesso caiu 6.2% — investigar prompt ou API"</span></li>
+          <li>Agente offline por &gt;15 minutos<span class="s">Alerta crítico · WhatsApp para Elias imediatamente</span></li>
+          <li>Custo diário &gt;150% da média histórica<span class="s">"SDR consumiu 890k tokens hoje — 48% acima da média"</span></li>
+          <li>Zero execuções em uma janela que deveria ter atividade<span class="s">"Agendamento: 0 exec entre 09h–12h — possível problema de trigger"</span></li>
+          <li>Deflexão cai abaixo de 65% por 2 horas seguidas<span class="s">Sinal de degradação de qualidade do output do agente</span></li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--amber)">Formato dos alertas</h4>
+        <ul>
+          <li>Estrutura compartilhada com ALERTAS da Visão Geral<span class="s">{ id, agente, tipo, severidade, titulo, contexto, desde, acao }</span></li>
+          <li>Severity: critical (vermelho pulsante) · warning (âmbar) · info (ciano)</li>
+          <li>Timestamp relativo: "há 4h 23min" · Atualizado em tempo real</li>
+          <li>Botão de ação inline: "Verificar no n8n" · "Aumentar quota" · "Contatar dev"</li>
+        </ul>
+      </div>
+      <div class="spec-col">
+        <h4 style="color:var(--violet)">Notificações externas</h4>
+        <ul>
+          <li>WhatsApp para Elias: agente offline &gt;15min<span class="s">n8n webhook → GoHighLevel → WhatsApp do Elias</span></li>
+          <li>Log no Supabase: todos os alertas com timestamp<span class="s">Auditoria histórica de problemas</span></li>
+          <li>Dashboard atualiza badge do botão "Agentes IA" na navbar em tempo real<span class="s">Número vermelho no tab quando há alerta crítico ativo</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRIORIDADES -->
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-n">07</span>
+    <div>
+      <h2>Ordem de Implementação</h2>
+      <div class="sec-sub">Ordenado por impacto operacional imediato + esforço de desenvolvimento</div>
+    </div>
+  </div>
+
+  <div class="tl">
+    <div class="tli" style="border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.02);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.2);">01</div>
+      <div class="tli-b">
+        <h4>INCIDENT_LOG dataset + Diagnóstico Degradação em Tempo Real (A4) + Alertas Proativos (A8)</h4>
+        <p>O Cobrança está Degradado agora. Implementar primeiro: webhook do n8n enviando status para Supabase + leitura no dashboard + WhatsApp automático para Elias. O INCIDENT_LOG alimenta o diagnóstico em tempo real, o log histórico e os alertas proativos. Mesmo dataset, três funcionalidades críticas. O Elias nunca deve descobrir que um agente degradou ao abrir o dashboard — deve ter sido avisado.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo dataset</span><span class="badge b-p1">P1 Crítico</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">n8n webhook → Supabase INCIDENT_LOG → dashboard polling · WhatsApp trigger</span></div>
+      </div>
+    </div>
+
+    <div class="tli" style="border-color:rgba(248,113,113,0.15);">
+      <div class="tli-n" style="color:rgba(248,113,113,0.18);">02</div>
+      <div class="tli-b">
+        <h4>Painel selAgent completo (A1) + Uptime histórico</h4>
+        <p>O useState selAgent já existe — só falta preencher com dados reais. Adicionar ao AGENTES os campos faltantes (ultimoStatusChange, uptimeHistorico, custoExecucao) e construir o painel expandido com as seções de ROI + incidentes + sparkline. Esforço médio, impacto alto porque resolve o problema de diagnóstico do Cobrança.</p>
+        <div class="tli-tags"><span class="badge b-warn">Expandir existente</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Adicionar campos ao AGENTES · construir painel no selAgent já existente</span></div>
+      </div>
+    </div>
+
+    <div class="tli" style="border-color:rgba(251,191,36,0.15);">
+      <div class="tli-n" style="color:rgba(251,191,36,0.15);">03</div>
+      <div class="tli-b">
+        <h4>Tabela de ROI por Agente (A2) + Deflexão por Agente (A3)</h4>
+        <p>Implementar juntos pois compartilham a mesma necessidade de dados: deflexao% e valorGerado por agente. A tabela de ROI é o melhor argumento para aumentar (ou manter) o orçamento de IA. A deflexão por agente identifica qual agente precisa de otimização de prompt — especialmente o SDR com 58% de deflexão e 66 escalações/período.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-p1">P1</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">Adicionar deflexao%, valorGerado, motivosEscalacao[] ao AGENTES</span></div>
+      </div>
+    </div>
+
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.14);">04</div>
+      <div class="tli-b">
+        <h4>Heatmap de Atividade (A5) + Gráfico de Execuções expandido (A4 expansão)</h4>
+        <p>HEATMAP_DATA[126] já existe no dataset — conectar à tela de Agentes com filtro por agente. O gráfico de execuções ganha toggle por agente e linha de taxa de sucesso %. Menor esforço relativo porque os dados já estão disponíveis, falta apenas a camada de visualização e o toggle.</p>
+        <div class="tli-tags"><span class="badge b-new">Novo</span><span class="badge b-warn">Expandir</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">HEATMAP_DATA já existe · adicionar toggle por agente · adicionar campo erro por célula</span></div>
+      </div>
+    </div>
+
+    <div class="tli">
+      <div class="tli-n" style="color:rgba(167,139,250,0.1);">05</div>
+      <div class="tli-b">
+        <h4>Cards enriquecidos (A7) + Custo por Resultado expandido (A6)</h4>
+        <p>Adições menores que completam a experiência visual: sparkline 7d no rodapé dos cards, "última exec há X min", tooltip enriquecido. Custo por resultado requer campo valorGerado (do passo 3) já disponível. Menor prioridade porque não resolve problema crítico — melhora a densidade de informação da tela já funcional.</p>
+        <div class="tli-tags"><span class="badge b-warn">Expandir</span><span class="badge b-p2">P2</span><span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--dim);">AGENT_PERF_7D novo dataset · tooltip JS simples · calcular custo por resultado</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TABELA RESUMO -->
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:40px;overflow-x:auto;">
+  <h3 style="font-size:14px;font-weight:800;letter-spacing:-0.3px;margin-bottom:18px;">Resumo — Tela Agentes IA após Expansão Completa</h3>
+  <table class="st">
+    <thead><tr><th>Bloco</th><th>Tipo</th><th>Pergunta que responde</th><th>Prioridade</th></tr></thead>
+    <tbody>
+      <tr><td>A1 — selAgent completo</td><td>Expandir · painel de detalhe</td><td>O Cobrança degradou quando? Por quê? Qual é o impacto?</td><td><span class="badge b-p1">P1 Crítico</span></td></tr>
+      <tr><td>A2 — Tabela ROI por Agente</td><td>Novo · tabela</td><td>Os agentes valem o investimento? Quanto de retorno gera cada R$1 investido?</td><td><span class="badge b-p1">P1</span></td></tr>
+      <tr><td>A3 — Deflexão por Agente</td><td>Novo · barras + motivos</td><td>Qual agente mais escala para humano? Por quê? Como reduzir?</td><td><span class="badge b-p1">P1</span></td></tr>
+      <tr><td>A4 — Log de Incidentes</td><td>Novo · dataset + log</td><td>Quantas vezes o agente degradou? Por quanto tempo? Qual causa?</td><td><span class="badge b-p1">P1 Crítico</span></td></tr>
+      <tr><td>A5 — Heatmap Hora×Dia</td><td>Novo · heatmap SVG</td><td>Em quais horários os agentes mais falham? Onde há pico de carga?</td><td><span class="badge b-p2">P2</span></td></tr>
+      <tr><td>A6 — Custo por Resultado</td><td>Expandir · custo por agente</td><td>Quanto custa cada lead qualificado? Cada cobrança enviada?</td><td><span class="badge b-p2">P2</span></td></tr>
+      <tr><td>A7 — Cards enriquecidos</td><td>Expandir · cards atuais</td><td>Quando foi a última execução? O agente está estável nos últimos 7 dias?</td><td><span class="badge b-p2">P2</span></td></tr>
+      <tr><td>A8 — Alertas Proativos</td><td>Novo · integração Health Banner</td><td>O Elias foi avisado antes de abrir o dashboard que algo está errado?</td><td><span class="badge b-p1">P1</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  Gerado por <span>Tria Company</span> · Dashboard Administrativo — Tela Agentes IA · dashelias.vercel.app
+</footer>
+</div>
+</body>
+</html>

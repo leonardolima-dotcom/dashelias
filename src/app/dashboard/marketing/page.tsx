@@ -399,6 +399,45 @@ const liveStories = [
   },
 ];
 
+const topPosts = [
+  {
+    id: 1, title: "Transformação Completa", type: "Carrossel • 5 fotos", time: "Há 2 dias", cover: "/reels 3.jpg",
+    views: "12.480", likes: "1.847", comments: "234", saves: "412", shares: "189",
+    caption: "De visual completamente novo! Confira essa transformação incrível 🔥✂️",
+    engagementRate: "21.5%",
+  },
+  {
+    id: 2, title: "Corte Degradê Perfeito", type: "Reels • 30s", time: "Há 3 dias", cover: "/reels 7.jpg",
+    views: "18.920", likes: "2.310", comments: "187", saves: "567", shares: "324",
+    caption: "Passo a passo do degradê que viralizou! Salva pra mostrar pro seu barbeiro 💈",
+    engagementRate: "17.9%",
+  },
+  {
+    id: 3, title: "Antes e Depois Barba", type: "Imagem", time: "Há 4 dias", cover: "/reels 5.jpg",
+    views: "8.740", likes: "1.123", comments: "98", saves: "287", shares: "76",
+    caption: "O poder de uma barba bem feita. Resultado que fala por si 👊",
+    engagementRate: "18.1%",
+  },
+  {
+    id: 4, title: "Dica de Produto", type: "Reels • 15s", time: "Há 5 dias", cover: "/reels 2.jpg",
+    views: "15.300", likes: "1.654", comments: "312", saves: "823", shares: "201",
+    caption: "O segredo pra manter o corte perfeito entre uma visita e outra 💡",
+    engagementRate: "19.5%",
+  },
+  {
+    id: 5, title: "Tour pela Barbearia", type: "Reels • 45s", time: "Há 6 dias", cover: "/reels 4.jpg",
+    views: "21.560", likes: "3.012", comments: "445", saves: "198", shares: "512",
+    caption: "Conheça cada cantinho da nossa barbearia! Ambiente feito pra você relaxar ☕✂️",
+    engagementRate: "19.3%",
+  },
+  {
+    id: 6, title: "Combo Corte + Barba", type: "Carrossel • 3 fotos", time: "Há 1 semana", cover: "/reels 6.jpg",
+    views: "9.870", likes: "1.432", comments: "167", saves: "345", shares: "98",
+    caption: "Nosso combo mais pedido! Corte + barba com acabamento navalhado 🪒",
+    engagementRate: "20.7%",
+  },
+];
+
 const paidVsOrganicConversions = [
   { month: "Nov", pago: 320, organico: 180 },
   { month: "Dez", pago: 380, organico: 240 },
@@ -1048,6 +1087,7 @@ export default function MarketingPage() {
   const [hoveredAge, setHoveredAge] = useState<string | null>(null);
   const [hoveredGender, setHoveredGender] = useState<string | null>(null);
   const [selectedStory, setSelectedStory] = useState<typeof liveStories[number] | null>(null);
+  const [selectedPost, setSelectedPost] = useState<typeof topPosts[number] | null>(null);
   const [hoveredRetention, setHoveredRetention] = useState<number | null>(null);
   const [hoveredOrgEvo, setHoveredOrgEvo] = useState<number | null>(null);
   // Filter dropdowns
@@ -1147,6 +1187,7 @@ export default function MarketingPage() {
     "Faixa Etária": "Distribuição demográfica por faixa etária do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
     "Sexo": "Distribuição por gênero do público que interage com o perfil. Dados extraídos do Instagram Insights — Público.",
     "Stories em Tempo Real": "Monitoramento dos Stories ativos com métricas de visualizações, curtidas, reações e compartilhamentos. Inclui resultados de interações (enquetes, quizzes, sliders, countdowns). Fonte: Instagram Stories API — Tempo Real.",
+    "Posts com Maior Engajamento": "Ranking dos posts com melhor performance orgânica no período. Métricas: views, curtidas, comentários, salvamentos e compartilhamentos. Inclui taxa de engajamento calculada por (interações ÷ alcance × 100). Fonte: Instagram Insights API.",
     "Métricas de Conversão": "Anéis de conversão mostrando as taxas em cada etapa do funil: Página → Checkout, Checkout → Compra e Página → Compra. Benchmarks baseados em médias de e-commerce brasileiro. Fonte: Google Analytics + Plataforma de checkout.",
     "Performance por Página de Destino": "Ranking das landing pages com melhor e pior taxa de conversão. Permite identificar páginas que precisam de otimização e as que podem receber mais tráfego. Fonte: Google Analytics — Landing Pages.",
     "Performance por Checkout": "Comparação de performance entre diferentes checkouts utilizados. Métricas: Receita, Vendas, Taxa de Conversão, Ticket Médio e CPA. Fonte: Plataformas de checkout + Google Analytics.",
@@ -1324,16 +1365,16 @@ export default function MarketingPage() {
 
         {/* ── Health Score ── */}
         <div
-          className="glass-panel rounded-2xl p-6"
+          className="glass-panel rounded-2xl pt-6 pb-5 px-2"
           style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.1s both", overflow: "visible" }}
         >
-          <div className="flex items-center gap-2 mb-5 relative z-10">
+          <div className="flex items-center gap-2 mb-5 relative z-10 px-[17px]">
             <span className="text-amber-400/60">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             </span>
             <h3 className="font-bold text-sm text-slate-300">Score de Saúde da Conta<InfoTip title="Score de Saúde da Conta" /></h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10" style={{ overflow: "visible" }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10" style={{ overflow: "visible" }}>
             {net.healthScore.map((h, hi) => {
               const color = h.status === "good" ? "emerald" : h.status === "warn" ? "amber" : "rose";
               const isLeft = hi <= 1;
@@ -3230,6 +3271,76 @@ export default function MarketingPage() {
           </div>
         </div>
 
+        {/* ── Posts com Maior Engajamento ── */}
+        <div
+          className="glass-panel rounded-2xl p-6 flex flex-col"
+          style={{ ...glassStyle, animation: "animationIn 0.8s ease-out 0.6s both" }}
+        >
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex items-center gap-2 mb-5 relative z-10">
+            <span className="text-emerald-400/60">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            </span>
+            <h3 className="font-bold text-sm text-slate-300">Posts com Maior Engajamento<InfoTip title="Posts com Maior Engajamento" /></h3>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 custom-scrollbar relative z-10 snap-x snap-mandatory flex-1 min-h-0">
+            {topPosts.map((post) => (
+              <div
+                key={post.id}
+                className="flex-shrink-0 w-64 rounded-xl border border-white/5 overflow-hidden cursor-pointer transition-all duration-300 group/post snap-start flex flex-col hover:border-emerald-500/20"
+                style={{ background: "rgba(255,255,255,0.02)" }}
+                onClick={() => setSelectedPost(post)}
+              >
+                {/* Cover image */}
+                <div className="relative h-[200px] overflow-hidden">
+                  <Image src={post.cover} alt={post.title} fill className="object-cover group-hover/post:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {post.type.includes("Reels") && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="size-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover/post:bg-white/20 transition-colors">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-bold text-white">{post.title}</p>
+                      <span className="text-[10px] font-bold text-amber-400">{post.time}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300 font-medium">{post.type}</p>
+                  </div>
+                </div>
+
+                {/* Metrics */}
+                <div className="p-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span className="text-[10px] font-bold text-white">{post.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{post.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{post.comments}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400/60" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                      <span className="text-[10px] font-bold text-white">{post.saves}</span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                    <span className="text-[9px] text-emerald-400 font-bold uppercase">Engajamento {post.engagementRate}</span>
+                    <span className="text-[9px] text-slate-500">Clique para ver</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── Video Retention Curve + Share Rate ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -4912,6 +5023,118 @@ export default function MarketingPage() {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedPost(null)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-5xl max-h-[90vh] rounded-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row"
+            style={{ ...glassStyle, background: "linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%)", animation: "animationIn 0.3s ease-out both" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => setSelectedPost(null)} className="absolute top-4 right-4 z-20 text-slate-400 hover:text-white transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            {/* Left — Post cover */}
+            <div className="relative md:w-[420px] shrink-0 bg-black flex items-center justify-center">
+              <div className="relative w-full aspect-square">
+                <Image src={selectedPost.cover} alt={selectedPost.title} fill className="object-cover" />
+              </div>
+              {selectedPost.type.includes("Reels") && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="size-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="ml-0.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right — Info */}
+            <div className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[80vh]">
+              <div>
+                <h4 className="text-base font-bold text-white">{selectedPost.title}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm font-semibold text-slate-300">{selectedPost.type}</span>
+                  <span className="text-sm font-bold text-amber-400">{selectedPost.time}</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-3 leading-relaxed">{selectedPost.caption}</p>
+              </div>
+
+              {/* Engagement ring */}
+              {(() => {
+                const viewsNum = parseInt(selectedPost.views.replace(/\./g, ""));
+                const likesNum = parseInt(selectedPost.likes.replace(/\./g, ""));
+                const commentsNum = parseInt(selectedPost.comments.replace(/\./g, ""));
+                const savesNum = parseInt(selectedPost.saves.replace(/\./g, ""));
+                const sharesNum = parseInt(selectedPost.shares.replace(/\./g, ""));
+                const interNum = likesNum + commentsNum + savesNum + sharesNum;
+                const rate = (interNum / viewsNum) * 100;
+                const r = 54;
+                const circ = 2 * Math.PI * r;
+                const filled = (Math.min(rate, 100) / 100) * circ;
+                return (
+                  <div className="rounded-xl p-5 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-6">
+                      <div className="relative shrink-0">
+                        <svg className="size-32" viewBox="0 0 120 120">
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                          <circle cx="60" cy="60" r={r} fill="transparent" stroke="rgba(52,211,153,0.8)" strokeWidth="10" strokeDasharray={`${filled} ${circ - filled}`} strokeDashoffset={circ / 4} strokeLinecap="round" style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <p className="text-xl font-bold text-emerald-400">{rate.toFixed(1)}%</p>
+                          <p className="text-[8px] text-slate-500 uppercase font-bold tracking-wider">Engajamento</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2.5">
+                        {[
+                          { label: "Curtidas", val: selectedPost.likes, num: likesNum, color: "bg-rose-400" },
+                          { label: "Comentários", val: selectedPost.comments, num: commentsNum, color: "bg-amber-400" },
+                          { label: "Salvamentos", val: selectedPost.saves, num: savesNum, color: "bg-violet-400" },
+                          { label: "Shares", val: selectedPost.shares, num: sharesNum, color: "bg-cyan-400" },
+                        ].map(m => (
+                          <div key={m.label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{m.label}</span>
+                              <span className="text-xs font-bold text-white">{m.val}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div className={`h-full ${m.color} rounded-full`} style={{ width: `${(m.num / interNum) * 100}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-500">Total interações</span>
+                          <span className="text-sm font-bold text-white">{interNum.toLocaleString("pt-BR")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Metrics grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Views", value: selectedPost.views, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg> },
+                  { label: "Curtidas", value: selectedPost.likes, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> },
+                  { label: "Comentários", value: selectedPost.comments, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg> },
+                  { label: "Salvamentos", value: selectedPost.saves, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> },
+                  { label: "Shares", value: selectedPost.shares, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> },
+                ].map((m) => (
+                  <div key={m.label} className="rounded-xl p-3 border border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="text-emerald-400/60">{m.icon}</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">{m.label}</span>
+                    </div>
+                    <p className="text-lg font-bold text-white">{m.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
