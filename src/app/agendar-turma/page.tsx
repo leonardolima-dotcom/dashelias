@@ -344,7 +344,7 @@ export default function AgendarTurmaPage() {
                       ) : (
                         <Badge color="red">Lotada</Badge>
                       )}
-                      {free > 0 && free <= 5 && <span className="text-[9px] text-amber-400 animate-pulse">Últimas vagas!</span>}
+                      {free > 0 && free <= 5 && <span className="text-[9px] text-amber-400 opacity-70">Últimas vagas!</span>}
                     </div>
                     <div className={`text-xs mt-1 ${diasColor}`}>Começa em {diasRestantes} dias</div>
                   </div>
@@ -358,31 +358,31 @@ export default function AgendarTurmaPage() {
                 {/* Info grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                   <div className="flex items-center gap-2">
-                    <Icon name="calendar" size={13} className="text-slate-500" />
+                    <Icon name="calendar" size={13} className="text-amber-400/50" />
                     <div>
-                      <div className="text-[9px] text-slate-600 uppercase">Período</div>
-                      <div className="text-xs text-slate-300">{t.inicio} a {t.fim}</div>
+                      <div className="text-[9px] text-slate-400 uppercase">Período</div>
+                      <div className="text-sm text-white">{t.inicio} a {t.fim}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Icon name="pin" size={13} className="text-slate-500" />
+                    <Icon name="pin" size={13} className="text-amber-400/50" />
                     <div>
-                      <div className="text-[9px] text-slate-600 uppercase">Local</div>
-                      <div className="text-xs text-slate-300">{t.local}</div>
+                      <div className="text-[9px] text-slate-400 uppercase">Local</div>
+                      <div className="text-sm text-white">{t.local}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Icon name="clock" size={13} className="text-slate-500" />
+                    <Icon name="clock" size={13} className="text-amber-400/50" />
                     <div>
-                      <div className="text-[9px] text-slate-600 uppercase">Carga horária</div>
-                      <div className="text-xs text-slate-300">{carga}h em {t.horarios.length} dias</div>
+                      <div className="text-[9px] text-slate-400 uppercase">Carga horária</div>
+                      <div className="text-sm text-white">{carga}h em {t.horarios.length} dias</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Icon name="users" size={13} className="text-slate-500" />
+                    <Icon name="users" size={13} className="text-amber-400/50" />
                     <div>
-                      <div className="text-[9px] text-slate-600 uppercase">Vagas</div>
-                      <div className="text-xs text-slate-300"><span className={free > 5 ? "text-emerald-400" : free > 0 ? "text-amber-400" : "text-rose-400"}>{free}</span> / {t.total}</div>
+                      <div className="text-[9px] text-slate-400 uppercase">Vagas</div>
+                      <div className="text-sm text-white"><span className={free > 5 ? "text-emerald-400" : free > 0 ? "text-amber-400" : "text-rose-400"}>{free}</span> / {t.total}</div>
                     </div>
                   </div>
                 </div>
@@ -390,10 +390,10 @@ export default function AgendarTurmaPage() {
                 {/* Horários inline */}
                 <div className="flex flex-wrap gap-1.5">
                   {t.horarios.map((h, j) => (
-                    <div key={j} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-[11px]">
+                    <div key={j} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs">
                       <span className="font-bold text-amber-400">{h.dia}</span>
-                      <span className="text-slate-400">{h.inicio}–{h.fim}</span>
-                      <span className="text-slate-600">({h.tipo})</span>
+                      <span className="text-white">{h.inicio}–{h.fim}</span>
+                      <span className="text-slate-400">({h.tipo})</span>
                     </div>
                   ))}
                 </div>
@@ -403,9 +403,9 @@ export default function AgendarTurmaPage() {
                   <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
                     <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: `${(t.ocupadas / t.total) * 100}%` }} />
                   </div>
-                  <div className="flex justify-between mt-1 text-[10px] text-slate-600">
+                  <div className="flex justify-between mt-1.5 text-[10px] text-slate-400">
                     <span>{t.ocupadas} inscritos</span>
-                    <span>{free} vagas livres</span>
+                    <span className="text-emerald-400/70">{free} vagas livres</span>
                   </div>
                 </div>
               </div>
@@ -433,10 +433,10 @@ function Shell({ children }: { children: React.ReactNode }) {
     <div className="relative min-h-screen overflow-x-hidden overflow-y-auto" style={{ background: "#0a0a0a" }}>
       {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
-        <div className="h-[120vh] w-[120vh] rounded-full" style={{ background: "rgba(255, 177, 23, 0.15)", filter: "blur(140px)", animation: "orbPulse 5s ease-in-out infinite" }} />
+        <div className="h-[120vh] w-[120vh] rounded-full" style={{ background: "rgba(255, 177, 23, 0.06)", filter: "blur(140px)", animation: "orbPulse 8s ease-in-out infinite" }} />
       </div>
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
-        <Image src="/seu_elias_logo_upscaled 1.png" alt="" fill className="opacity-[0.03] select-none object-contain p-8" draggable={false} />
+        <Image src="/seu_elias_logo_upscaled 1.png" alt="" fill className="opacity-[0.006] select-none object-contain p-8" draggable={false} />
       </div>
 
       <div className="relative min-h-screen" style={{ zIndex: 1 }}>
