@@ -184,7 +184,7 @@ export default function AgendarTurmaPage() {
           </div>
 
           {/* Info grid */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Vagas disponíveis", value: free, color: "text-emerald-400" },
               { label: "Carga horária", value: `${carga}h`, color: "text-amber-400" },
@@ -198,7 +198,7 @@ export default function AgendarTurmaPage() {
             ))}
           </div>
 
-          <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 340px" }}>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-[1fr_340px]">
             {/* Left: Calendar + horários */}
             <div className="space-y-5">
               {/* Calendar */}
@@ -304,7 +304,7 @@ export default function AgendarTurmaPage() {
     <Shell>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Welcome */}
-        <div style={{ animation: "animationIn 0.8s ease-out 0.1s both" }}>
+        <div className="text-center pt-4 md:pt-2" style={{ animation: "animationIn 0.8s ease-out 0.1s both" }}>
           <h3 className="text-lg font-bold text-white">Olá, {ALUNO_LOGADO.nome}!</h3>
           <p className="text-sm text-slate-400 mt-1">
             Escolha uma turma disponível para o seu curso <b className="text-amber-400">{ALUNO_LOGADO.produto}</b>.
@@ -312,7 +312,7 @@ export default function AgendarTurmaPage() {
         </div>
 
         {/* Info banner */}
-        <div className="rounded-xl p-4 bg-amber-400/[0.04] border border-amber-400/15 flex items-center gap-3" style={{ animation: "animationIn 0.8s ease-out 0.15s both" }}>
+        <div className="rounded-xl p-4 bg-amber-400/[0.04] border border-amber-400/15 flex items-center gap-3 text-center justify-center" style={{ animation: "animationIn 0.8s ease-out 0.15s both" }}>
           <Icon name="info" size={16} className="text-amber-400 shrink-0" />
           <p className="text-xs text-slate-400">
             Selecione a turma que melhor se encaixa na sua agenda. Confira os dias, horários e local antes de confirmar sua inscrição.
@@ -331,75 +331,82 @@ export default function AgendarTurmaPage() {
               <div
                 key={t.id}
                 onClick={() => free > 0 && setSelId(t.id)}
-                className={`rounded-2xl p-6 border transition-all duration-200 ${free > 0 ? "border-white/[0.06] bg-white/[0.02] cursor-pointer hover:border-amber-400/20 hover:bg-white/[0.03]" : "border-white/[0.04] bg-white/[0.01] opacity-50 cursor-not-allowed"}`}
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${free > 0 ? "border-white/[0.06] bg-white/[0.02] cursor-pointer hover:border-amber-400/20 hover:bg-white/[0.03]" : "border-white/[0.04] bg-white/[0.01] opacity-50 cursor-not-allowed"}`}
                 style={{ animation: `animationIn 0.8s ease-out ${0.2 + i * 0.06}s both` }}>
 
                 {/* Header */}
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-base font-bold text-white">{t.nome} — {t.periodo}</span>
-                      {free > 0 ? (
-                        <Badge color={free <= 5 ? "amber" : "green"}>{free} vagas</Badge>
-                      ) : (
-                        <Badge color="red">Lotada</Badge>
-                      )}
-                      {free > 0 && free <= 5 && <span className="text-[9px] text-amber-400 opacity-70">Últimas vagas!</span>}
+                <div className="px-5 pt-5 pb-4 md:px-6 md:pt-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-base md:text-lg font-bold text-white">{t.nome} — {t.periodo}</span>
+                        {free > 0 ? (
+                          <Badge color={free <= 5 ? "amber" : "green"}>{free} vagas</Badge>
+                        ) : (
+                          <Badge color="red">Lotada</Badge>
+                        )}
+                        {free > 0 && free <= 5 && <span className="text-[9px] text-amber-400 opacity-70">Últimas vagas!</span>}
+                      </div>
+                      <div className={`text-xs mt-1 ${diasColor}`}>Começa em {diasRestantes} dias</div>
                     </div>
-                    <div className={`text-xs mt-1 ${diasColor}`}>Começa em {diasRestantes} dias</div>
-                  </div>
-                  {free > 0 && (
-                    <div className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-400/10 text-amber-400 border border-amber-400/20">
-                      Selecionar
-                    </div>
-                  )}
-                </div>
-
-                {/* Info grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Icon name="calendar" size={13} className="text-amber-400/50" />
-                    <div>
-                      <div className="text-[9px] text-slate-400 uppercase">Período</div>
-                      <div className="text-sm text-white">{t.inicio} a {t.fim}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="pin" size={13} className="text-amber-400/50" />
-                    <div>
-                      <div className="text-[9px] text-slate-400 uppercase">Local</div>
-                      <div className="text-sm text-white">{t.local}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="clock" size={13} className="text-amber-400/50" />
-                    <div>
-                      <div className="text-[9px] text-slate-400 uppercase">Carga horária</div>
-                      <div className="text-sm text-white">{carga}h em {t.horarios.length} dias</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="users" size={13} className="text-amber-400/50" />
-                    <div>
-                      <div className="text-[9px] text-slate-400 uppercase">Vagas</div>
-                      <div className="text-sm text-white"><span className={free > 5 ? "text-emerald-400" : free > 0 ? "text-amber-400" : "text-rose-400"}>{free}</span> / {t.total}</div>
-                    </div>
+                    {free > 0 && (
+                      <div className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-400/10 text-amber-400 border border-amber-400/20 shrink-0 ml-3 hidden md:block">
+                        Selecionar
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Horários inline */}
-                <div className="flex flex-wrap gap-1.5">
-                  {t.horarios.map((h, j) => (
-                    <div key={j} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs">
-                      <span className="font-bold text-amber-400">{h.dia}</span>
-                      <span className="text-white">{h.inicio}–{h.fim}</span>
-                      <span className="text-slate-400">({h.tipo})</span>
+                {/* Info grid — 2x2 with dividers */}
+                <div className="grid grid-cols-2 border-t border-white/[0.06]">
+                  <div className="px-5 py-3 md:px-6 md:py-4 border-r border-b border-white/[0.06]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon name="calendar" size={12} className="text-amber-400/50" />
+                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Período</span>
                     </div>
-                  ))}
+                    <div className="text-sm text-white font-medium whitespace-nowrap">{t.inicio.slice(0, 5)} a {t.fim.slice(0, 5)}</div>
+                  </div>
+                  <div className="px-5 py-3 md:px-6 md:py-4 border-b border-white/[0.06]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon name="pin" size={12} className="text-amber-400/50" />
+                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Local</span>
+                    </div>
+                    <div className="text-sm text-white font-medium">{t.local}</div>
+                  </div>
+                  <div className="px-5 py-3 md:px-6 md:py-4 border-r border-white/[0.06]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon name="clock" size={12} className="text-amber-400/50" />
+                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Carga horária</span>
+                    </div>
+                    <div className="text-sm text-white font-medium">{carga}h em {t.horarios.length} dias</div>
+                  </div>
+                  <div className="px-5 py-3 md:px-6 md:py-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon name="users" size={12} className="text-amber-400/50" />
+                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Vagas</span>
+                    </div>
+                    <div className="text-sm text-white font-medium"><span className={free > 5 ? "text-emerald-400" : free > 0 ? "text-amber-400" : "text-rose-400"}>{free}</span> / {t.total}</div>
+                  </div>
                 </div>
 
-                {/* Occupancy bar */}
-                <div className="mt-4">
+                {/* Horários — structured list */}
+                <div className="border-t border-white/[0.06]">
+                  <div className="px-5 pt-3 pb-1 md:px-6">
+                    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Horários</span>
+                  </div>
+                  <div className="px-5 pb-3 md:px-6 space-y-1">
+                    {t.horarios.map((h, j) => (
+                      <div key={j} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                        <span className="font-bold text-amber-400 text-xs w-8">{h.dia}</span>
+                        <span className="text-sm text-white flex-1">{h.inicio} – {h.fim}</span>
+                        <span className="text-xs text-slate-400">{h.tipo}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Occupancy bar + mobile CTA */}
+                <div className="px-5 pb-5 md:px-6 md:pb-6">
                   <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
                     <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: `${(t.ocupadas / t.total) * 100}%` }} />
                   </div>
@@ -407,6 +414,11 @@ export default function AgendarTurmaPage() {
                     <span>{t.ocupadas} inscritos</span>
                     <span className="text-emerald-400/70">{free} vagas livres</span>
                   </div>
+                  {free > 0 && (
+                    <div className="mt-3 md:hidden w-full py-2.5 rounded-lg text-xs font-bold bg-amber-400/10 text-amber-400 border border-amber-400/20 text-center">
+                      Selecionar esta turma
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -441,23 +453,15 @@ function Shell({ children }: { children: React.ReactNode }) {
 
       <div className="relative min-h-screen" style={{ zIndex: 1 }}>
         {/* Header */}
-        <header className="flex items-center justify-between px-8 py-4 fixed top-0 left-0 right-0 border-b border-white/[0.06]" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", zIndex: 30, animation: "animationIn 0.8s ease-out 0.1s both" }}>
-          <div className="flex items-center gap-3 shrink-0">
-            <div>
-              <h2 className="text-xl font-bold text-white tracking-tight">Agendar Turma</h2>
-              <p className="text-xs text-slate-400 uppercase tracking-widest">Escolha sua turma presencial</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 bg-black border border-white/5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300">
-              <Icon name="calendar" size={14} className="text-amber-400" />
-              <span>{new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}</span>
-            </div>
+        <header className="flex items-center justify-center px-4 md:px-8 py-3 md:py-4 fixed top-0 left-0 right-0 border-b border-white/[0.06]" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", zIndex: 30, animation: "animationIn 0.8s ease-out 0.1s both" }}>
+          <div className="text-center">
+            <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">Agendar Turma</h2>
+            <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest">Escolha sua turma presencial</p>
           </div>
         </header>
 
         {/* Content */}
-        <main className="relative px-6 pt-24 pb-12 text-slate-100">
+        <main className="relative px-4 md:px-6 pt-20 md:pt-24 pb-8 md:pb-12 text-slate-100">
           {children}
         </main>
       </div>

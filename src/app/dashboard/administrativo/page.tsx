@@ -468,8 +468,17 @@ const cardTooltips: Record<string, string> = {
   "Performance Semanal": "Vendas semanais por membro da equipe ao longo das últimas 6 semanas.",
   "Execuções dos Agentes": "Volume de execuções diárias dos agentes IA separadas por sucesso e erro.",
   "Custo por Agente": "Custo mensal de cada agente IA comparado ao custo de um vendedor humano.",
-  "Formas de Pagamento": "Distribuição de vendas por forma de pagamento com taxa de inadimplência.",
+  "Formas de Pagamento": "Distribuição de vendas por forma de pagamento com taxa de inadimplência e variação mensal (MoM).",
   "Inadimplência por Aluno": "Lista de alunos com parcelas em atraso ordenada por valor.",
+  "DRE Simplificado": "Demonstração de Resultado simplificada. Receita Bruta = matrículas + cobranças recuperadas. Deduções = taxas Pix e cartão. Receita Líquida = bruta - deduções. Custos Variáveis = comissões + IA + material. Margem de Contribuição = líquida - variáveis. Custos Fixos = folha + aluguel + SaaS + marketing. Lucro Operacional = margem - fixos. Lucro Líquido = operacional - impostos estimados. Clique nas linhas para expandir.",
+  "Custos por Categoria": "Cada barra mostra o custo mensal de uma categoria: Comissões (% sobre vendas pagas à equipe), Folha (salários fixos), Aluguel (espaço físico), SaaS (ferramentas e softwares), Marketing (tráfego pago + criativos), IA (tokens dos agentes), Material (apostilas e kits). O percentual à direita indica quanto cada custo representa sobre a receita bruta.",
+  "Receita vs Custos — 6 Meses": "Barras verdes = receita bruta mensal. Barras vermelhas = custos variáveis (comissões, IA, material). Barras amarelas = custos fixos (folha, aluguel, SaaS, marketing). A % abaixo de cada mês é a margem líquida: (receita - todos os custos) / receita.",
+  "Previsão de Caixa": "Projeção de fluxo de caixa. Matrículas novas = vendas esperadas com base na média dos últimos 3 meses. Parcelas recorrentes = parcelas já contratadas com vencimento no período. Recuperação = estimativa de cobranças de inadimplentes com base no score de recovery. Custos fixos = folha + aluguel + SaaS + marketing. Custos variáveis = comissões projetadas sobre as vendas esperadas. Saldo = entradas - saídas. Cor verde = saudável, amarelo = atenção, vermelho = risco.",
+  "Vencimentos Próximos": "Parcelas com vencimento nos próximos 14 dias. Cada linha mostra a data, quantidade de parcelas e valor total. Ciano = vence hoje, cinza = normal, amarelo = pico de vencimentos (muitas parcelas no dia), vermelho = parcelas de alunos com histórico de atraso.",
+  "Receita & Margem por Produto": "Ticket = preço cobrado por aluno. Alunos ativos = total de alunos matriculados no produto. CPV (Custo por Venda) = comissão + material + custo IA por aluno. Lucro/aluno = ticket - CPV. Margem = lucro/ticket × 100. Receita total = ticket × alunos. Lucro total = lucro/aluno × alunos.",
+  "Inadimplência — Aging & Recovery": "Aging divide os inadimplentes por tempo de atraso: 1-30d (recente), 31-45d (moderado), 45+d (crítico). O % de recovery indica a probabilidade histórica de receber o valor com base no comportamento de pagamento. Recuperação esperada = soma ponderada de cada faixa × seu % de recovery. A tabela abaixo detalha cada aluno inadimplente com tentativas de cobrança já realizadas.",
+  "AIR — Receita Gerada por IA": "AI-Influenced Revenue: receita de vendas onde pelo menos um agente de IA participou do processo. SDR = leads qualificados pelo agente SDR que converteram. Agendamento = reuniões agendadas automaticamente que geraram venda. Enriquecimento = leads enriquecidos que entraram no funil. ROI = receita gerada pela IA / custo total dos agentes (tokens + infraestrutura).",
+  "AIRE — Eficiência de Receita por IA": "AI Revenue Efficiency: mede o impacto incremental da IA na receita. Baseline = receita estimada sem IA (média histórica pré-implantação). AIRE = receita real - baseline. Crescimento MoM = variação percentual do AIRE em relação ao mês anterior. Os marcos (go-live, stack completa, etc.) indicam eventos que impactaram a performance.",
 };
 
 const pagBadgeColor = (s: string) => s === "paga" ? "green" : s === "atrasada" ? "red" : "amber";
@@ -1697,7 +1706,7 @@ function FinanceiroScreen() {
           <div className="rounded-2xl p-6 border border-purple-500/10 bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.8s both" }}>
             <div className="flex items-start justify-between mb-5 relative z-10">
               <div>
-                <SectionHeader icon="chart" title="AIRE — Evolução pós-IA" sub="AI Revenue Impact Evolution" />
+                <SectionHeader icon="chart" title="AIRE — Eficiência de Receita por IA" sub="AI Revenue Impact Evolution" />
               </div>
               <div className="text-right">
                 <p className="text-2xl font-black text-purple-400 drop-shadow-[0_0_12px_rgba(167,139,250,0.25)]">+{fmtR(aireTotal)}</p>
