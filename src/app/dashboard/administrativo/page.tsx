@@ -1299,7 +1299,7 @@ function FinanceiroScreen() {
           const cardKey = `${d.mes}-${d.ano}`;
           const isExpanded = dreExpandido === cardKey;
           return (
-            <div className="rounded-2xl border border-white/[0.06] overflow-hidden" style={glassCard}>
+            <div className="rounded-2xl border border-white/[0.06]" style={{ ...glassCard, overflow: "clip" }}>
               {/* Card header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
                 <div className="flex items-center gap-2.5">
@@ -1334,7 +1334,7 @@ function FinanceiroScreen() {
                 ].map((item, i) => {
                   const delta = item.comp != null ? (item.isPct ? item.valor - item.comp : (item.comp !== 0 ? ((item.valor - item.comp) / item.comp) * 100 : 0)) : null;
                   return (
-                    <div key={i} className="bg-[#0a0a0a]/50 px-3 py-2.5 text-center">
+                    <div key={i} className="bg-white/[0.02] px-3 py-2.5 text-center">
                       <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{item.label}</div>
                       <div className="text-sm font-bold text-white mt-0.5">{item.isPct ? `${item.valor}%` : fmtR(item.valor as number)}</div>
                       {item.comp != null && (
