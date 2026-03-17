@@ -397,9 +397,9 @@ const RECEITA_CUSTO_6M = [
 ];
 
 const CASHFLOW_FORECAST = [
-  { periodo: "Abril (30d)", saldo: 36800, entradas: [{ l: "Matrículas novas", v: 42000 }, { l: "Parcelas recorrentes", v: 14200 }, { l: "Recuperação", v: 4200 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -6200 }], status: "healthy" as const },
-  { periodo: "Maio (60d)", saldo: 24600, entradas: [{ l: "Matrículas novas", v: 38000 }, { l: "Parcelas recorrentes", v: 12800 }, { l: "Recuperação", v: 3400 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -12200 }], status: "warning" as const },
-  { periodo: "Junho (90d)", saldo: 18400, entradas: [{ l: "Matrículas novas", v: 32000 }, { l: "Parcelas recorrentes", v: 11200 }, { l: "Recuperação", v: 2800 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -10200 }], status: "caution" as const },
+  { periodo: "Abril (30d)", saldo: 36800, saldoAnterior: 14307, entradas: [{ l: "Parcelas recorrentes", v: 14200 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -6200 }], status: "healthy" as const },
+  { periodo: "Maio (60d)", saldo: 24600, saldoAnterior: 36800, entradas: [{ l: "Parcelas recorrentes", v: 12800 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -12200 }], status: "warning" as const },
+  { periodo: "Junho (90d)", saldo: 18400, saldoAnterior: 24600, entradas: [{ l: "Parcelas recorrentes", v: 11200 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -10200 }], status: "caution" as const },
 ];
 
 const CALENDARIO_PAGAMENTOS = [
@@ -1549,6 +1549,11 @@ function FinanceiroScreen() {
                 </div>
                 <p className={`text-xl font-bold ${cashStatusColor[cf.status]} mb-4`}>+{fmtR(cf.saldo)}</p>
                 <div className="space-y-1.5 flex-1 flex flex-col justify-end">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs text-slate-400 whitespace-nowrap">Saldo anterior</span>
+                    <span className="text-xs font-bold text-slate-300 whitespace-nowrap">{fmtR(cf.saldoAnterior)}</span>
+                  </div>
+                  <div className="border-t border-white/[0.04] my-1" />
                   {cf.entradas.map((e, j) => (
                     <div key={j} className="flex justify-between items-center gap-2">
                       <span className="text-xs text-slate-400 whitespace-nowrap">{e.l}</span>
