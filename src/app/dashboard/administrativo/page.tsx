@@ -296,15 +296,18 @@ const DAILY = {
   negociacoesAbertas: 18, negociacoesFechHoje: 5,
 };
 
+// DRE de Março 2026 (usado nos KPIs do topo)
+const DRE_MAR26 = buildDRE("Mar", 2026, 43200, 3800, 423, 650, 8640, 673, 2100, 10000, 3200, 2400, 1787);
 const DRE = {
-  receitaBruta: { matriculas: 43200, recuperada: 3800, total: 47000 },
-  deducoes: { taxasPix: 423, taxasCartao: 650, total: 1073 },
-  receitaLiquida: 45927,
-  custosVariaveis: { comissoes: 8640, ia: 673, material: 2100, total: 11413 },
-  margemContribuicao: { valor: 34514, pct: 79.9 },
-  custosFixos: { folha: 10000, aluguel: 3200, saas: 2400, marketing: 1787, total: 17387 },
-  lucroOperacional: { valor: 17127, pct: 39.7 },
-  lucroLiquido: { valor: 14307, pct: 33.1 },
+  receitaBruta: DRE_MAR26.receitaBruta,
+  deducoes: DRE_MAR26.deducoes,
+  receitaLiquida: DRE_MAR26.receitaLiquida,
+  custosVariaveis: DRE_MAR26.custosVariaveis,
+  margemContribuicao: DRE_MAR26.margemContribuicao,
+  custosFixos: DRE_MAR26.custosFixos,
+  lucroOperacional: DRE_MAR26.lucroOperacional,
+  impostos: DRE_MAR26.impostos,
+  lucroLiquido: DRE_MAR26.lucroLiquido,
 };
 
 type DREMensal = {
@@ -317,6 +320,7 @@ type DREMensal = {
   margemContribuicao: { valor: number; pct: number };
   custosFixos: { folha: number; aluguel: number; saas: number; marketing: number; total: number };
   lucroOperacional: { valor: number; pct: number };
+  impostos: { simples: number; irpj: number; csll: number; total: number };
   lucroLiquido: { valor: number; pct: number };
 };
 
@@ -332,7 +336,12 @@ function buildDRE(mes: string, ano: number, matriculas: number, recuperada: numb
   const custosFixTotal = folha + aluguel + saas + marketing;
   const lucroOp = margemValor - custosFixTotal;
   const lucroOpPct = receitaTotal > 0 ? Math.round((lucroOp / receitaTotal) * 1000) / 10 : 0;
-  const lucroLiq = Math.round(lucroOp * 0.835);
+  // Impostos detalhados sobre o lucro operacional
+  const simples = Math.round(lucroOp * 0.0953);  // Simples Nacional ~9.53% (faixa 4)
+  const irpj = Math.round(lucroOp * 0.048);      // IRPJ ~4.8%
+  const csll = Math.round(lucroOp * 0.0216);     // CSLL ~2.16%
+  const impostosTotal = simples + irpj + csll;
+  const lucroLiq = lucroOp - impostosTotal;
   const lucroLiqPct = receitaTotal > 0 ? Math.round((lucroLiq / receitaTotal) * 1000) / 10 : 0;
   return {
     mes, ano,
@@ -343,6 +352,7 @@ function buildDRE(mes: string, ano: number, matriculas: number, recuperada: numb
     margemContribuicao: { valor: margemValor, pct: margemPct },
     custosFixos: { folha, aluguel, saas, marketing, total: custosFixTotal },
     lucroOperacional: { valor: lucroOp, pct: lucroOpPct },
+    impostos: { simples, irpj, csll, total: impostosTotal },
     lucroLiquido: { valor: lucroLiq, pct: lucroLiqPct },
   };
 }
@@ -1278,6 +1288,7 @@ function FinanceiroScreen() {
             { key: "margem", label: "Margem de Contribuição", pct: `${d.margemContribuicao.pct}%`, valor: d.margemContribuicao.valor, subtotal: true },
             { key: "custofix", label: "Custos Fixos", pct: pct(d.custosFixos.total), valor: d.custosFixos.total, negative: true, subs: [{ label: "Folha de pagamento", valor: d.custosFixos.folha }, { label: "Aluguel", valor: d.custosFixos.aluguel }, { label: "SaaS / Ferramentas", valor: d.custosFixos.saas }, { label: "Marketing", valor: d.custosFixos.marketing }] },
             { key: "opex", label: "Lucro Operacional", pct: `${d.lucroOperacional.pct}%`, valor: d.lucroOperacional.valor, subtotal: true },
+            { key: "impostos", label: "Impostos", pct: pct(d.impostos.total), valor: d.impostos.total, negative: true, subs: [{ label: "Simples Nacional (9.53%)", valor: d.impostos.simples }, { label: "IRPJ (4.8%)", valor: d.impostos.irpj }, { label: "CSLL (2.16%)", valor: d.impostos.csll }] },
             { key: "lucro", label: "Lucro Líquido", pct: `${d.lucroLiquido.pct}%`, valor: d.lucroLiquido.valor, final: true },
           ];
         };
