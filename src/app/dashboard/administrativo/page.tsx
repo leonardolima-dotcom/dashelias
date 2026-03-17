@@ -307,6 +307,66 @@ const DRE = {
   lucroLiquido: { valor: 14307, pct: 33.1 },
 };
 
+type DREMensal = {
+  mes: string;
+  ano: number;
+  receitaBruta: { matriculas: number; recuperada: number; total: number };
+  deducoes: { taxasPix: number; taxasCartao: number; total: number };
+  receitaLiquida: number;
+  custosVariaveis: { comissoes: number; ia: number; material: number; total: number };
+  margemContribuicao: { valor: number; pct: number };
+  custosFixos: { folha: number; aluguel: number; saas: number; marketing: number; total: number };
+  lucroOperacional: { valor: number; pct: number };
+  lucroLiquido: { valor: number; pct: number };
+};
+
+const MESES_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+function buildDRE(mes: string, ano: number, matriculas: number, recuperada: number, taxasPix: number, taxasCartao: number, comissoes: number, ia: number, material: number, folha: number, aluguel: number, saas: number, marketing: number): DREMensal {
+  const receitaTotal = matriculas + recuperada;
+  const deducoesTotal = taxasPix + taxasCartao;
+  const receitaLiquida = receitaTotal - deducoesTotal;
+  const custosVarTotal = comissoes + ia + material;
+  const margemValor = receitaLiquida - custosVarTotal;
+  const margemPct = receitaTotal > 0 ? Math.round((margemValor / receitaTotal) * 1000) / 10 : 0;
+  const custosFixTotal = folha + aluguel + saas + marketing;
+  const lucroOp = margemValor - custosFixTotal;
+  const lucroOpPct = receitaTotal > 0 ? Math.round((lucroOp / receitaTotal) * 1000) / 10 : 0;
+  const lucroLiq = Math.round(lucroOp * 0.835);
+  const lucroLiqPct = receitaTotal > 0 ? Math.round((lucroLiq / receitaTotal) * 1000) / 10 : 0;
+  return {
+    mes, ano,
+    receitaBruta: { matriculas, recuperada, total: receitaTotal },
+    deducoes: { taxasPix, taxasCartao, total: deducoesTotal },
+    receitaLiquida,
+    custosVariaveis: { comissoes, ia, material, total: custosVarTotal },
+    margemContribuicao: { valor: margemValor, pct: margemPct },
+    custosFixos: { folha, aluguel, saas, marketing, total: custosFixTotal },
+    lucroOperacional: { valor: lucroOp, pct: lucroOpPct },
+    lucroLiquido: { valor: lucroLiq, pct: lucroLiqPct },
+  };
+}
+
+const DRE_MENSAL: DREMensal[] = [
+  // 2025
+  buildDRE("Jan", 2025, 31200, 2100, 280, 420, 5800, 320, 1400, 8500, 3000, 1800, 1200),
+  buildDRE("Fev", 2025, 34800, 2600, 310, 470, 6400, 380, 1500, 8500, 3000, 1800, 1300),
+  buildDRE("Mar", 2025, 38400, 3100, 340, 520, 7200, 420, 1600, 8800, 3000, 1900, 1400),
+  buildDRE("Abr", 2025, 36100, 2800, 320, 490, 6800, 400, 1550, 8800, 3000, 1900, 1350),
+  buildDRE("Mai", 2025, 41200, 3400, 370, 560, 7800, 450, 1700, 9000, 3100, 2000, 1500),
+  buildDRE("Jun", 2025, 39600, 3200, 350, 540, 7400, 440, 1650, 9000, 3100, 2000, 1450),
+  buildDRE("Jul", 2025, 44800, 3800, 400, 610, 8400, 500, 1800, 9200, 3100, 2100, 1600),
+  buildDRE("Ago", 2025, 48200, 4200, 430, 650, 9200, 540, 1900, 9200, 3100, 2100, 1650),
+  buildDRE("Set", 2025, 46400, 3900, 410, 630, 8800, 520, 1850, 9500, 3200, 2200, 1700),
+  buildDRE("Out", 2025, 52100, 4600, 460, 700, 10000, 580, 2000, 9500, 3200, 2200, 1750),
+  buildDRE("Nov", 2025, 55800, 5100, 490, 750, 10800, 620, 2100, 9800, 3200, 2300, 1800),
+  buildDRE("Dez", 2025, 61200, 5800, 540, 830, 12000, 680, 2300, 9800, 3200, 2300, 1900),
+  // 2026
+  buildDRE("Jan", 2026, 38400, 3200, 340, 520, 7200, 520, 1800, 10000, 3200, 2400, 1700),
+  buildDRE("Fev", 2026, 54600, 5400, 480, 740, 10800, 640, 2100, 10000, 3200, 2400, 1787),
+  buildDRE("Mar", 2026, 43200, 3800, 423, 650, 8640, 673, 2100, 10000, 3200, 2400, 1787),
+];
+
 const CUSTOS_CATEGORIAS = [
   { label: "Comissões", valor: 8640, pctTotal: 29.9, pctReceita: 20.0, cor: "rgba(251,191,36,0.7)" },
   { label: "Folha", valor: 10000, pctTotal: 34.7, pctReceita: 23.1, cor: "rgba(59,130,246,0.7)" },
@@ -477,7 +537,7 @@ const cardTooltips: Record<string, string> = {
   "Custo por Agente": "Custo mensal de cada agente IA comparado ao custo de um vendedor humano.",
   "Formas de Pagamento": "Distribuição de vendas por forma de pagamento com taxa de inadimplência e variação mensal (MoM).",
   "Inadimplência por Aluno": "Lista de alunos com parcelas em atraso ordenada por valor.",
-  "DRE Simplificado": "Demonstração de Resultado simplificada. Receita Bruta = matrículas + cobranças recuperadas. Deduções = taxas Pix e cartão. Receita Líquida = bruta - deduções. Custos Variáveis = comissões + IA + material. Margem de Contribuição = líquida - variáveis. Custos Fixos = folha + aluguel + SaaS + marketing. Lucro Operacional = margem - fixos. Lucro Líquido = operacional - impostos estimados. Clique nas linhas para expandir.",
+  "DRE Mensal": "Demonstração de Resultado mês a mês com comparativo anual. Receita Bruta = matrículas + cobranças recuperadas. Deduções = taxas Pix e cartão. Receita Líquida = bruta - deduções. Custos Variáveis = comissões + IA + material. Margem de Contribuição = líquida - variáveis. Custos Fixos = folha + aluguel + SaaS + marketing. Lucro Operacional = margem - fixos. Lucro Líquido = operacional - impostos estimados. Selecione o ano e compare com anos anteriores. Clique em cada mês para expandir o detalhamento completo.",
   "Custos por Categoria": "Cada barra mostra o custo mensal de uma categoria: Comissões (% sobre vendas pagas à equipe), Folha (salários fixos), Aluguel (espaço físico), SaaS (ferramentas e softwares), Marketing (tráfego pago + criativos), IA (tokens dos agentes), Material (apostilas e kits). O percentual à direita indica quanto cada custo representa sobre a receita bruta.",
   "Receita vs Custos — 6 Meses": "Barras verdes = receita bruta mensal. Barras vermelhas = custos variáveis (comissões, IA, material). Barras amarelas = custos fixos (folha, aluguel, SaaS, marketing). A % abaixo de cada mês é a margem líquida: (receita - todos os custos) / receita.",
   "Previsão de Caixa": "Projeção de fluxo de caixa. Matrículas novas = vendas esperadas com base na média dos últimos 3 meses. Parcelas recorrentes = parcelas já contratadas com vencimento no período. Recuperação = estimativa de cobranças de inadimplentes com base no score de recovery. Custos fixos = folha + aluguel + SaaS + marketing. Custos variáveis = comissões projetadas sobre as vendas esperadas. Saldo = entradas - saídas. Cor verde = saudável, amarelo = atenção, vermelho = risco.",
@@ -1173,6 +1233,9 @@ function FunilScreen() {
 function FinanceiroScreen() {
   const [hoveredPag, setHoveredPag] = useState<string | null>(null);
   const [dreDetail, setDreDetail] = useState<string | null>(null);
+  const [dreAno, setDreAno] = useState(2026);
+  const [dreAnoComp, setDreAnoComp] = useState<number | null>(2025);
+  const [dreExpandido, setDreExpandido] = useState<string | null>(null);
   const [hoveredAire, setHoveredAire] = useState<number | null>(null);
   const formaPag = [
     { forma: "Cartão de crédito", vendas: 31, total: 79980, inadimplencia: "2.1%", delta: "-0.3%" },
@@ -1199,53 +1262,173 @@ function FinanceiroScreen() {
         <KpiCard label="Inadimplência" value={fmtR(12400)} sub="4.2% da carteira" delta="1.1%" deltaUp={false} icon="alert" idx={5} />
       </div>
 
-      {/* DRE */}
+      {/* DRE Mensal — Comparativo */}
       {(() => {
-        const dreRows: { key: string; label: string; pct: string; valor: number; negative?: boolean; subtotal?: boolean; final?: boolean; subs?: { label: string; valor: number }[] }[] = [
-          { key: "receita", label: "Receita Bruta", pct: "100%", valor: DRE.receitaBruta.total, subs: [{ label: "Matrículas", valor: DRE.receitaBruta.matriculas }, { label: "Recuperada (cobrança)", valor: DRE.receitaBruta.recuperada }] },
-          { key: "deducoes", label: "Deduções (taxas)", pct: "2.3%", valor: DRE.deducoes.total, negative: true, subs: [{ label: "Taxas Pix", valor: DRE.deducoes.taxasPix }, { label: "Taxas Cartão", valor: DRE.deducoes.taxasCartao }] },
-          { key: "liquida", label: "Receita Líquida", pct: "97.7%", valor: DRE.receitaLiquida, subtotal: true },
-          { key: "custovar", label: "Custos Variáveis", pct: "24.3%", valor: DRE.custosVariaveis.total, negative: true, subs: [{ label: "Comissões equipe", valor: DRE.custosVariaveis.comissoes }, { label: "IA / Agentes", valor: DRE.custosVariaveis.ia }, { label: "Material didático", valor: DRE.custosVariaveis.material }] },
-          { key: "margem", label: "Margem de Contribuição", pct: `${DRE.margemContribuicao.pct}%`, valor: DRE.margemContribuicao.valor, subtotal: true },
-          { key: "custofix", label: "Custos Fixos", pct: "37.0%", valor: DRE.custosFixos.total, negative: true, subs: [{ label: "Folha de pagamento", valor: DRE.custosFixos.folha }, { label: "Aluguel", valor: DRE.custosFixos.aluguel }, { label: "SaaS / Ferramentas", valor: DRE.custosFixos.saas }, { label: "Marketing", valor: DRE.custosFixos.marketing }] },
-          { key: "opex", label: "Lucro Operacional", pct: `${DRE.lucroOperacional.pct}%`, valor: DRE.lucroOperacional.valor, subtotal: true },
-          { key: "lucro", label: "Lucro Líquido", pct: `${DRE.lucroLiquido.pct}%`, valor: DRE.lucroLiquido.valor, final: true },
-        ];
-        return (
-          <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.3s both" }}>
-            <SectionHeader icon="dollar" title="DRE Simplificado" sub="Março 2026" />
-            <div className="relative z-10">
-              {dreRows.map((row) => (
-                <div key={row.key}>
-                  {/* Main row */}
-                  <div
-                    className={`flex items-center py-3.5 px-4 rounded-lg transition-colors ${row.subtotal ? "bg-white/[0.03] border-b border-white/[0.06]" : row.final ? "bg-white/[0.04] border border-white/[0.08] mt-2 rounded-xl" : "border-b border-white/[0.04]"} ${row.subs ? "cursor-pointer hover:bg-white/[0.03]" : ""}`}
-                    onClick={() => row.subs && setDreDetail(dreDetail === row.key ? null : row.key)}
-                  >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      {row.subs && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform shrink-0 ${dreDetail === row.key ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
-                      )}
-                      <span className={`text-sm font-bold ${row.final ? "text-amber-400" : row.subtotal ? "text-white" : row.negative ? "text-slate-400" : "text-slate-300"}`}>{row.label}</span>
-                    </div>
-                    <span className={`text-sm w-16 text-right shrink-0 ${row.final ? "text-amber-400 font-bold" : row.subtotal ? "text-slate-300 font-bold" : "text-slate-500"}`}>{row.pct}</span>
-                    <span className={`text-base font-bold w-28 text-right shrink-0 ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
-                      {row.negative ? `(${fmtR(row.valor)})` : fmtR(row.valor)}
-                    </span>
+        const anosDisponiveis = [...new Set(DRE_MENSAL.map(d => d.ano))].sort();
+        const dreMesesAno = DRE_MENSAL.filter(d => d.ano === dreAno);
+        const dreMesesComp = dreAnoComp ? DRE_MENSAL.filter(d => d.ano === dreAnoComp) : [];
+
+        const buildRows = (d: DREMensal) => {
+          const pct = (v: number) => d.receitaBruta.total > 0 ? `${Math.round((v / d.receitaBruta.total) * 1000) / 10}%` : "0%";
+          return [
+            { key: "receita", label: "Receita Bruta", pct: "100%", valor: d.receitaBruta.total, subs: [{ label: "Matrículas", valor: d.receitaBruta.matriculas }, { label: "Recuperada (cobrança)", valor: d.receitaBruta.recuperada }] },
+            { key: "deducoes", label: "Deduções (taxas)", pct: pct(d.deducoes.total), valor: d.deducoes.total, negative: true, subs: [{ label: "Taxas Pix", valor: d.deducoes.taxasPix }, { label: "Taxas Cartão", valor: d.deducoes.taxasCartao }] },
+            { key: "liquida", label: "Receita Líquida", pct: pct(d.receitaLiquida), valor: d.receitaLiquida, subtotal: true },
+            { key: "custovar", label: "Custos Variáveis", pct: pct(d.custosVariaveis.total), valor: d.custosVariaveis.total, negative: true, subs: [{ label: "Comissões equipe", valor: d.custosVariaveis.comissoes }, { label: "IA / Agentes", valor: d.custosVariaveis.ia }, { label: "Material didático", valor: d.custosVariaveis.material }] },
+            { key: "margem", label: "Margem de Contribuição", pct: `${d.margemContribuicao.pct}%`, valor: d.margemContribuicao.valor, subtotal: true },
+            { key: "custofix", label: "Custos Fixos", pct: pct(d.custosFixos.total), valor: d.custosFixos.total, negative: true, subs: [{ label: "Folha de pagamento", valor: d.custosFixos.folha }, { label: "Aluguel", valor: d.custosFixos.aluguel }, { label: "SaaS / Ferramentas", valor: d.custosFixos.saas }, { label: "Marketing", valor: d.custosFixos.marketing }] },
+            { key: "opex", label: "Lucro Operacional", pct: `${d.lucroOperacional.pct}%`, valor: d.lucroOperacional.valor, subtotal: true },
+            { key: "lucro", label: "Lucro Líquido", pct: `${d.lucroLiquido.pct}%`, valor: d.lucroLiquido.valor, final: true },
+          ];
+        };
+
+        const DreCard = ({ d, compD }: { d: DREMensal; compD?: DREMensal }) => {
+          const rows = buildRows(d);
+          const compRows = compD ? buildRows(compD) : null;
+          const cardKey = `${d.mes}-${d.ano}`;
+          const isExpanded = dreExpandido === cardKey;
+          return (
+            <div className="rounded-2xl border border-white/[0.06] overflow-hidden" style={glassCard}>
+              {/* Card header */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-amber-400/10 flex items-center justify-center">
+                    <span className="text-xs font-bold text-amber-400">{d.mes.slice(0, 3)}</span>
                   </div>
-                  {/* Expandable detail */}
-                  {row.subs && dreDetail === row.key && (
-                    <div className="ml-8 mr-4 mb-2 mt-1 space-y-0.5" style={{ animation: "animationIn 0.3s ease-out both" }}>
-                      {row.subs.map((s, j) => (
-                        <div key={j} className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-white/[0.02] transition-colors">
-                          <span className="text-xs text-slate-500">{s.label}</span>
-                          <span className="text-xs font-bold text-slate-400">{fmtR(s.valor)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div>
+                    <span className="text-sm font-bold text-white">{d.mes} {d.ano}</span>
+                    {compD && (
+                      <span className="text-[10px] text-slate-500 ml-2">vs {compD.mes} {compD.ano}</span>
+                    )}
+                  </div>
                 </div>
-              ))}
+                <div className="flex items-center gap-4">
+                  <div className="text-right hidden md:block">
+                    <div className="text-xs text-slate-500">Lucro Líquido</div>
+                    <div className={`text-sm font-bold ${d.lucroLiquido.valor >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{fmtR(d.lucroLiquido.valor)}</div>
+                  </div>
+                  <div className={`text-xs font-bold px-2 py-1 rounded-md ${d.lucroLiquido.pct >= 30 ? "bg-emerald-400/10 text-emerald-400" : d.lucroLiquido.pct >= 15 ? "bg-amber-400/10 text-amber-400" : "bg-rose-400/10 text-rose-400"}`}>
+                    {d.lucroLiquido.pct}%
+                  </div>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+              </div>
+
+              {/* Summary row (always visible) */}
+              <div className="grid grid-cols-4 gap-px bg-white/[0.04]">
+                {[
+                  { label: "Receita Bruta", valor: d.receitaBruta.total, comp: compD?.receitaBruta.total },
+                  { label: "Custos Totais", valor: d.custosVariaveis.total + d.custosFixos.total, comp: compD ? compD.custosVariaveis.total + compD.custosFixos.total : undefined },
+                  { label: "Lucro Op.", valor: d.lucroOperacional.valor, comp: compD?.lucroOperacional.valor },
+                  { label: "Margem", valor: d.margemContribuicao.pct, comp: compD?.margemContribuicao.pct, isPct: true },
+                ].map((item, i) => {
+                  const delta = item.comp != null ? (item.isPct ? item.valor - item.comp : (item.comp !== 0 ? ((item.valor - item.comp) / item.comp) * 100 : 0)) : null;
+                  return (
+                    <div key={i} className="bg-[#0a0a0a]/50 px-3 py-2.5 text-center">
+                      <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{item.label}</div>
+                      <div className="text-sm font-bold text-white mt-0.5">{item.isPct ? `${item.valor}%` : fmtR(item.valor as number)}</div>
+                      {delta != null && (
+                        <div className={`text-[10px] font-bold mt-0.5 ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                          {delta >= 0 ? "↑" : "↓"} {Math.abs(Math.round(delta * 10) / 10)}{item.isPct ? "pp" : "%"}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Expanded detail */}
+              {isExpanded && (
+                <div className="px-4 py-3 space-y-0" style={{ animation: "animationIn 0.3s ease-out both" }}>
+                  {rows.map((row, ri) => {
+                    const compVal = compRows ? compRows[ri].valor : null;
+                    const delta = compVal != null && compVal !== 0 ? ((row.valor - compVal) / compVal) * 100 : null;
+                    const detKey = `${cardKey}-${row.key}`;
+                    return (
+                      <div key={row.key}>
+                        <div
+                          className={`flex items-center py-3 px-3 rounded-lg transition-colors ${row.subtotal ? "bg-white/[0.03] border-b border-white/[0.06]" : row.final ? "bg-white/[0.04] border border-white/[0.08] mt-2 rounded-xl" : "border-b border-white/[0.04]"} ${row.subs ? "cursor-pointer hover:bg-white/[0.03]" : ""}`}
+                          onClick={() => row.subs && setDreDetail(dreDetail === detKey ? null : detKey)}
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            {row.subs && (
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform shrink-0 ${dreDetail === detKey ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
+                            )}
+                            <span className={`text-sm font-bold ${row.final ? "text-amber-400" : row.subtotal ? "text-white" : row.negative ? "text-slate-400" : "text-slate-300"}`}>{row.label}</span>
+                          </div>
+                          <span className={`text-xs w-14 text-right shrink-0 ${row.final ? "text-amber-400 font-bold" : row.subtotal ? "text-slate-300 font-bold" : "text-slate-500"}`}>{row.pct}</span>
+                          {delta != null && (
+                            <span className={`text-[10px] w-16 text-right shrink-0 font-bold ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                              {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}%
+                            </span>
+                          )}
+                          <span className={`text-sm font-bold w-24 text-right shrink-0 ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
+                            {row.negative ? `(${fmtR(row.valor)})` : fmtR(row.valor)}
+                          </span>
+                          {compVal != null && (
+                            <span className="text-xs text-slate-600 w-20 text-right shrink-0 hidden md:block">
+                              {row.negative ? `(${fmtR(compVal)})` : fmtR(compVal)}
+                            </span>
+                          )}
+                        </div>
+                        {row.subs && dreDetail === detKey && (
+                          <div className="ml-8 mr-4 mb-2 mt-1 space-y-0.5" style={{ animation: "animationIn 0.3s ease-out both" }}>
+                            {row.subs.map((s, j) => (
+                              <div key={j} className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-white/[0.02] transition-colors">
+                                <span className="text-xs text-slate-500">{s.label}</span>
+                                <span className="text-xs font-bold text-slate-400">{fmtR(s.valor)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        return (
+          <div className="space-y-4" style={{ animation: "animationIn 0.8s ease-out 0.3s both" }}>
+            {/* Header with year selector */}
+            <div className="rounded-2xl p-5 border border-white/[0.06]" style={glassCard}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <SectionHeader icon="dollar" title="DRE Mensal" sub="Demonstração de Resultado por mês" />
+                <div className="flex items-center gap-3 relative z-10">
+                  {/* Year selector */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider mr-1">Ano:</span>
+                    {anosDisponiveis.map(a => (
+                      <button key={a} onClick={() => setDreAno(a)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${dreAno === a ? "bg-amber-400/15 text-amber-400 border border-amber-400/25" : "bg-white/[0.04] text-slate-400 border border-white/[0.06] hover:bg-white/[0.08]"}`}>
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="w-px h-6 bg-white/[0.08]" />
+                  {/* Compare year */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider mr-1">Comparar:</span>
+                    <button onClick={() => setDreAnoComp(null)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${dreAnoComp === null ? "bg-white/[0.08] text-white border border-white/[0.12]" : "bg-white/[0.04] text-slate-500 border border-white/[0.06] hover:bg-white/[0.08]"}`}>
+                      —
+                    </button>
+                    {anosDisponiveis.filter(a => a !== dreAno).map(a => (
+                      <button key={a} onClick={() => setDreAnoComp(a)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${dreAnoComp === a ? "bg-cyan-400/15 text-cyan-400 border border-cyan-400/25" : "bg-white/[0.04] text-slate-400 border border-white/[0.06] hover:bg-white/[0.08]"}`}>
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Monthly DRE cards */}
+            <div className="grid grid-cols-1 gap-4">
+              {dreMesesAno.map((d, i) => {
+                const compD = dreMesesComp.find(c => c.mes === d.mes);
+                return <DreCard key={`${d.mes}-${d.ano}`} d={d} compD={compD} />;
+              })}
             </div>
           </div>
         );
