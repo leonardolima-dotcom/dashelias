@@ -1290,32 +1290,31 @@ function FinanceiroScreen() {
           return (
             <div className="rounded-2xl border border-white/[0.06] overflow-hidden" style={glassCard}>
               {/* Card header */}
-              <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-amber-400/10 flex items-center justify-center">
-                    <span className="text-xs font-bold text-amber-400">{d.mes.slice(0, 3)}</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-400/10 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-amber-400">{d.mes.slice(0, 3)}</span>
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-white">{d.mes} {d.ano}</span>
+                    <div className="text-sm font-bold text-white">{d.mes}/{d.ano}</div>
                     {compD && (
-                      <span className="text-[10px] text-slate-500 ml-2">vs {compD.mes} {compD.ano}</span>
+                      <div className="text-[9px] text-slate-500">vs {compD.ano}</div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right hidden md:block">
-                    <div className="text-xs text-slate-500">Lucro Líquido</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
                     <div className={`text-sm font-bold ${d.lucroLiquido.valor >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{fmtR(d.lucroLiquido.valor)}</div>
-                  </div>
-                  <div className={`text-xs font-bold px-2 py-1 rounded-md ${d.lucroLiquido.pct >= 30 ? "bg-emerald-400/10 text-emerald-400" : d.lucroLiquido.pct >= 15 ? "bg-amber-400/10 text-amber-400" : "bg-rose-400/10 text-rose-400"}`}>
-                    {d.lucroLiquido.pct}%
+                    <div className={`text-[10px] font-bold ${d.lucroLiquido.pct >= 30 ? "text-emerald-400/60" : d.lucroLiquido.pct >= 15 ? "text-amber-400/60" : "text-rose-400/60"}`}>
+                      {d.lucroLiquido.pct}% margem
+                    </div>
                   </div>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
                 </div>
               </div>
 
               {/* Summary row (always visible) */}
-              <div className="grid grid-cols-4 gap-px bg-white/[0.04]">
+              <div className="grid grid-cols-2 gap-px bg-white/[0.04]">
                 {[
                   { label: "Receita Bruta", valor: d.receitaBruta.total, comp: compD?.receitaBruta.total },
                   { label: "Custos Totais", valor: d.custosVariaveis.total + d.custosFixos.total, comp: compD ? compD.custosVariaveis.total + compD.custosFixos.total : undefined },
@@ -1356,20 +1355,16 @@ function FinanceiroScreen() {
                             )}
                             <span className={`text-sm font-bold ${row.final ? "text-amber-400" : row.subtotal ? "text-white" : row.negative ? "text-slate-400" : "text-slate-300"}`}>{row.label}</span>
                           </div>
-                          <span className={`text-xs w-14 text-right shrink-0 ${row.final ? "text-amber-400 font-bold" : row.subtotal ? "text-slate-300 font-bold" : "text-slate-500"}`}>{row.pct}</span>
-                          {delta != null && (
-                            <span className={`text-[10px] w-16 text-right shrink-0 font-bold ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                              {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}%
-                            </span>
-                          )}
-                          <span className={`text-sm font-bold w-24 text-right shrink-0 ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {delta != null && (
+                              <span className={`text-[10px] font-bold ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                                {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}%
+                              </span>
+                            )}
+                          </div>
+                          <span className={`text-sm font-bold text-right shrink-0 ml-auto ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
                             {row.negative ? `(${fmtR(row.valor)})` : fmtR(row.valor)}
                           </span>
-                          {compVal != null && (
-                            <span className="text-xs text-slate-600 w-20 text-right shrink-0 hidden md:block">
-                              {row.negative ? `(${fmtR(compVal)})` : fmtR(compVal)}
-                            </span>
-                          )}
                         </div>
                         {row.subs && dreDetail === detKey && (
                           <div className="ml-8 mr-4 mb-2 mt-1 space-y-0.5" style={{ animation: "animationIn 0.3s ease-out both" }}>
@@ -1423,11 +1418,15 @@ function FinanceiroScreen() {
               </div>
             </div>
 
-            {/* Monthly DRE cards */}
-            <div className="grid grid-cols-1 gap-4">
-              {dreMesesAno.map((d, i) => {
+            {/* Monthly DRE cards — horizontal scroll */}
+            <div className="flex gap-4 overflow-x-auto pb-3 custom-scrollbar snap-x snap-mandatory">
+              {dreMesesAno.map((d) => {
                 const compD = dreMesesComp.find(c => c.mes === d.mes);
-                return <DreCard key={`${d.mes}-${d.ano}`} d={d} compD={compD} />;
+                return (
+                  <div key={`${d.mes}-${d.ano}`} className="min-w-[340px] w-[340px] md:min-w-[380px] md:w-[380px] shrink-0 snap-start">
+                    <DreCard d={d} compD={compD} />
+                  </div>
+                );
               })}
             </div>
           </div>
