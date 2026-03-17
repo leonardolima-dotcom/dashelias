@@ -7,36 +7,38 @@ import Image from "next/image";
    MOCK DATA
    ═══════════════════════════════════════════ */
 
-// Simula o aluno logado — produto que ele comprou
+// Simula o aluno logado — produto que ele comprou + status de pagamento
 const ALUNO_LOGADO = {
   id: 2,
   nome: "Marcos Oliveira",
   produto: "Formação Barber Pro",
+  parcelasPagas: 3,
+  parcelasTotal: 12,
 };
 
 const TURMAS = [
-  { id: 1, nome: "Turma 47", periodo: "Mai/2026", produto: "Formação Barber Pro", inicio: "12/05/2026", fim: "16/05/2026", total: 28, ocupadas: 22, bloqueadas: 2, status: "aberta", local: "São Paulo, SP", horarios: [
+  { id: 1, nome: "Turma 47", periodo: "Mai/2026", produto: "Formação Barber Pro", inicio: "12/05/2026", fim: "16/05/2026", total: 28, ocupadas: 22, bloqueadas: 2, status: "aberta", local: "São Paulo, SP", parcelasMinimas: 3, horarios: [
     { dia: "Seg", inicio: "08:00", fim: "12:00", tipo: "Teórico" },
     { dia: "Ter", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qua", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qui", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Sex", inicio: "08:00", fim: "17:00", tipo: "Avaliação" },
   ]},
-  { id: 2, nome: "Turma 48", periodo: "Jun/2026", produto: "Formação Barber Pro", inicio: "09/06/2026", fim: "13/06/2026", total: 28, ocupadas: 14, bloqueadas: 0, status: "aberta", local: "São Paulo, SP", horarios: [
+  { id: 2, nome: "Turma 48", periodo: "Jun/2026", produto: "Formação Barber Pro", inicio: "09/06/2026", fim: "13/06/2026", total: 28, ocupadas: 14, bloqueadas: 0, status: "aberta", local: "São Paulo, SP", parcelasMinimas: 5, horarios: [
     { dia: "Seg", inicio: "08:00", fim: "12:00", tipo: "Teórico" },
     { dia: "Ter", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qua", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qui", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Sex", inicio: "08:00", fim: "17:00", tipo: "Avaliação" },
   ]},
-  { id: 3, nome: "Turma 49", periodo: "Jul/2026", produto: "Formação Barber Pro", inicio: "14/07/2026", fim: "18/07/2026", total: 28, ocupadas: 3, bloqueadas: 0, status: "aberta", local: "São Paulo, SP", horarios: [
+  { id: 3, nome: "Turma 49", periodo: "Jul/2026", produto: "Formação Barber Pro", inicio: "14/07/2026", fim: "18/07/2026", total: 28, ocupadas: 3, bloqueadas: 0, status: "aberta", local: "São Paulo, SP", parcelasMinimas: 7, horarios: [
     { dia: "Seg", inicio: "08:00", fim: "12:00", tipo: "Teórico" },
     { dia: "Ter", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qua", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qui", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Sex", inicio: "08:00", fim: "17:00", tipo: "Avaliação" },
   ]},
-  { id: 4, nome: "Turma 50", periodo: "Ago/2026", produto: "Master Cut", inicio: "04/08/2026", fim: "06/08/2026", total: 28, ocupadas: 8, bloqueadas: 1, status: "aberta", local: "Rio de Janeiro, RJ", horarios: [
+  { id: 4, nome: "Turma 50", periodo: "Ago/2026", produto: "Master Cut", inicio: "04/08/2026", fim: "06/08/2026", total: 28, ocupadas: 8, bloqueadas: 1, status: "aberta", local: "Rio de Janeiro, RJ", parcelasMinimas: 4, horarios: [
     { dia: "Seg", inicio: "08:00", fim: "18:00", tipo: "Teórico + Prático" },
     { dia: "Ter", inicio: "08:00", fim: "18:00", tipo: "Prático" },
     { dia: "Qua", inicio: "08:00", fim: "17:00", tipo: "Avaliação" },
@@ -54,6 +56,7 @@ function Icon({ name, size = 14, className = "" }: { name: string; size?: number
     pin: <><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></>,
     users: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>,
     check: <><polyline points="20 6 9 17 4 12" /></>,
+    lock: <><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>,
     info: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></>,
   };
   return (
@@ -80,8 +83,11 @@ export default function AgendarTurmaPage() {
   const [selId, setSelId] = useState<number | null>(null);
   const [confirmado, setConfirmado] = useState(false);
 
-  // Filtra turmas pelo produto do aluno e com vagas
-  const turmasDisponiveis = TURMAS.filter(t => t.produto === ALUNO_LOGADO.produto && t.status === "aberta");
+  // Filtra turmas pelo produto do aluno
+  const turmasDoProduto = TURMAS.filter(t => t.produto === ALUNO_LOGADO.produto && t.status === "aberta");
+  // Separa desbloqueadas e bloqueadas por parcelas
+  const turmasDisponiveis = turmasDoProduto.filter(t => ALUNO_LOGADO.parcelasPagas >= t.parcelasMinimas);
+  const turmasBloqueadas = turmasDoProduto.filter(t => ALUNO_LOGADO.parcelasPagas < t.parcelasMinimas);
   const turmaSel = selId !== null ? turmasDisponiveis.find(t => t.id === selId) : null;
 
   const calcDiasRestantes = (inicioStr: string) => {
@@ -311,6 +317,19 @@ export default function AgendarTurmaPage() {
           </p>
         </div>
 
+        {/* Payment status */}
+        <div className="rounded-xl p-4 bg-white/[0.02] border border-white/[0.06] flex items-center gap-4" style={{ animation: "animationIn 0.8s ease-out 0.12s both" }}>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Pagamento</span>
+              <span className="text-xs text-white font-bold">{ALUNO_LOGADO.parcelasPagas}/{ALUNO_LOGADO.parcelasTotal} parcelas pagas</span>
+            </div>
+            <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: `${(ALUNO_LOGADO.parcelasPagas / ALUNO_LOGADO.parcelasTotal) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+
         {/* Info banner */}
         <div className="rounded-xl p-4 bg-amber-400/[0.04] border border-amber-400/15 flex items-center gap-3 text-center justify-center" style={{ animation: "animationIn 0.8s ease-out 0.15s both" }}>
           <Icon name="info" size={16} className="text-amber-400 shrink-0" />
@@ -425,10 +444,109 @@ export default function AgendarTurmaPage() {
           })}
         </div>
 
-        {turmasDisponiveis.length === 0 && (
+        {turmasDisponiveis.length === 0 && turmasBloqueadas.length === 0 && (
           <div className="text-center py-16 text-slate-500">
             <p className="text-sm">Nenhuma turma disponível para o seu curso no momento.</p>
             <p className="text-xs mt-1 text-slate-600">Novas turmas serão abertas em breve.</p>
+          </div>
+        )}
+
+        {/* Turmas bloqueadas */}
+        {turmasBloqueadas.length > 0 && (
+          <div className="space-y-4" style={{ animation: "animationIn 0.8s ease-out 0.4s both" }}>
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/[0.06]" />
+              <div className="flex items-center gap-2 text-slate-500">
+                <Icon name="lock" size={14} />
+                <span className="text-[10px] uppercase font-bold tracking-wider">Turmas bloqueadas</span>
+              </div>
+              <div className="h-px flex-1 bg-white/[0.06]" />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {turmasBloqueadas.map((t, i) => {
+                const free = t.total - t.ocupadas - t.bloqueadas;
+                const parcelasFaltam = t.parcelasMinimas - ALUNO_LOGADO.parcelasPagas;
+                const carga = calcCargaHoraria(t.horarios);
+
+                return (
+                  <div
+                    key={t.id}
+                    className="rounded-2xl border border-white/[0.04] bg-white/[0.01] overflow-hidden opacity-60 relative"
+                    style={{ animation: `animationIn 0.8s ease-out ${0.45 + i * 0.06}s both` }}>
+
+                    {/* Lock overlay */}
+                    <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                      <div className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl bg-black/60 backdrop-blur-sm border border-white/[0.08]">
+                        <Icon name="lock" size={28} className="text-amber-400/80" />
+                        <span className="text-sm font-bold text-white">Pague mais {parcelasFaltam} parcela{parcelasFaltam > 1 ? "s" : ""}</span>
+                        <span className="text-[10px] text-slate-400">para desbloquear esta turma</span>
+                      </div>
+                    </div>
+
+                    {/* Header */}
+                    <div className="px-5 pt-5 pb-4 md:px-6 md:pt-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-base md:text-lg font-bold text-white">{t.nome} — {t.periodo}</span>
+                            <Badge color="red">Bloqueada</Badge>
+                          </div>
+                          <div className="text-xs mt-1 text-slate-500">Mínimo {t.parcelasMinimas} parcelas pagas</div>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-white/[0.04] text-slate-500 border border-white/[0.06] shrink-0 ml-3 hidden md:flex items-center gap-1.5">
+                          <Icon name="lock" size={10} />
+                          Bloqueada
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info grid — 2x2 with dividers */}
+                    <div className="grid grid-cols-2 border-t border-white/[0.06]">
+                      <div className="px-5 py-3 md:px-6 md:py-4 border-r border-b border-white/[0.06]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Icon name="calendar" size={12} className="text-slate-500" />
+                          <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Período</span>
+                        </div>
+                        <div className="text-sm text-slate-300 font-medium whitespace-nowrap">{t.inicio.slice(0, 5)} a {t.fim.slice(0, 5)}</div>
+                      </div>
+                      <div className="px-5 py-3 md:px-6 md:py-4 border-b border-white/[0.06]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Icon name="pin" size={12} className="text-slate-500" />
+                          <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Local</span>
+                        </div>
+                        <div className="text-sm text-slate-300 font-medium">{t.local}</div>
+                      </div>
+                      <div className="px-5 py-3 md:px-6 md:py-4 border-r border-white/[0.06]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Icon name="clock" size={12} className="text-slate-500" />
+                          <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Carga horária</span>
+                        </div>
+                        <div className="text-sm text-slate-300 font-medium">{carga}h em {t.horarios.length} dias</div>
+                      </div>
+                      <div className="px-5 py-3 md:px-6 md:py-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Icon name="users" size={12} className="text-slate-500" />
+                          <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Vagas</span>
+                        </div>
+                        <div className="text-sm text-slate-300 font-medium">{free} / {t.total}</div>
+                      </div>
+                    </div>
+
+                    {/* Parcelas progress */}
+                    <div className="px-5 pb-5 md:px-6 md:pb-6 pt-3 border-t border-white/[0.06]">
+                      <div className="flex justify-between mb-1.5 text-[10px]">
+                        <span className="text-slate-500">Progresso para desbloquear</span>
+                        <span className="text-amber-400/70 font-bold">{ALUNO_LOGADO.parcelasPagas}/{t.parcelasMinimas} parcelas</span>
+                      </div>
+                      <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-gradient-to-r from-amber-500/60 to-amber-400/60" style={{ width: `${(ALUNO_LOGADO.parcelasPagas / t.parcelasMinimas) * 100}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

@@ -399,6 +399,13 @@ const ATIVIDADE = [
 const fmt = (n: number) => n.toLocaleString("pt-BR");
 const fmtR = (n: number) => `R$ ${fmt(n)}`;
 
+const glassCard: React.CSSProperties = {
+  background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
+  backdropFilter: "blur(6px) saturate(140%)",
+  WebkitBackdropFilter: "blur(6px) saturate(140%)",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+};
+
 
 const rndParticles = (count: number, horizontal = false) => (
   <div className={horizontal ? "particles-wrapper-h" : "particles-wrapper"}>
@@ -575,7 +582,7 @@ function KpiCard({ label, value, sub, delta, deltaUp, icon, idx = 0 }: {
   label: string; value: string | number; sub?: string; delta?: string; deltaUp?: boolean; icon: string; idx?: number;
 }) {
   return (
-    <div className="rounded-2xl p-5 cursor-default border border-white/[0.06] bg-white/[0.02]" style={{ animation: `animationIn 0.8s ease-out ${0.15 + idx * 0.04}s both` }}>
+    <div className="rounded-2xl p-5 cursor-default border border-white/[0.06]" style={{ ...glassCard, animation: `animationIn 0.8s ease-out ${0.15 + idx * 0.04}s both` }}>
       <div className="flex items-center justify-between mb-1">
         <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">{label}</p>
         <Icon name={icon} size={14} className="text-amber-400/60" />
@@ -672,7 +679,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
           { label: "Conversão", value: "36%", sub: "89 de 247 leads", delta: "3pp", up: true, page: "funil" },
           { label: "Inadimplência", value: fmtR(12400), sub: "8 alunos · 4.2% da carteira", delta: "1.1%", up: false, page: "financeiro" },
         ].map((d, i) => (
-          <div key={i} onClick={() => setPage(d.page)} className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02] cursor-pointer hover:border-white/[0.12] transition-colors">
+          <div key={i} onClick={() => setPage(d.page)} className="rounded-2xl p-5 border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors" style={glassCard}>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">{d.label}</p>
             <p className="text-2xl font-bold text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]">{d.value}</p>
             <p className="text-xs text-slate-500 mt-1">{d.sub}</p>
@@ -687,7 +694,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
       </div>
 
       {/* ③ META PROGRESS — barra simples */}
-      <div className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.2s both" }}>
+      <div className="rounded-2xl p-5 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.2s both" }}>
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Meta {new Date().toLocaleDateString("pt-BR", { month: "long" })}</span>
           <div className="flex items-baseline gap-2">
@@ -712,7 +719,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
       {/* ④ HOJE + AGENTES — lado a lado */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ animation: "animationIn 0.8s ease-out 0.25s both" }}>
         {/* Snapshot do dia */}
-        <div className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
+        <div className="rounded-2xl p-5 border border-white/[0.06]" style={glassCard}>
           <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-3">Hoje</p>
           <div className="space-y-4">
             {[
@@ -742,7 +749,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
           </div>
         </div>
         {/* Agentes */}
-        <div className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
+        <div className="rounded-2xl p-5 border border-white/[0.06]" style={glassCard}>
           <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-3">Agentes</p>
           <div className="space-y-2">
             {AGENTES.map((a, i) => {
@@ -764,7 +771,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
 
       {/* ⑤ Receita (chart) + Mini Funil */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.4s both" }}>
+        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.4s both" }}>
           <SectionHeader icon="chart" title="Receita Mensal" sub="Últimos 6 meses" />
           <div className="relative z-10">
             {(() => {
@@ -814,7 +821,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
           </div>
         </div>
 
-        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.45s both" }}>
+        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.45s both" }}>
           <SectionHeader icon="funnel" title="Mini Funil" sub="Março 2026" />
           <div className="flex flex-col gap-3 relative z-10">
             {FUNIL_DATA.slice(0, 5).map((f, i) => {
@@ -860,7 +867,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
 
       {/* Turmas (A6 — com urgência) + Atividade */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.5s both" }}>
+        <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.5s both" }}>
           <SectionHeader icon="calendar" title="Próximas Turmas" />
           <div className="space-y-4">
             {TURMAS.filter(t => t.status === "aberta").slice(0, 3).map(t => {
@@ -887,7 +894,7 @@ function HomeScreen({ setPage }: { setPage: (p: string) => void }) {
           </div>
         </div>
 
-        <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.55s both" }}>
+        <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.55s both" }}>
           <SectionHeader icon="clock" title="Atividade Recente" />
           <div className="flex flex-col gap-0.5 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar relative z-10">
             {ATIVIDADE.map((a, i) => (
@@ -1002,7 +1009,7 @@ function FunilScreen() {
       {/* F4: Pipeline financial KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" style={{ animation: "animationIn 0.8s ease-out 0.1s both" }}>
         {pipelineKpis.map((k, i) => (
-          <div key={i} className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
+          <div key={i} className="rounded-2xl p-5 border border-white/[0.06]" style={glassCard}>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">{k.label}</p>
             <p className="text-xl font-bold text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]">{k.value}</p>
             <p className="text-xs text-slate-500 mt-1">{k.sub}</p>
@@ -1014,7 +1021,7 @@ function FunilScreen() {
       </div>
 
       {/* F1: Dual Funnel */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.2s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.2s both" }}>
         <SectionHeader icon="funnel" title="Funil de Vendas" sub="Março 2026">
           <span className="text-xs text-slate-500">Clique em uma etapa para detalhes</span>
         </SectionHeader>
@@ -1054,7 +1061,7 @@ function FunilScreen() {
 
       {/* F5: Detail panel */}
       {etapaSel && detailData[etapaSel] && (
-        <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.4s ease-out both" }}>
+        <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.4s ease-out both" }}>
           <SectionHeader icon="chart" title={`Detalhe: ${etapaSel}`} sub="Análise da etapa selecionada" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
             {detailData[etapaSel].kpis.map((k, i) => (
@@ -1102,7 +1109,7 @@ function FunilScreen() {
       )}
 
       {/* F6: Evolution chart with 5 series */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.4s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.4s both" }}>
         <SectionHeader icon="chart" title="Evolução do Funil" sub="Leads por dia nos últimos 30 dias" />
         <div className="relative z-10">
           {(() => {
@@ -1205,7 +1212,7 @@ function FinanceiroScreen() {
           { key: "lucro", label: "Lucro Líquido", pct: `${DRE.lucroLiquido.pct}%`, valor: DRE.lucroLiquido.valor, final: true },
         ];
         return (
-          <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.3s both" }}>
+          <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.3s both" }}>
             <SectionHeader icon="dollar" title="DRE Simplificado" sub="Março 2026" />
             <div className="relative z-10">
               {dreRows.map((row) => (
@@ -1246,7 +1253,7 @@ function FinanceiroScreen() {
 
       {/* Cost Breakdown + 6-Month Evolution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.4s both" }}>
+        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.4s both" }}>
           <SectionHeader icon="chart" title="Custos por Categoria" sub="Março 2026" />
           <div className="space-y-4 relative z-10">
             {CUSTOS_CATEGORIAS.map((c, i) => (
@@ -1266,7 +1273,7 @@ function FinanceiroScreen() {
           </div>
         </div>
 
-        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] flex flex-col" style={{ animation: "animationIn 0.8s ease-out 0.45s both" }}>
+        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06] flex flex-col" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.45s both" }}>
           <SectionHeader icon="chart" title="Receita vs Custos — 6 Meses" sub="Evolução e Margem %" />
           <div className="relative z-10 flex-1 flex flex-col">
             {(() => {
@@ -1310,7 +1317,7 @@ function FinanceiroScreen() {
 
       {/* Cash Flow Forecast + Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] flex flex-col" style={{ animation: "animationIn 0.8s ease-out 0.5s both" }}>
+        <div className="lg:col-span-7 rounded-2xl p-6 border border-white/[0.06] flex flex-col" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.5s both" }}>
           <SectionHeader icon="chart" title="Previsão de Caixa" sub="30 / 60 / 90 dias" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10 flex-1">
             {CASHFLOW_FORECAST.map((cf, i) => (
@@ -1340,7 +1347,7 @@ function FinanceiroScreen() {
           </div>
         </div>
 
-        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.55s both" }}>
+        <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.55s both" }}>
           <SectionHeader icon="calendar" title="Vencimentos Próximos" sub="14 dias" />
           <div className="space-y-1 relative z-10">
             {CALENDARIO_PAGAMENTOS.map((p, i) => (
@@ -1358,7 +1365,7 @@ function FinanceiroScreen() {
       </div>
 
       {/* Revenue by Product */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.6s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.6s both" }}>
         <SectionHeader icon="target" title="Receita & Margem por Produto" sub="Comparativo de rentabilidade" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
           {PRODUTOS_FINANCEIRO.map((p, i) => {
@@ -1403,7 +1410,7 @@ function FinanceiroScreen() {
       </div>
 
       {/* Aging + Delinquency Table */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.65s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.65s both" }}>
         <SectionHeader icon="alert" title="Inadimplência — Aging & Recovery" sub="Score de recuperação por faixa" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 relative z-10">
           {AGING_INADIMPLENCIA.map((a, i) => (
@@ -1450,7 +1457,7 @@ function FinanceiroScreen() {
       </div>
 
       {/* Payment Methods */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.7s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.7s both" }}>
         <SectionHeader icon="dollar" title="Formas de Pagamento" sub="Inadimplência por forma" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           <div className="lg:col-span-4 flex justify-center items-center">
@@ -1560,7 +1567,7 @@ function FinanceiroScreen() {
         const arcHum = circ - arcIA;
 
         return (
-          <div className="rounded-2xl p-6 border border-emerald-500/10 bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.75s both" }}>
+          <div className="rounded-2xl p-6 border border-emerald-500/10" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.75s both" }}>
             <div className="flex items-start justify-between mb-5 relative z-10">
               <div>
                 <SectionHeader icon="bot" title="AIR — Receita Gerada por IA" sub="AI-Generated Revenue" />
@@ -1703,7 +1710,7 @@ function FinanceiroScreen() {
         const areaPoints = [...ptReal, ...ptBase.reverse()].join(" ");
 
         return (
-          <div className="rounded-2xl p-6 border border-purple-500/10 bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.8s both" }}>
+          <div className="rounded-2xl p-6 border border-purple-500/10" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.8s both" }}>
             <div className="flex items-start justify-between mb-5 relative z-10">
               <div>
                 <SectionHeader icon="chart" title="AIRE — Eficiência de Receita por IA" sub="AI Revenue Impact Evolution" />
@@ -1868,7 +1875,7 @@ function AgentesScreen() {
   return (
     <div className="space-y-6">
       {/* ── ROI Banner ── */}
-      <div className="rounded-2xl p-5 border border-emerald-500/10 bg-white/[0.02] flex items-center justify-between flex-wrap gap-4" style={{ animation: "animationIn 0.8s ease-out 0.1s both" }}>
+      <div className="rounded-2xl p-5 border border-emerald-500/10 flex items-center justify-between flex-wrap gap-4" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.1s both" }}>
         <div className="flex items-center gap-3 relative z-10">
           <Icon name="bot" size={18} className="text-amber-400" />
           <div>
@@ -1900,8 +1907,8 @@ function AgentesScreen() {
           const spkMax = Math.max(...a.sparkline);
           return (
             <div key={i} onClick={() => setSelAgent(selAgent === i ? null : i)}
-              className={`rounded-2xl p-4 border cursor-pointer transition-all duration-200 bg-white/[0.02] ${isSelected ? "border-amber-400/20" : "border-white/[0.06] hover:border-white/[0.1]"}`}
-              style={{ animation: `animationIn 0.8s ease-out ${0.15 + i * 0.05}s both` }}>
+              className={`rounded-2xl p-4 border cursor-pointer transition-all duration-200 ${isSelected ? "border-amber-400/20" : "border-white/[0.06] hover:border-white/[0.1]"}`}
+              style={{ ...glassCard, animation: `animationIn 0.8s ease-out ${0.15 + i * 0.05}s both` }}>
               <div className="flex items-center justify-between mb-2 relative z-10">
                 <div className="flex items-center gap-2">
                   <div className="size-7 rounded flex items-center justify-center bg-white/[0.04]">
@@ -1936,7 +1943,7 @@ function AgentesScreen() {
 
       {/* ── Expanded Agent Panel ── */}
       {sel && selAgent !== null && (
-        <div className="rounded-2xl p-6 border border-cyan-500/15 bg-white/[0.02]" style={{ animation: "animationIn 0.4s ease-out both" }}>
+        <div className="rounded-2xl p-6 border border-cyan-500/15" style={{ ...glassCard, animation: "animationIn 0.4s ease-out both" }}>
           <div className="flex items-start justify-between mb-5 relative z-10">
             <div className="flex items-center gap-3">
               <div className="size-9 rounded-lg flex items-center justify-center bg-white/[0.04]">
@@ -2037,7 +2044,7 @@ function AgentesScreen() {
 
       {/* ── Deflexão por Agente ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-4 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] flex flex-col items-center justify-center text-center" style={{ animation: "animationIn 0.8s ease-out 0.4s both" }}>
+        <div className="lg:col-span-4 rounded-2xl p-6 border border-white/[0.06] flex flex-col items-center justify-center text-center" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.4s both" }}>
           <p className="text-xs text-neutral-500 font-bold uppercase tracking-widest relative z-10">Deflexão Geral</p>
           <p className="text-5xl font-black text-emerald-400 mt-3 drop-shadow-[0_0_20px_rgba(16,185,129,0.25)] relative z-10">73%</p>
           <p className="text-xs text-slate-400 mt-2 relative z-10">das interações resolvidas sem humano</p>
@@ -2052,7 +2059,7 @@ function AgentesScreen() {
           </div>
         </div>
 
-        <div className="lg:col-span-8 rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.45s both" }}>
+        <div className="lg:col-span-8 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.45s both" }}>
           <SectionHeader icon="target" title="Deflexão por Agente" sub="Resolvido sem humano" />
           <div className="space-y-2.5 relative z-10">
             {[...AGENTES].sort((a, b) => b.deflexao - a.deflexao).map((a, i) => (
@@ -2093,7 +2100,7 @@ function AgentesScreen() {
       {/* ── Execuções + Heatmap ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Execuções com filtro */}
-        <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] flex flex-col" style={{ animation: "animationIn 0.8s ease-out 0.5s both" }}>
+        <div className="rounded-2xl p-6 border border-white/[0.06] flex flex-col" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.5s both" }}>
           <SectionHeader icon="bot" title="Execuções dos Agentes" sub="Sucesso vs Erro">
             <div className="flex gap-1">
               {["todos", "SDR", "Cobrança"].map(f => (
@@ -2138,7 +2145,7 @@ function AgentesScreen() {
         </div>
 
         {/* Heatmap */}
-        <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.55s both" }}>
+        <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.55s both" }}>
           <SectionHeader icon="clock" title="Heatmap de Atividade" sub="Hora × Dia" />
           <div className="relative z-10">
             {/* Header hours */}
@@ -2174,7 +2181,7 @@ function AgentesScreen() {
       </div>
 
       {/* ── ROI Table ── */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.6s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.6s both" }}>
         <SectionHeader icon="chart" title="ROI por Agente" sub="Custo vs Valor Gerado" />
         <div className="overflow-x-auto relative z-10">
           <table className="w-full">
@@ -2222,7 +2229,7 @@ function AgentesScreen() {
       </div>
 
       {/* ── Custo por Agente (visual bars) ── */}
-      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02]" style={{ animation: "animationIn 0.8s ease-out 0.65s both" }}>
+      <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.65s both" }}>
         <SectionHeader icon="dollar" title="Custo por Agente" sub="vs vendedor humano" />
         <div className="space-y-2 relative z-10">
           {AGENTES.map((a, i) => (
@@ -2429,7 +2436,7 @@ function AlunosScreen() {
 
       {/* RIGHT: Student panel */}
       {aluno && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] flex flex-col overflow-hidden" style={{ animation: "animationIn 0.4s ease-out both" }}>
+        <div className="rounded-2xl border border-white/[0.06] flex flex-col overflow-hidden" style={{ ...glassCard, animation: "animationIn 0.4s ease-out both" }}>
           {/* Panel header */}
           <div className="p-5 border-b border-white/[0.06] flex gap-4 items-start">
             <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 border border-purple-400/20" style={{ background: "linear-gradient(135deg,rgba(167,139,250,0.3),rgba(34,211,238,0.2))" }}>
@@ -3143,8 +3150,8 @@ function TurmasScreen() {
           const diasColor = diasRestantes > 30 ? "text-emerald-400" : diasRestantes > 7 ? "text-amber-400" : "text-rose-400";
           return (
             <div key={t.id} onClick={() => setSelTurma(t.id)}
-              className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] cursor-pointer hover:border-white/[0.1] hover:bg-white/[0.03] transition-all duration-200"
-              style={{ animation: `animationIn 0.8s ease-out ${0.25 + i * 0.05}s both` }}>
+              className="rounded-2xl p-6 border border-white/[0.06] cursor-pointer hover:border-white/[0.1] hover:bg-white/[0.03] transition-all duration-200"
+              style={{ ...glassCard, animation: `animationIn 0.8s ease-out ${0.25 + i * 0.05}s both` }}>
               <div className="flex justify-between items-start mb-3 relative z-10">
                 <div>
                   <div className="flex items-center gap-2">
@@ -3192,10 +3199,7 @@ export default function AdministrativoPage() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden overflow-y-auto" style={{ background: "#0a0a0a" }}>
-      {/* Ambient background */}
-      <div className="pointer-events-none fixed inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
-        <div className="h-[120vh] w-[120vh] rounded-full" style={{ background: "rgba(255, 177, 23, 0.15)", filter: "blur(140px)", animation: "orbPulse 5s ease-in-out infinite" }} />
-      </div>
+      {/* Background logo only */}
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
         <Image src="/seu_elias_logo_upscaled 1.png" alt="" fill className="opacity-[0.03] select-none object-contain p-8" draggable={false} />
       </div>
@@ -3252,7 +3256,7 @@ export default function AdministrativoPage() {
         </main>
 
         {/* Footer */}
-        <footer className="fixed bottom-8 left-4 right-4 flex items-center justify-between rounded-xl px-8 py-3 bg-[#0a0a0a]/90 border border-white/[0.06]" style={{ backdropFilter: "blur(12px)", zIndex: 20, animation: "animationIn 0.8s ease-out 0.6s both" }}>
+        <footer className="fixed bottom-8 left-4 right-4 flex items-center justify-between rounded-xl px-8 py-3 border border-white/[0.04]" style={{ ...glassCard, zIndex: 20, animation: "animationIn 0.8s ease-out 0.6s both" }}>
           <div className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-emerald-500 animate-pulse" style={{ boxShadow: "0 0 8px rgba(16,185,129,0.6)" }} />
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sistema Online — Dados em Tempo Real</span>
