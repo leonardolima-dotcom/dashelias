@@ -470,8 +470,10 @@ const fmt = (n: number) => n.toLocaleString("pt-BR");
 const fmtR = (n: number) => `R$ ${fmt(n)}`;
 
 const glassCard: React.CSSProperties = {
-  background: "linear-gradient(135deg, #17191c 0%, #111315 100%)",
-  boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(255,255,255,0.03)",
+  background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)",
+  backdropFilter: "blur(16px) saturate(180%)",
+  WebkitBackdropFilter: "blur(16px) saturate(180%)",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
 };
 
 
