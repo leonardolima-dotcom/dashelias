@@ -1299,7 +1299,7 @@ function FinanceiroScreen() {
           const cardKey = `${d.mes}-${d.ano}`;
           const isExpanded = dreExpandido === cardKey;
           return (
-            <div className="rounded-2xl border border-white/[0.06] overflow-clip" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%)", backdropFilter: "blur(16px) saturate(180%)", WebkitBackdropFilter: "blur(16px) saturate(180%)", boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
+            <div className="rounded-2xl border border-white/[0.06] overflow-clip" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
               {/* Card header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
                 <div className="flex items-center gap-2.5">
@@ -1458,15 +1458,17 @@ function FinanceiroScreen() {
             </div>
 
             {/* Monthly DRE cards — horizontal scroll */}
-            <div className="flex gap-4 overflow-x-auto pb-3 custom-scrollbar snap-x snap-mandatory">
-              {dreMesesAno.map((d) => {
-                const compD = dreMesesComp.find(c => c.mes === d.mes);
-                return (
-                  <div key={`${d.mes}-${d.ano}`} className="min-w-[340px] w-[340px] md:min-w-[380px] md:w-[380px] shrink-0 snap-start">
-                    <DreCard d={d} compD={compD} />
-                  </div>
-                );
-              })}
+            <div className="rounded-2xl p-4 border border-white/[0.06]" style={glassCard}>
+              <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar snap-x snap-mandatory">
+                {dreMesesAno.map((d) => {
+                  const compD = dreMesesComp.find(c => c.mes === d.mes);
+                  return (
+                    <div key={`${d.mes}-${d.ano}`} className="min-w-[340px] w-[340px] md:min-w-[380px] md:w-[380px] shrink-0 snap-start">
+                      <DreCard d={d} compD={compD} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
