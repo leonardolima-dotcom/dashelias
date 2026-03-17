@@ -1542,24 +1542,24 @@ function FinanceiroScreen() {
           <SectionHeader icon="chart" title="Previsão de Caixa" sub="30 / 60 / 90 dias" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10 flex-1">
             {CASHFLOW_FORECAST.map((cf, i) => (
-              <div key={i} className="rounded-xl p-5 border border-white/[0.06] bg-white/[0.02] flex flex-col">
+              <div key={i} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] flex flex-col">
                 <div className="flex items-center gap-2.5 mb-3">
                   <span className="size-2.5 rounded-full" style={{ background: cashDot[cf.status] }} />
                   <span className="text-sm font-bold text-white">{cf.periodo}</span>
                 </div>
                 <p className={`text-xl font-bold ${cashStatusColor[cf.status]} mb-4`}>+{fmtR(cf.saldo)}</p>
-                <div className="space-y-2 flex-1 flex flex-col justify-end">
+                <div className="space-y-1.5 flex-1 flex flex-col justify-end">
                   {cf.entradas.map((e, j) => (
-                    <div key={j} className="flex justify-between items-center">
-                      <span className="text-sm text-slate-400">{e.l}</span>
-                      <span className="text-sm font-bold text-emerald-400">+{fmtR(e.v)}</span>
+                    <div key={j} className="flex justify-between items-center gap-2">
+                      <span className="text-xs text-slate-400 whitespace-nowrap">{e.l}</span>
+                      <span className="text-xs font-bold text-emerald-400 whitespace-nowrap">+{fmtR(e.v)}</span>
                     </div>
                   ))}
                   <div className="border-t border-white/[0.04] my-1" />
                   {cf.saidas.map((s, j) => (
-                    <div key={j} className="flex justify-between items-center">
-                      <span className="text-sm text-slate-400">{s.l}</span>
-                      <span className="text-sm font-bold text-rose-400">{fmtR(s.v)}</span>
+                    <div key={j} className="flex justify-between items-center gap-2">
+                      <span className="text-xs text-slate-400 whitespace-nowrap">{s.l}</span>
+                      <span className="text-xs font-bold text-rose-400 whitespace-nowrap">{fmtR(s.v)}</span>
                     </div>
                   ))}
                 </div>
