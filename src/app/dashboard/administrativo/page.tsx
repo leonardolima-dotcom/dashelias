@@ -1337,9 +1337,14 @@ function FinanceiroScreen() {
                     <div key={i} className="bg-[#0a0a0a]/50 px-3 py-2.5 text-center">
                       <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{item.label}</div>
                       <div className="text-sm font-bold text-white mt-0.5">{item.isPct ? `${item.valor}%` : fmtR(item.valor as number)}</div>
-                      {delta != null && (
-                        <div className={`text-[10px] font-bold mt-0.5 ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                          {delta >= 0 ? "↑" : "↓"} {Math.abs(Math.round(delta * 10) / 10)}{item.isPct ? "pp" : "%"}
+                      {item.comp != null && (
+                        <div className="text-[10px] text-slate-600 mt-0.5">
+                          {item.isPct ? `${item.comp}%` : fmtR(item.comp as number)}
+                          {delta != null && (
+                            <span className={`ml-1 font-bold ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                              {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}{item.isPct ? "pp" : "%"}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1349,7 +1354,16 @@ function FinanceiroScreen() {
 
               {/* Expanded detail */}
               {isExpanded && (
-                <div className="px-4 py-3 space-y-0" style={{ animation: "animationIn 0.3s ease-out both" }}>
+                <div className="px-3 py-3 space-y-0" style={{ animation: "animationIn 0.3s ease-out both" }}>
+                  {/* Column headers when comparing */}
+                  {compRows && (
+                    <div className="flex items-center py-1.5 px-3 mb-1">
+                      <div className="flex-1" />
+                      <span className="text-[9px] text-amber-400/60 font-bold uppercase tracking-wider w-20 text-right shrink-0">{d.ano}</span>
+                      <span className="text-[9px] text-cyan-400/60 font-bold uppercase tracking-wider w-20 text-right shrink-0">{compD?.ano}</span>
+                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider w-14 text-right shrink-0">Var.</span>
+                    </div>
+                  )}
                   {rows.map((row, ri) => {
                     const compVal = compRows ? compRows[ri].valor : null;
                     const delta = compVal != null && compVal !== 0 ? ((row.valor - compVal) / compVal) * 100 : null;
@@ -1357,34 +1371,48 @@ function FinanceiroScreen() {
                     return (
                       <div key={row.key}>
                         <div
-                          className={`flex items-center py-3 px-3 rounded-lg transition-colors ${row.subtotal ? "bg-white/[0.03] border-b border-white/[0.06]" : row.final ? "bg-white/[0.04] border border-white/[0.08] mt-2 rounded-xl" : "border-b border-white/[0.04]"} ${row.subs ? "cursor-pointer hover:bg-white/[0.03]" : ""}`}
+                          className={`flex items-center py-2.5 px-3 rounded-lg transition-colors ${row.subtotal ? "bg-white/[0.03] border-b border-white/[0.06]" : row.final ? "bg-white/[0.04] border border-white/[0.08] mt-2 rounded-xl" : "border-b border-white/[0.04]"} ${row.subs ? "cursor-pointer hover:bg-white/[0.03]" : ""}`}
                           onClick={() => row.subs && setDreDetail(dreDetail === detKey ? null : detKey)}
                         >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-1 min-w-0">
                             {row.subs && (
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform shrink-0 ${dreDetail === detKey ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-slate-500 transition-transform shrink-0 ${dreDetail === detKey ? "rotate-180" : ""}`}><path d="m6 9 6 6 6-6"/></svg>
                             )}
-                            <span className={`text-sm font-bold ${row.final ? "text-amber-400" : row.subtotal ? "text-white" : row.negative ? "text-slate-400" : "text-slate-300"}`}>{row.label}</span>
+                            <span className={`text-xs font-bold truncate ${row.final ? "text-amber-400" : row.subtotal ? "text-white" : row.negative ? "text-slate-400" : "text-slate-300"}`}>{row.label}</span>
                           </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {delta != null && (
-                              <span className={`text-[10px] font-bold ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                                {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}%
-                              </span>
-                            )}
-                          </div>
-                          <span className={`text-sm font-bold text-right shrink-0 ml-auto ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
+                          <span className={`text-xs font-bold w-20 text-right shrink-0 ${row.final ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : row.negative ? "text-rose-400" : "text-white"}`}>
                             {row.negative ? `(${fmtR(row.valor)})` : fmtR(row.valor)}
                           </span>
+                          {compVal != null && (
+                            <span className={`text-xs w-20 text-right shrink-0 ${row.negative ? "text-rose-400/40" : "text-slate-500"}`}>
+                              {row.negative ? `(${fmtR(compVal)})` : fmtR(compVal)}
+                            </span>
+                          )}
+                          {compVal != null && delta != null && (
+                            <span className={`text-[10px] font-bold w-14 text-right shrink-0 ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                              {delta >= 0 ? "↑" : "↓"}{Math.abs(Math.round(delta * 10) / 10)}%
+                            </span>
+                          )}
                         </div>
                         {row.subs && dreDetail === detKey && (
-                          <div className="ml-8 mr-4 mb-2 mt-1 space-y-0.5" style={{ animation: "animationIn 0.3s ease-out both" }}>
-                            {row.subs.map((s, j) => (
-                              <div key={j} className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-white/[0.02] transition-colors">
-                                <span className="text-xs text-slate-500">{s.label}</span>
-                                <span className="text-xs font-bold text-slate-400">{fmtR(s.valor)}</span>
-                              </div>
-                            ))}
+                          <div className="ml-6 mr-2 mb-2 mt-1 space-y-0.5" style={{ animation: "animationIn 0.3s ease-out both" }}>
+                            {row.subs.map((s, j) => {
+                              const compSub = compRows?.[ri]?.subs?.[j];
+                              return (
+                                <div key={j} className="flex items-center justify-between py-1.5 px-3 rounded-md hover:bg-white/[0.02] transition-colors">
+                                  <span className="text-[11px] text-slate-500 flex-1">{s.label}</span>
+                                  <span className="text-[11px] font-bold text-slate-400 w-20 text-right">{fmtR(s.valor)}</span>
+                                  {compSub && (
+                                    <span className="text-[11px] text-slate-600 w-20 text-right">{fmtR(compSub.valor)}</span>
+                                  )}
+                                  {compSub && compSub.valor !== 0 && (
+                                    <span className={`text-[9px] font-bold w-14 text-right ${s.valor >= compSub.valor ? "text-emerald-400/60" : "text-rose-400/60"}`}>
+                                      {s.valor >= compSub.valor ? "↑" : "↓"}{Math.abs(Math.round(((s.valor - compSub.valor) / compSub.valor) * 1000) / 10)}%
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
