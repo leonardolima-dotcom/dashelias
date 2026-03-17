@@ -1299,7 +1299,7 @@ function FinanceiroScreen() {
           const cardKey = `${d.mes}-${d.ano}`;
           const isExpanded = dreExpandido === cardKey;
           return (
-            <div className="rounded-2xl border border-white/[0.06]" style={{ ...glassCard, overflow: "clip" }}>
+            <div className="rounded-2xl border border-white/[0.06] overflow-clip" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%)", backdropFilter: "blur(16px) saturate(180%)", WebkitBackdropFilter: "blur(16px) saturate(180%)", boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
               {/* Card header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors" onClick={() => setDreExpandido(isExpanded ? null : cardKey)}>
                 <div className="flex items-center gap-2.5">
