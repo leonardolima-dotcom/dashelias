@@ -396,6 +396,15 @@ const RECEITA_CUSTO_6M = [
   { mes: "Mar", receita: 43200, custoVar: 11413, custoFixo: 17387, margem: 33.1 },
 ];
 
+const ROAS_ROI_MER = [
+  { mes: "Out", roas: 3.2, roi: 1.8, mer: 4.1, impPct: 16.5, impVal: 11286, gwPct: 2.1, gwVal: 1436, hcQtd: 5, hcVal: 9500, mktSpend: 1750 },
+  { mes: "Nov", roas: 3.5, roi: 2.1, mer: 4.3, impPct: 16.5, impVal: 11897, gwPct: 2.2, gwVal: 1586, hcQtd: 5, hcVal: 9800, mktSpend: 1800 },
+  { mes: "Dez", roas: 4.1, roi: 2.6, mer: 4.8, impPct: 16.5, impVal: 13415, gwPct: 2.3, gwVal: 1870, hcQtd: 6, hcVal: 9800, mktSpend: 1900 },
+  { mes: "Jan", roas: 2.4, roi: 1.2, mer: 3.5, impPct: 16.5, impVal: 9768, gwPct: 2.1, gwVal: 1243, hcQtd: 6, hcVal: 10000, mktSpend: 1700 },
+  { mes: "Fev", roas: 4.8, roi: 3.1, mer: 5.2, impPct: 16.5, impVal: 14454, gwPct: 2.0, gwVal: 1752, hcQtd: 6, hcVal: 10000, mktSpend: 1787 },
+  { mes: "Mar", roas: 3.6, roi: 2.0, mer: 4.4, impPct: 16.5, impVal: 7128, gwPct: 2.3, gwVal: 994, hcQtd: 6, hcVal: 10000, mktSpend: 1787 },
+];
+
 const CASHFLOW_FORECAST = [
   { periodo: "Abril (30d)", saldo: 36800, saldoAnterior: 14307, entradas: [{ l: "Parcelas recorrentes", v: 14200 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -6200 }], status: "healthy" as const },
   { periodo: "Maio (60d)", saldo: 24600, saldoAnterior: 36800, entradas: [{ l: "Parcelas recorrentes", v: 12800 }], saidas: [{ l: "Custos fixos", v: -17400 }, { l: "Custos variáveis", v: -12200 }], status: "warning" as const },
@@ -403,14 +412,14 @@ const CASHFLOW_FORECAST = [
 ];
 
 const CALENDARIO_PAGAMENTOS = [
-  { dia: "13/03", valor: 4800, parcelas: 2, risco: "today" as const },
-  { dia: "14/03", valor: 2400, parcelas: 1, risco: "normal" as const },
-  { dia: "15/03", valor: 7200, parcelas: 3, risco: "normal" as const },
-  { dia: "17/03", valor: 14400, parcelas: 6, risco: "peak" as const },
-  { dia: "20/03", valor: 9600, parcelas: 4, risco: "normal" as const },
-  { dia: "22/03", valor: 4800, parcelas: 2, risco: "normal" as const },
-  { dia: "25/03", valor: 2400, parcelas: 1, risco: "critical" as const },
-  { dia: "27/03", valor: 7200, parcelas: 3, risco: "normal" as const },
+  { dia: "13/03", valor: 4800, parcelas: 2, risco: "today" as const, desc: "Parcela 3/12 — Lucas Mendes (Barber Pro) · Parcela 5/6 — Thiago Reis (Master Cut)" },
+  { dia: "14/03", valor: 2400, parcelas: 1, risco: "normal" as const, desc: "Parcela 2/12 — Camila Duarte (Barber Pro)" },
+  { dia: "15/03", valor: 7200, parcelas: 3, risco: "normal" as const, desc: "Parcela 4/12 — Pedro Alves (Barber Pro) · Parcela 6/6 — Ana Costa (Master Cut) · Parcela 8/12 — Felipe Ramos (Barber Pro)" },
+  { dia: "17/03", valor: 14400, parcelas: 6, risco: "peak" as const, desc: "Parcela 1/12 — Juliana Matos (Barber Pro) · Parcela 3/6 — Ricardo Lima (Master Cut) · Parcela 7/12 — Bruno Oliveira (Barber Pro) · Parcela 2/12 — Marina Santos (Barber Pro) · Parcela 5/12 — Gabriel Torres (Barber Pro) · Parcela 4/6 — Diego Ferreira (Master Cut)" },
+  { dia: "20/03", valor: 9600, parcelas: 4, risco: "normal" as const, desc: "Parcela 6/12 — Renata Azevedo (Barber Pro) · Parcela 2/6 — Carlos Neto (Master Cut) · Parcela 9/12 — Amanda Lopes (Barber Pro) · Parcela 3/12 — Vitor Hugo (Barber Pro)" },
+  { dia: "22/03", valor: 4800, parcelas: 2, risco: "normal" as const, desc: "Parcela 10/12 — Letícia Rocha (Barber Pro) · Parcela 1/6 — Mateus Silva (Master Cut)" },
+  { dia: "25/03", valor: 2400, parcelas: 1, risco: "critical" as const, desc: "Parcela 4/12 — André Souza (Barber Pro) — histórico de atraso" },
+  { dia: "27/03", valor: 7200, parcelas: 3, risco: "normal" as const, desc: "Parcela 5/12 — Isabela Martins (Barber Pro) · Parcela 6/6 — Paulo Henrique (Master Cut) · Parcela 11/12 — Fernanda Costa (Barber Pro)" },
 ];
 
 const PRODUTOS_FINANCEIRO = [
@@ -422,6 +431,12 @@ const AGING_INADIMPLENCIA = [
   { faixa: "1-30 dias", valor: 2400, recovery: 82, cor: "rgba(251,191,36,0.7)" },
   { faixa: "31-45 dias", valor: 8000, recovery: 48, cor: "rgba(249,115,22,0.7)" },
   { faixa: "45+ dias", valor: 2000, recovery: 8, cor: "rgba(244,63,94,0.7)" },
+];
+
+const INAD_HISTORICO = [
+  { mes: "Dez/2025", totalInad: 9800, convertido: 7200, pctConversao: 73.5 },
+  { mes: "Jan/2026", totalInad: 14200, convertido: 9100, pctConversao: 64.1 },
+  { mes: "Fev/2026", totalInad: 11600, convertido: 8400, pctConversao: 72.4 },
 ];
 
 const INAD_DETALHADA = [
@@ -555,6 +570,12 @@ const cardTooltips: Record<string, string> = {
   "Receita & Margem por Produto": "Ticket = preço cobrado por aluno. Alunos ativos = total de alunos matriculados no produto. CPV (Custo por Venda) = comissão + material + custo IA por aluno. Lucro/aluno = ticket - CPV. Margem = lucro/ticket × 100. Receita total = ticket × alunos. Lucro total = lucro/aluno × alunos.",
   "Inadimplência — Aging & Recovery": "Aging divide os inadimplentes por tempo de atraso: 1-30d (recente), 31-45d (moderado), 45+d (crítico). O % de recovery indica a probabilidade histórica de receber o valor com base no comportamento de pagamento. Recuperação esperada = soma ponderada de cada faixa × seu % de recovery. A tabela abaixo detalha cada aluno inadimplente com tentativas de cobrança já realizadas.",
   "AIR — Receita Gerada por IA": "AI-Influenced Revenue: receita de vendas onde pelo menos um agente de IA participou do processo. SDR = leads qualificados pelo agente SDR que converteram. Agendamento = reuniões agendadas automaticamente que geraram venda. Enriquecimento = leads enriquecidos que entraram no funil. ROI = receita gerada pela IA / custo total dos agentes (tokens + infraestrutura).",
+  "ROAS — Retorno sobre Gasto em Ads": "Return on Ad Spend: receita gerada / valor investido em anúncios. ROAS 3× = cada R$ 1 investido gerou R$ 3 de receita. Valores acima de 3× são considerados saudáveis para o segmento de educação.",
+  "ROI — Retorno sobre Investimento": "Return on Investment: (lucro líquido / investimento total) × 100. Investimento total inclui marketing + IA + material. ROI positivo indica que o investimento se pagou e gerou lucro adicional.",
+  "MER — Marketing Efficiency Ratio": "Receita total / gasto total em marketing. Diferente do ROAS, o MER considera TODA a receita (não só a atribuída diretamente aos ads). Quanto maior, mais eficiente é o marketing no contexto geral do negócio.",
+  "Impostos": "Carga tributária mensal: Simples Nacional (9.53%) + IRPJ (4.8%) + CSLL (2.16%) = ~16.5% sobre o lucro operacional. O gráfico mostra a evolução do valor absoluto e a linha tracejada indica a alíquota efetiva.",
+  "Gateway — Taxas de Pagamento": "Taxas cobradas pelos meios de pagamento (Pix, cartão, boleto). O percentual médio varia entre 2.0% e 2.3% conforme o mix de formas de pagamento. Valor = taxa média × receita bruta do mês.",
+  "Headcount & Folha": "Quantidade de colaboradores e custo total da folha de pagamento. Inclui salários fixos, encargos e benefícios. O custo per capita = folha / headcount mostra a eficiência da estrutura de pessoal.",
   "AIRE — Eficiência de Receita por IA": "AI Revenue Efficiency: mede o impacto incremental da IA na receita. Baseline = receita estimada sem IA (média histórica pré-implantação). AIRE = receita real - baseline. Crescimento MoM = variação percentual do AIRE em relação ao mês anterior. Os marcos (go-live, stack completa, etc.) indicam eventos que impactaram a performance.",
 };
 
@@ -1474,6 +1495,342 @@ function FinanceiroScreen() {
         );
       })()}
 
+      {/* ══════ Receita vs Despesa + Realizado vs Planejado ══════ */}
+      {(() => {
+        const mesesAno = DRE_MENSAL.filter(d => d.ano === dreAno);
+        // Chart 1: Receita vs Despesa
+        const ch1Data = mesesAno.map(d => ({
+          mes: d.mes,
+          receita: d.receitaBruta.total,
+          despesa: d.custosVariaveis.total + d.custosFixos.total + d.impostos.total,
+        }));
+        // Chart 2: Realizado vs Planejado (mock planejado = +15% sobre 2025 ou base)
+        const mesesAnoAnt = DRE_MENSAL.filter(d => d.ano === dreAno - 1);
+        const ch2Data = mesesAno.map((d, i) => {
+          const base = mesesAnoAnt[i];
+          const planejado = base ? Math.round(base.receitaBruta.total * 1.15) : Math.round(d.receitaBruta.total * 1.1);
+          return { mes: d.mes, realizado: d.receitaBruta.total, planejado };
+        });
+
+        const chartW = 440;
+        const chartH = 200;
+        const pad = { l: 8, r: 8, t: 50, b: 22 };
+        const usW = chartW - pad.l - pad.r;
+        const usH = chartH - pad.t - pad.b;
+
+        const buildLine = (data: number[], max: number, min: number) =>
+          data.map((v, i) => {
+            const x = pad.l + (i / Math.max(data.length - 1, 1)) * usW;
+            const y = pad.t + usH - ((v - min) / (max - min || 1)) * usH;
+            return `${x},${y}`;
+          });
+
+        // Chart 1
+        const allC1 = ch1Data.flatMap(d => [d.receita, d.despesa]);
+        const maxC1 = Math.max(...allC1) * 1.05;
+        const minC1 = Math.min(...allC1) * 0.9;
+        const c1Receita = buildLine(ch1Data.map(d => d.receita), maxC1, minC1);
+        const c1Despesa = buildLine(ch1Data.map(d => d.despesa), maxC1, minC1);
+
+        // Chart 2
+        const allC2 = ch2Data.flatMap(d => [d.realizado, d.planejado]);
+        const maxC2 = Math.max(...allC2) * 1.05;
+        const minC2 = Math.min(...allC2) * 0.9;
+        const c2Realizado = buildLine(ch2Data.map(d => d.realizado), maxC2, minC2);
+        const c2Planejado = buildLine(ch2Data.map(d => d.planejado), maxC2, minC2);
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Chart 1: Receita vs Despesa */}
+            <div className="rounded-2xl p-5 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.32s both" }}>
+              <SectionHeader icon="chart" title="Receita vs Despesa" sub={`Mensal · ${dreAno}`} />
+              <div className="relative z-10 mt-3">
+                <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet" style={{ overflow: "visible" }}>
+                  {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
+                    <line key={i} x1={pad.l} y1={pad.t + usH - f * usH} x2={chartW - pad.r} y2={pad.t + usH - f * usH} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                  ))}
+                  {/* Area under receita */}
+                  <polygon points={`${c1Receita.join(" ")} ${pad.l + usW},${pad.t + usH} ${pad.l},${pad.t + usH}`} fill="rgba(52,211,153,0.06)" />
+                  {/* Lines */}
+                  <polyline points={c1Receita.join(" ")} fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinejoin="round" />
+                  <polyline points={c1Despesa.join(" ")} fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinejoin="round" />
+                  {/* Dots + labels */}
+                  {ch1Data.map((d, i) => {
+                    const rp = c1Receita[i].split(",");
+                    const dp = c1Despesa[i].split(",");
+                    const x = Number(rp[0]);
+                    return (
+                      <g key={i}>
+                        <circle cx={x} cy={Number(rp[1])} r="3" fill="#34d399" />
+                        <circle cx={x} cy={Number(dp[1])} r="3" fill="#f87171" />
+                        <text x={x} y={chartH - 4} fontSize="8" fill="rgba(255,255,255,0.3)" textAnchor="middle">{d.mes}</text>
+                      </g>
+                    );
+                  })}
+                  {/* Hover areas with tooltip */}
+                  {ch1Data.map((d, i) => {
+                    const rp = c1Receita[i].split(",");
+                    const x = Number(rp[0]);
+                    const ry = Number(rp[1]);
+                    const colW = usW / ch1Data.length;
+                    const saldo = d.receita - d.despesa;
+                    const tw = 140;
+                    const th = 42;
+                    let tx = x - tw / 2;
+                    if (tx < 2) tx = 2;
+                    if (tx + tw > chartW - 2) tx = chartW - tw - 2;
+                    const ty = ry - th - 8 >= 2 ? ry - th - 8 : ry + 12;
+                    return (
+                      <g key={`h${i}`} className="group/c1">
+                        <rect x={x - colW / 2} y={0} width={colW} height={chartH} fill="transparent" className="peer" />
+                        <g className="opacity-0 peer-hover:opacity-100 transition-opacity">
+                          <rect x={tx} y={ty} width={tw} height={th} rx="5" fill="rgba(10,12,24,0.95)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                          <text x={tx + tw / 2} y={ty + 14} textAnchor="middle" fontSize="8" fontWeight="700" fill="#34d399">Receita: {fmtR(d.receita)}</text>
+                          <text x={tx + tw / 2} y={ty + 26} textAnchor="middle" fontSize="8" fontWeight="700" fill="#f87171">Despesa: {fmtR(d.despesa)}</text>
+                          <text x={tx + tw / 2} y={ty + 37} textAnchor="middle" fontSize="7" fill={saldo >= 0 ? "#34d399" : "#f87171"}>Saldo: {saldo >= 0 ? "+" : ""}{fmtR(saldo)}</text>
+                        </g>
+                      </g>
+                    );
+                  })}
+                </svg>
+                <div className="flex gap-4 mt-2 justify-center">
+                  <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded bg-emerald-400" />Receita</span>
+                  <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded bg-red-400" />Despesa</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Chart 2: Realizado vs Planejado */}
+            <div className="rounded-2xl p-5 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.34s both" }}>
+              <SectionHeader icon="target" title="Realizado vs Planejado" sub={`Meta ${dreAno} (+15% sobre ${dreAno - 1})`} />
+              <div className="relative z-10 mt-3">
+                <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet" style={{ overflow: "visible" }}>
+                  {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
+                    <line key={i} x1={pad.l} y1={pad.t + usH - f * usH} x2={chartW - pad.r} y2={pad.t + usH - f * usH} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                  ))}
+                  {/* Area between */}
+                  {(() => {
+                    const above = [...c2Realizado, ...c2Planejado.slice().reverse()].join(" ");
+                    return <polygon points={above} fill="rgba(96,165,250,0.06)" />;
+                  })()}
+                  {/* Lines */}
+                  <polyline points={c2Planejado.join(" ")} fill="none" stroke="rgba(96,165,250,0.5)" strokeWidth="1.5" strokeDasharray="5,4" />
+                  <polyline points={c2Realizado.join(" ")} fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinejoin="round" />
+                  {/* Dots + labels */}
+                  {ch2Data.map((d, i) => {
+                    const rp = c2Realizado[i].split(",");
+                    const pp = c2Planejado[i].split(",");
+                    const x = Number(rp[0]);
+                    const atingido = d.planejado > 0 ? ((d.realizado / d.planejado) * 100).toFixed(0) : "—";
+                    const acima = d.realizado >= d.planejado;
+                    return (
+                      <g key={i}>
+                        <circle cx={x} cy={Number(rp[1])} r="3" fill={acima ? "#34d399" : "#60a5fa"} />
+                        <circle cx={x} cy={Number(pp[1])} r="2.5" fill="rgba(96,165,250,0.5)" />
+                        <text x={x} y={chartH - 4} fontSize="8" fill="rgba(255,255,255,0.3)" textAnchor="middle">{d.mes}</text>
+                      </g>
+                    );
+                  })}
+                  {/* Hover tooltips */}
+                  {ch2Data.map((d, i) => {
+                    const rp = c2Realizado[i].split(",");
+                    const x = Number(rp[0]);
+                    const ry = Number(rp[1]);
+                    const colW = usW / ch2Data.length;
+                    const pct = d.planejado > 0 ? ((d.realizado / d.planejado) * 100).toFixed(1) : "—";
+                    const acima = d.realizado >= d.planejado;
+                    const tw = 140;
+                    const th = 42;
+                    let tx = x - tw / 2;
+                    if (tx < 2) tx = 2;
+                    if (tx + tw > chartW - 2) tx = chartW - tw - 2;
+                    const ty = ry - th - 8 >= 2 ? ry - th - 8 : ry + 12;
+                    return (
+                      <g key={`h${i}`}>
+                        <rect x={x - colW / 2} y={0} width={colW} height={chartH} fill="transparent" className="peer" />
+                        <g className="opacity-0 peer-hover:opacity-100 transition-opacity">
+                          <rect x={tx} y={ty} width={tw} height={th} rx="5" fill="rgba(10,12,24,0.95)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                          <text x={tx + tw / 2} y={ty + 14} textAnchor="middle" fontSize="8" fontWeight="700" fill="#60a5fa">Realizado: {fmtR(d.realizado)}</text>
+                          <text x={tx + tw / 2} y={ty + 26} textAnchor="middle" fontSize="8" fill="rgba(96,165,250,0.6)">Planejado: {fmtR(d.planejado)}</text>
+                          <text x={tx + tw / 2} y={ty + 37} textAnchor="middle" fontSize="7" fontWeight="700" fill={acima ? "#34d399" : "#fbbf24"}>{pct}% da meta</text>
+                        </g>
+                      </g>
+                    );
+                  })}
+                </svg>
+                <div className="flex gap-4 mt-2 justify-center">
+                  <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded bg-blue-400" />Realizado</span>
+                  <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded border-b border-dashed border-blue-400/50" />Planejado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ══════ AIRE — Evolução da Receita após IA ══════ */}
+      {(() => {
+        const aireTotal = AIRE_TIMELINE.reduce((s, m) => s + m.aire, 0);
+        const aireMar = AIRE_TIMELINE[AIRE_TIMELINE.length - 1];
+        const custoIATotal = 673 * AIRE_TIMELINE.length;
+        const aireROI = (aireTotal / custoIATotal).toFixed(1);
+        const allVals = AIRE_TIMELINE.flatMap(m => [m.receita, m.baseline]);
+        const maxRecChart = Math.max(...allVals);
+        const minRecChart = Math.min(...allVals) * 0.9;
+        const rangeChart = maxRecChart - minRecChart;
+        const chartH = 180;
+        const chartW = 900;
+        const padL = 10;
+        const padR = 10;
+        const topPad = 30;
+        const botPad = 24;
+        const usableH = chartH - topPad - botPad;
+
+        const ptReal = AIRE_TIMELINE.map((m, i) => {
+          const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
+          const y = topPad + usableH - ((m.receita - minRecChart) / rangeChart) * usableH;
+          return `${x},${y}`;
+        });
+        const ptBase = AIRE_TIMELINE.map((m, i) => {
+          const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
+          const y = topPad + usableH - ((m.baseline - minRecChart) / rangeChart) * usableH;
+          return `${x},${y}`;
+        });
+        const areaPoints = [...ptReal, ...ptBase.slice().reverse()].join(" ");
+        const ptBaseReversed = ptBase.slice().reverse();
+
+        return (
+          <div className="rounded-2xl p-6 border border-purple-500/10" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.35s both" }}>
+            <div className="flex items-start justify-between mb-5 relative z-10">
+              <div>
+                <SectionHeader icon="chart" title="AIRE — Eficiência de Receita por IA" sub="AI Revenue Impact Evolution" />
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-black text-purple-400 drop-shadow-[0_0_12px_rgba(167,139,250,0.25)]">+{fmtR(aireTotal)}</p>
+                <p className="text-xs text-slate-500">Receita incremental acumulada desde implementação</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 relative z-10">
+              {[
+                { l: "AIRE Acumulado", v: `+${fmtR(aireTotal)}`, c: "text-purple-400", d: "desde Ago/25" },
+                { l: "AIRE · Mar/26", v: `+${fmtR(aireMar.aire)}`, c: "text-purple-400", d: `vs ${fmtR(aireMar.baseline)} sem IA` },
+                { l: "Aceleração CAGR", v: "4.8×", c: "text-white", d: "vs crescimento pré-IA" },
+                { l: "Payback da IA", v: "< 1 mês", c: "text-emerald-400", d: `custo total: ${fmtR(custoIATotal)} · ROI: ${aireROI}×` },
+              ].map((k, i) => (
+                <div key={i} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] text-center">
+                  <p className={`text-xl font-black ${k.c}`}>{k.v}</p>
+                  <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">{k.l}</p>
+                  <p className="text-xs text-slate-500 mt-1">{k.d}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-0 rounded-xl overflow-hidden border border-white/[0.06] mb-5 relative z-10">
+              {[
+                { date: "Jul/25", label: "Pré-IA", valor: "R$26.400", c: "text-slate-500", bg: "" },
+                { date: "Ago/25", label: "Go-live SDR", valor: "R$28.900", c: "text-amber-400", bg: "bg-amber-400/[0.02]" },
+                { date: "Out/25", label: "Stack completa", valor: "R$29.000", c: "text-cyan-400", bg: "" },
+                { date: "Dez/25", label: "5 agentes online", valor: "R$33.400", c: "text-emerald-400", bg: "" },
+                { date: "Mar/26", label: "Hoje", valor: "R$43.200", c: "text-emerald-400", bg: "bg-emerald-400/[0.02]" },
+              ].map((ms, i) => (
+                <div key={i} className={`flex-1 py-3 px-2 text-center border-r border-white/[0.06] last:border-r-0 ${ms.bg}`}>
+                  <p className="text-xs text-slate-600">{ms.date}</p>
+                  <p className={`text-xs font-bold ${ms.c}`}>{ms.label}</p>
+                  <p className="text-sm font-black text-white mt-1">{ms.valor}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] mb-5 relative z-10">
+              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-3">Receita real vs Projeção sem IA</p>
+              <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" onMouseLeave={() => setHoveredAire(null)}>
+                {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
+                  <line key={i} x1={padL} y1={topPad + usableH - f * usableH} x2={chartW - padR} y2={topPad + usableH - f * usableH} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                ))}
+                <polygon points={areaPoints} fill="rgba(167,139,250,0.08)" />
+                <polyline points={ptBaseReversed.join(" ")} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeDasharray="5,4" />
+                <polyline points={ptReal.join(" ")} fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinejoin="round" />
+                {AIRE_TIMELINE.map((m, i) => {
+                  const rp = ptReal[i].split(",");
+                  const bp = ptBase[i].split(",");
+                  const rx = Number(rp[0]);
+                  const ry = Number(rp[1]);
+                  const by = Number(bp[1]);
+                  const isHov = hoveredAire === i;
+                  const isCurrent = i === AIRE_TIMELINE.length - 1;
+                  return (
+                    <g key={i}>
+                      {isHov && <line x1={rx} y1={topPad} x2={rx} y2={topPad + usableH} stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="3,3" />}
+                      <circle cx={rx} cy={ry} r={isHov ? 5 : isCurrent ? 4 : 0} fill="#34d399" style={{ transition: "r 0.15s" }} />
+                      <circle cx={rx} cy={by} r={isHov ? 4 : 0} fill="rgba(255,255,255,0.3)" style={{ transition: "r 0.15s" }} />
+                      {isHov && (() => {
+                        const tw = 160;
+                        const th = 34;
+                        let tx = rx - tw / 2;
+                        if (tx < 2) tx = 2;
+                        if (tx + tw > chartW - 2) tx = chartW - tw - 2;
+                        const above = ry - th - 10;
+                        const ty = above >= 2 ? above : ry + 12;
+                        return (
+                          <>
+                            <rect x={tx} y={ty} width={tw} height={th} rx="5" fill="rgba(10,12,24,0.95)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                            <text x={tx + tw / 2} y={ty + 13} textAnchor="middle" fontSize="9" fontWeight="700" fill="#34d399">{fmtR(m.receita)} <tspan fill="rgba(167,139,250,0.8)">+{fmtR(m.aire)}</tspan></text>
+                            <text x={tx + tw / 2} y={ty + 26} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.4)">sem IA: {fmtR(m.baseline)}</text>
+                          </>
+                        );
+                      })()}
+                      <rect x={rx - (chartW / AIRE_TIMELINE.length) / 2} y={0} width={chartW / AIRE_TIMELINE.length} height={chartH} fill="transparent" onMouseEnter={() => setHoveredAire(i)} style={{ cursor: "crosshair" }} />
+                    </g>
+                  );
+                })}
+                {AIRE_TIMELINE.map((m, i) => {
+                  const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
+                  const isCurrent = i === AIRE_TIMELINE.length - 1;
+                  const isHov = hoveredAire === i;
+                  return <text key={i} x={x} y={chartH - 4} fontSize="9" fill={isCurrent || isHov ? "#34d399" : "rgba(255,255,255,0.25)"} textAnchor="middle" fontWeight={isCurrent || isHov ? "700" : "400"}>{m.mes.replace("/25", "").replace("/26", "")}</text>;
+                })}
+              </svg>
+              <div className="flex gap-4 mt-3 justify-center">
+                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3.5 h-0.5 rounded bg-emerald-400" />Receita real</span>
+                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3.5 h-0.5 rounded border-b border-dashed border-white/30" />Projeção sem IA</span>
+                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "rgba(167,139,250,0.2)" }} />AIRE (incremental)</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden relative z-10">
+              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider px-4 pt-4 pb-2">Taxa de crescimento — Pré-IA vs Pós-IA</p>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    {["Período", "Receita", "Cresc. MoM", "Sem IA (proj.)", "AIRE do mês"].map(h => (
+                      <th key={h} className={`py-2 px-4 text-xs text-neutral-500 font-bold uppercase tracking-wider ${h === "Período" ? "text-left" : "text-right"}`}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {AIRE_TIMELINE.map((m, i) => {
+                    const isCurrent = i === AIRE_TIMELINE.length - 1;
+                    return (
+                      <tr key={i} className={`border-b border-white/[0.025] ${isCurrent ? "bg-emerald-400/[0.03]" : m.label === "Go-live SDR" ? "bg-amber-400/[0.015]" : ""}`}>
+                        <td className="py-2.5 px-4">
+                          <span className={`text-xs font-bold ${isCurrent ? "text-emerald-400" : "text-white"}`}>{m.mes}</span>
+                          {m.label && <span className={`ml-2 text-xs ${m.label === "Go-live SDR" ? "text-amber-400" : m.label === "Hoje" ? "text-emerald-400" : "text-cyan-400"}`}>{m.label}</span>}
+                        </td>
+                        <td className={`py-2.5 px-4 text-right text-xs ${isCurrent ? "font-bold text-emerald-400" : "text-white"}`}>{fmtR(m.receita)}</td>
+                        <td className={`py-2.5 px-4 text-right text-xs font-bold ${m.crescMoM >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{m.crescMoM >= 0 ? "▲" : "▼"} {m.crescMoM >= 0 ? "+" : ""}{m.crescMoM}%</td>
+                        <td className="py-2.5 px-4 text-right text-sm text-slate-300">{fmtR(m.baseline)}</td>
+                        <td className={`py-2.5 px-4 text-right text-xs font-bold ${isCurrent ? "text-purple-400" : "text-purple-400/70"}`}>+{fmtR(m.aire)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Cost Breakdown + 6-Month Evolution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.4s both" }}>
@@ -1577,17 +1934,31 @@ function FinanceiroScreen() {
 
         <div className="lg:col-span-5 rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.55s both" }}>
           <SectionHeader icon="calendar" title="Vencimentos Próximos" sub="14 dias" />
-          <div className="space-y-1 relative z-10">
-            {CALENDARIO_PAGAMENTOS.map((p, i) => (
-              <div key={i} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group/cal cursor-default">
-                <div className="flex items-center gap-2.5 w-20">
-                  <span className="size-2 rounded-full shrink-0" style={{ background: riscoDot[p.risco] }} />
-                  <span className={`text-sm font-bold ${riscoColor[p.risco]}`}>{p.dia}</span>
-                </div>
-                <span className="text-sm text-slate-400 flex-1 text-center">{p.parcelas} parcela{p.parcelas > 1 ? "s" : ""}</span>
-                <span className={`text-sm font-bold w-24 text-right ${p.risco === "peak" ? "text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]" : p.risco === "critical" ? "text-rose-400" : "text-white"}`}>{fmtR(p.valor)}</span>
-              </div>
-            ))}
+          <div className="space-y-0.5 relative z-10">
+            {CALENDARIO_PAGAMENTOS.map((p, i) => {
+              const items = p.desc.split(" · ");
+              return (
+                <details key={i} className="group/det rounded-lg hover:bg-white/[0.03] transition-colors">
+                  <summary className="flex items-center justify-between py-2.5 px-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <div className="flex items-center gap-2.5 w-20">
+                      <span className="size-2 rounded-full shrink-0" style={{ background: riscoDot[p.risco] }} />
+                      <span className={`text-sm font-bold ${riscoColor[p.risco]}`}>{p.dia}</span>
+                    </div>
+                    <span className="text-sm text-slate-400 flex-1 text-center">{p.parcelas} parcela{p.parcelas > 1 ? "s" : ""}</span>
+                    <span className={`text-sm font-bold w-24 text-right ${p.risco === "peak" ? "text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]" : p.risco === "critical" ? "text-rose-400" : "text-white"}`}>{fmtR(p.valor)}</span>
+                    <svg className="w-3.5 h-3.5 ml-2 text-slate-500 transition-transform group-open/det:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </summary>
+                  <div className="px-3 pb-2.5 pt-0.5 ml-[30px] border-l border-white/[0.06] space-y-1">
+                    {items.map((item, j) => (
+                      <div key={j} className="flex items-start gap-2 text-xs text-slate-400">
+                        <span className="text-slate-600 mt-0.5">›</span>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1595,43 +1966,55 @@ function FinanceiroScreen() {
       {/* Revenue by Product */}
       <div className="rounded-2xl p-6 border border-white/[0.06]" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.6s both" }}>
         <SectionHeader icon="target" title="Receita & Margem por Produto" sub="Comparativo de rentabilidade" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+        <div className="space-y-0.5 relative z-10 max-h-[420px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
           {PRODUTOS_FINANCEIRO.map((p, i) => {
             const receitaTotal = p.ticket * p.alunos;
             const lucroTotal = p.lucroUnit * p.alunos;
             return (
-              <div key={i} className="rounded-xl p-5 border border-white/[0.06] bg-white/[0.02]">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-base font-bold text-white">{p.nome}</p>
-                    <p className="text-sm text-slate-500">{p.turmas} · {p.tipo}</p>
-                  </div>
-                  <Badge color={p.margem > 40 ? "green" : "amber"}>{p.margem}% margem</Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  {[
-                    { l: "Ticket", v: fmtR(p.ticket) },
-                    { l: "Alunos ativos", v: String(p.alunos) },
-                    { l: "CPV unitário", v: fmtR(p.cpv) },
-                    { l: "Lucro/aluno", v: fmtR(p.lucroUnit) },
-                  ].map((m, j) => (
-                    <div key={j}>
-                      <p className="text-sm text-slate-400">{m.l}</p>
-                      <p className="text-base font-bold text-white">{m.v}</p>
+              <details key={i} className="group/prod rounded-lg hover:bg-white/[0.03] transition-colors">
+                <summary className="flex items-center justify-between py-3 px-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="size-2 rounded-full shrink-0" style={{ background: p.margem > 40 ? "#34d399" : "#fbbf24" }} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white truncate">{p.nome}</p>
+                      <p className="text-xs text-slate-500">{p.turmas} · {p.tipo}</p>
                     </div>
-                  ))}
-                </div>
-                <div className="flex justify-between pt-4 border-t border-white/[0.06]">
-                  <div>
-                    <p className="text-sm text-slate-400">Receita total</p>
-                    <p className="text-base font-bold text-emerald-400">{fmtR(receitaTotal)}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-400">Lucro total</p>
-                    <p className="text-base font-bold text-amber-400">{fmtR(lucroTotal)}</p>
+                  <div className="flex items-center gap-6 shrink-0">
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-emerald-400">{fmtR(receitaTotal)}</p>
+                      <p className="text-xs text-slate-500">receita</p>
+                    </div>
+                    <Badge color={p.margem > 40 ? "green" : "amber"}>{p.margem}% margem</Badge>
+                    <svg className="w-3.5 h-3.5 text-slate-500 transition-transform group-open/prod:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </summary>
+                <div className="px-3 pb-3 pt-1 ml-[18px] border-l border-white/[0.06]">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
+                    {[
+                      { l: "Ticket", v: fmtR(p.ticket) },
+                      { l: "Alunos ativos", v: String(p.alunos) },
+                      { l: "CPV unitário", v: fmtR(p.cpv), neg: true },
+                      { l: "Lucro/aluno", v: fmtR(p.lucroUnit) },
+                    ].map((m, j) => (
+                      <div key={j}>
+                        <p className="text-xs text-slate-500">{m.l}</p>
+                        <p className={`text-sm font-bold ${m.neg ? "text-rose-400" : "text-white"}`}>{m.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-white/[0.06]">
+                    <div>
+                      <p className="text-xs text-slate-500">Receita total</p>
+                      <p className="text-sm font-bold text-emerald-400">{fmtR(receitaTotal)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">Lucro total</p>
+                      <p className="text-sm font-bold text-amber-400">{fmtR(lucroTotal)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </details>
             );
           })}
         </div>
@@ -1681,6 +2064,41 @@ function FinanceiroScreen() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Histórico de Inadimplência */}
+        <div className="mt-6 pt-6 border-t border-white/[0.06] relative z-10">
+          <p className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-4">Histórico de Inadimplência — Meses Anteriores</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {INAD_HISTORICO.map((h, i) => {
+              const perdido = h.totalInad - h.convertido;
+              const pctPerdido = ((perdido / h.totalInad) * 100).toFixed(1);
+              return (
+                <div key={i} className="rounded-xl p-5 border border-white/[0.06] bg-white/[0.02]">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-bold text-white">{h.mes}</p>
+                    <Badge color={h.pctConversao >= 70 ? "green" : h.pctConversao >= 50 ? "amber" : "red"}>{h.pctConversao}% convertido</Badge>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-1">Total inadimplente</p>
+                  <p className="text-lg font-bold text-rose-400 mb-3">{fmtR(h.totalInad)}</p>
+                  <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden ring-1 ring-white/5 mb-3 flex">
+                    <div className="h-full rounded-l-full" style={{ width: `${h.pctConversao}%`, background: "linear-gradient(90deg, rgba(52,211,153,0.7), rgba(52,211,153,0.4))", boxShadow: "0 0 8px rgba(52,211,153,0.2)" }} />
+                    <div className="h-full rounded-r-full" style={{ width: `${100 - h.pctConversao}%`, background: "linear-gradient(90deg, rgba(244,63,94,0.5), rgba(244,63,94,0.3))" }} />
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>
+                      <p className="text-slate-500">Recuperado</p>
+                      <p className="font-bold text-emerald-400">{fmtR(h.convertido)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-slate-500">Perdido</p>
+                      <p className="font-bold text-rose-400">{fmtR(perdido)} <span className="text-slate-600">({pctPerdido}%)</span></p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -1778,6 +2196,170 @@ function FinanceiroScreen() {
           </div>
         </div>
       </div>
+
+      {/* ══════ ROAS / ROI / MER / Impostos / Gateway / Headcount ══════ */}
+      {(() => {
+        const d = ROAS_ROI_MER;
+        const curr = d[d.length - 1];
+        const prev = d[d.length - 2];
+        const chartW = 440;
+        const chartH = 140;
+        const pad = { l: 8, r: 8, t: 16, b: 20 };
+        const usW = chartW - pad.l - pad.r;
+        const usH = chartH - pad.t - pad.b;
+
+        const mkLine = (vals: number[]) => {
+          const max = Math.max(...vals) * 1.1;
+          const min = Math.min(...vals) * 0.85;
+          const range = max - min || 1;
+          return vals.map((v, i) => {
+            const x = pad.l + (i / Math.max(vals.length - 1, 1)) * usW;
+            const y = pad.t + usH - ((v - min) / range) * usH;
+            return { x, y, str: `${x},${y}` };
+          });
+        };
+
+        const miniChart = (
+          title: string,
+          sub: string,
+          vals: number[],
+          color: string,
+          currentVal: string,
+          delta: string,
+          deltaUp: boolean,
+          extraLine?: { vals: number[]; color: string; dash?: boolean; label: string },
+        ) => {
+          const pts = mkLine(extraLine ? [...vals, ...extraLine.vals] : vals);
+          const mainPts = mkLine(vals);
+          const exPts = extraLine ? mkLine(extraLine.vals) : null;
+          // Recalculate with unified scale if extraLine
+          let mainLine = mainPts;
+          let extraLinePts = exPts;
+          if (extraLine) {
+            const allVals = [...vals, ...extraLine.vals];
+            const max = Math.max(...allVals) * 1.1;
+            const min = Math.min(...allVals) * 0.85;
+            const range = max - min || 1;
+            mainLine = vals.map((v, i) => {
+              const x = pad.l + (i / Math.max(vals.length - 1, 1)) * usW;
+              const y = pad.t + usH - ((v - min) / range) * usH;
+              return { x, y, str: `${x},${y}` };
+            });
+            extraLinePts = extraLine.vals.map((v, i) => {
+              const x = pad.l + (i / Math.max(extraLine.vals.length - 1, 1)) * usW;
+              const y = pad.t + usH - ((v - min) / range) * usH;
+              return { x, y, str: `${x},${y}` };
+            });
+          }
+
+          return (
+            <div className="rounded-2xl p-5 border border-white/[0.06]" style={{ ...glassCard }}>
+              <SectionHeader icon="chart" title={title} sub={sub} />
+              <div className="flex items-baseline gap-3 mt-2 mb-3 relative z-10">
+                <span className="text-2xl font-black text-white">{currentVal}</span>
+                <span className={`text-sm font-bold ${deltaUp ? "text-emerald-400" : "text-rose-400"}`}>
+                  {deltaUp ? "▲" : "▼"} {delta}
+                </span>
+              </div>
+              <div className="relative z-10">
+                <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet" style={{ overflow: "visible" }}>
+                  {[0, 0.5, 1].map((f, i) => (
+                    <line key={i} x1={pad.l} y1={pad.t + usH - f * usH} x2={chartW - pad.r} y2={pad.t + usH - f * usH} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                  ))}
+                  {extraLinePts && (
+                    <polyline points={extraLinePts.map(p => p.str).join(" ")} fill="none" stroke={extraLine!.color} strokeWidth="1.5" strokeDasharray={extraLine!.dash ? "5,4" : "0"} strokeLinejoin="round" />
+                  )}
+                  <polyline points={mainLine.map(p => p.str).join(" ")} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" />
+                  {/* Area */}
+                  <polygon points={`${mainLine.map(p => p.str).join(" ")} ${pad.l + usW},${pad.t + usH} ${pad.l},${pad.t + usH}`} fill={`${color}10`} />
+                  {/* Dots */}
+                  {mainLine.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r={i === mainLine.length - 1 ? 3.5 : 2} fill={color} />
+                  ))}
+                  {extraLinePts && extraLinePts.map((p, i) => (
+                    <circle key={`e${i}`} cx={p.x} cy={p.y} r="2" fill={extraLine!.color} opacity="0.6" />
+                  ))}
+                  {/* Month labels */}
+                  {d.map((m, i) => {
+                    const x = pad.l + (i / Math.max(d.length - 1, 1)) * usW;
+                    return <text key={i} x={x} y={chartH - 4} fontSize="8" fill="rgba(255,255,255,0.25)" textAnchor="middle">{m.mes}</text>;
+                  })}
+                  {/* Hover tooltips */}
+                  {vals.map((v, i) => {
+                    const x = mainLine[i].x;
+                    const y = mainLine[i].y;
+                    const colW = usW / vals.length;
+                    const exVal = extraLine ? extraLine.vals[i] : null;
+                    return (
+                      <g key={`tip${i}`}>
+                        <rect x={x - colW / 2} y={0} width={colW} height={chartH} fill="transparent" className="peer" />
+                        <g className="opacity-0 peer-hover:opacity-100 transition-opacity">
+                          <line x1={x} y1={pad.t} x2={x} y2={pad.t + usH} stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="3,3" />
+                          <rect x={Math.min(Math.max(x - 55, 2), chartW - 112)} y={Math.max(2, y - 30)} width={110} height={exVal != null ? 28 : 18} rx="4" fill="rgba(10,12,24,0.95)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                          <text x={Math.min(Math.max(x, 57), chartW - 57)} y={Math.max(2, y - 30) + 12} textAnchor="middle" fontSize="8" fontWeight="700" fill={color}>{d[i].mes}: {typeof v === "number" && v < 20 ? `${v.toFixed(1)}×` : fmtR(v)}</text>
+                          {exVal != null && (
+                            <text x={Math.min(Math.max(x, 57), chartW - 57)} y={Math.max(2, y - 30) + 23} textAnchor="middle" fontSize="7" fill={extraLine!.color}>{typeof exVal === "number" && exVal < 20 ? `${exVal.toFixed(1)}` : fmtR(exVal)}</text>
+                          )}
+                        </g>
+                      </g>
+                    );
+                  })}
+                </svg>
+                {extraLine && (
+                  <div className="flex gap-4 mt-1 justify-center">
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded" style={{ background: color }} />{title.split("—")[0].trim()}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3 h-0.5 rounded" style={{ background: extraLine.color, borderBottom: extraLine.dash ? "1px dashed" : "none" }} />{extraLine.label}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        const roasDelta = ((curr.roas - prev.roas) / prev.roas * 100).toFixed(1);
+        const roiDelta = ((curr.roi - prev.roi) / prev.roi * 100).toFixed(1);
+        const merDelta = ((curr.mer - prev.mer) / prev.mer * 100).toFixed(1);
+        const impDelta = ((curr.impVal - prev.impVal) / prev.impVal * 100).toFixed(1);
+        const gwDelta = ((curr.gwVal - prev.gwVal) / prev.gwVal * 100).toFixed(1);
+        const hcDelta = ((curr.hcVal - prev.hcVal) / prev.hcVal * 100).toFixed(1);
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {miniChart(
+              "ROAS — Retorno sobre Gasto em Ads", "6 meses",
+              d.map(m => m.roas), "#34d399",
+              `${curr.roas.toFixed(1)}×`, `${roasDelta}% vs mês ant.`, curr.roas >= prev.roas,
+            )}
+            {miniChart(
+              "ROI — Retorno sobre Investimento", "6 meses",
+              d.map(m => m.roi), "#a78bfa",
+              `${curr.roi.toFixed(1)}×`, `${roiDelta}% vs mês ant.`, curr.roi >= prev.roi,
+            )}
+            {miniChart(
+              "MER — Marketing Efficiency Ratio", "Receita total / gasto MKT",
+              d.map(m => m.mer), "#60a5fa",
+              `${curr.mer.toFixed(1)}×`, `${merDelta}% vs mês ant.`, curr.mer >= prev.mer,
+            )}
+            {miniChart(
+              "Impostos", `Alíquota efetiva: ${curr.impPct}%`,
+              d.map(m => m.impVal), "#f87171",
+              fmtR(curr.impVal), `${impDelta}% vs mês ant.`, curr.impVal <= prev.impVal,
+              { vals: d.map(m => m.impPct * 600), color: "rgba(248,113,113,0.35)", dash: true, label: `Alíquota (${curr.impPct}%)` },
+            )}
+            {miniChart(
+              "Gateway — Taxas de Pagamento", `Taxa média: ${curr.gwPct}%`,
+              d.map(m => m.gwVal), "#fbbf24",
+              fmtR(curr.gwVal), `${gwDelta}% vs mês ant.`, curr.gwVal <= prev.gwVal,
+              { vals: d.map(m => m.gwPct * 500), color: "rgba(251,191,36,0.35)", dash: true, label: `Taxa (${curr.gwPct}%)` },
+            )}
+            {miniChart(
+              "Headcount & Folha", `${curr.hcQtd} colaboradores`,
+              d.map(m => m.hcVal), "#22d3ee",
+              fmtR(curr.hcVal), `${hcDelta}% vs mês ant. · Per capita: ${fmtR(Math.round(curr.hcVal / curr.hcQtd))}`, curr.hcVal <= prev.hcVal,
+            )}
+          </div>
+        );
+      })()}
 
       {/* ══════ AIR — Receita Gerada por IA ══════ */}
       {(() => {
@@ -1906,182 +2488,6 @@ function FinanceiroScreen() {
         );
       })()}
 
-      {/* ══════ AIRE — Evolução da Receita após IA ══════ */}
-      {(() => {
-        const aireTotal = AIRE_TIMELINE.reduce((s, m) => s + m.aire, 0);
-        const aireMar = AIRE_TIMELINE[AIRE_TIMELINE.length - 1];
-        const custoIATotal = 673 * AIRE_TIMELINE.length;
-        const aireROI = (aireTotal / custoIATotal).toFixed(1);
-        const allVals = AIRE_TIMELINE.flatMap(m => [m.receita, m.baseline]);
-        const maxRecChart = Math.max(...allVals);
-        const minRecChart = Math.min(...allVals) * 0.9;
-        const rangeChart = maxRecChart - minRecChart;
-        const chartH = 180;
-        const chartW = 900;
-        const padL = 10;
-        const padR = 10;
-        const topPad = 30;
-        const botPad = 24;
-        const usableH = chartH - topPad - botPad;
-
-        const ptReal = AIRE_TIMELINE.map((m, i) => {
-          const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
-          const y = topPad + usableH - ((m.receita - minRecChart) / rangeChart) * usableH;
-          return `${x},${y}`;
-        });
-        const ptBase = AIRE_TIMELINE.map((m, i) => {
-          const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
-          const y = topPad + usableH - ((m.baseline - minRecChart) / rangeChart) * usableH;
-          return `${x},${y}`;
-        });
-        // Area between lines (for shading)
-        const areaPoints = [...ptReal, ...ptBase.reverse()].join(" ");
-
-        return (
-          <div className="rounded-2xl p-6 border border-purple-500/10" style={{ ...glassCard, animation: "animationIn 0.8s ease-out 0.8s both" }}>
-            <div className="flex items-start justify-between mb-5 relative z-10">
-              <div>
-                <SectionHeader icon="chart" title="AIRE — Eficiência de Receita por IA" sub="AI Revenue Impact Evolution" />
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-black text-purple-400 drop-shadow-[0_0_12px_rgba(167,139,250,0.25)]">+{fmtR(aireTotal)}</p>
-                <p className="text-xs text-slate-500">Receita incremental acumulada desde implementação</p>
-              </div>
-            </div>
-
-            {/* KPIs */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 relative z-10">
-              {[
-                { l: "AIRE Acumulado", v: `+${fmtR(aireTotal)}`, c: "text-purple-400", d: "desde Ago/25" },
-                { l: "AIRE · Mar/26", v: `+${fmtR(aireMar.aire)}`, c: "text-purple-400", d: `vs ${fmtR(aireMar.baseline)} sem IA` },
-                { l: "Aceleração CAGR", v: "4.8×", c: "text-white", d: "vs crescimento pré-IA" },
-                { l: "Payback da IA", v: "< 1 mês", c: "text-emerald-400", d: `custo total: ${fmtR(custoIATotal)} · ROI: ${aireROI}×` },
-              ].map((k, i) => (
-                <div key={i} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] text-center">
-                  <p className={`text-xl font-black ${k.c}`}>{k.v}</p>
-                  <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">{k.l}</p>
-                  <p className="text-xs text-slate-500 mt-1">{k.d}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Timeline milestones */}
-            <div className="flex gap-0 rounded-xl overflow-hidden border border-white/[0.06] mb-5 relative z-10">
-              {[
-                { date: "Jul/25", label: "Pré-IA", valor: "R$26.400", c: "text-slate-500", bg: "" },
-                { date: "Ago/25", label: "Go-live SDR", valor: "R$28.900", c: "text-amber-400", bg: "bg-amber-400/[0.02]" },
-                { date: "Out/25", label: "Stack completa", valor: "R$29.000", c: "text-cyan-400", bg: "" },
-                { date: "Dez/25", label: "5 agentes online", valor: "R$33.400", c: "text-emerald-400", bg: "" },
-                { date: "Mar/26", label: "Hoje", valor: "R$43.200", c: "text-emerald-400", bg: "bg-emerald-400/[0.02]" },
-              ].map((ms, i) => (
-                <div key={i} className={`flex-1 py-3 px-2 text-center border-r border-white/[0.06] last:border-r-0 ${ms.bg}`}>
-                  <p className="text-xs text-slate-600">{ms.date}</p>
-                  <p className={`text-xs font-bold ${ms.c}`}>{ms.label}</p>
-                  <p className="text-sm font-black text-white mt-1">{ms.valor}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Chart: dual lines with area */}
-            <div className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] mb-5 relative z-10">
-              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-3">Receita real vs Projeção sem IA</p>
-              <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" onMouseLeave={() => setHoveredAire(null)}>
-                {/* Grid lines */}
-                {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
-                  <line key={i} x1={padL} y1={topPad + usableH - f * usableH} x2={chartW - padR} y2={topPad + usableH - f * usableH} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                ))}
-                {/* Shaded area */}
-                <polygon points={areaPoints} fill="rgba(167,139,250,0.08)" />
-                {/* Baseline (dashed) */}
-                <polyline points={ptBase.reverse().join(" ")} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeDasharray="5,4" />
-                {/* Real line */}
-                <polyline points={ptReal.join(" ")} fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinejoin="round" />
-                {/* Data points + hover areas */}
-                {AIRE_TIMELINE.map((m, i) => {
-                  const rp = ptReal[i].split(",");
-                  const bp = ptBase[i].split(",");
-                  const rx = Number(rp[0]);
-                  const ry = Number(rp[1]);
-                  const by = Number(bp[1]);
-                  const isHov = hoveredAire === i;
-                  const isCurrent = i === AIRE_TIMELINE.length - 1;
-                  return (
-                    <g key={i}>
-                      {/* Vertical guide on hover */}
-                      {isHov && <line x1={rx} y1={topPad} x2={rx} y2={topPad + usableH} stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="3,3" />}
-                      {/* Dots */}
-                      <circle cx={rx} cy={ry} r={isHov ? 5 : isCurrent ? 4 : 0} fill="#34d399" style={{ transition: "r 0.15s" }} />
-                      <circle cx={rx} cy={by} r={isHov ? 4 : 0} fill="rgba(255,255,255,0.3)" style={{ transition: "r 0.15s" }} />
-                      {/* Tooltip */}
-                      {isHov && (() => {
-                        const tw = 160;
-                        const th = 34;
-                        let tx = rx - tw / 2;
-                        if (tx < 2) tx = 2;
-                        if (tx + tw > chartW - 2) tx = chartW - tw - 2;
-                        const above = ry - th - 10;
-                        const ty = above >= 2 ? above : ry + 12;
-                        return (
-                          <>
-                            <rect x={tx} y={ty} width={tw} height={th} rx="5" fill="rgba(10,12,24,0.95)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            <text x={tx + tw / 2} y={ty + 13} textAnchor="middle" fontSize="9" fontWeight="700" fill="#34d399">{fmtR(m.receita)} <tspan fill="rgba(167,139,250,0.8)">+{fmtR(m.aire)}</tspan></text>
-                            <text x={tx + tw / 2} y={ty + 26} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.4)">sem IA: {fmtR(m.baseline)}</text>
-                          </>
-                        );
-                      })()}
-                      {/* Invisible hit area */}
-                      <rect x={rx - (chartW / AIRE_TIMELINE.length) / 2} y={0} width={chartW / AIRE_TIMELINE.length} height={chartH} fill="transparent" onMouseEnter={() => setHoveredAire(i)} style={{ cursor: "crosshair" }} />
-                    </g>
-                  );
-                })}
-                {/* Month labels */}
-                {AIRE_TIMELINE.map((m, i) => {
-                  const x = padL + (i / (AIRE_TIMELINE.length - 1)) * (chartW - padL - padR);
-                  const isCurrent = i === AIRE_TIMELINE.length - 1;
-                  const isHov = hoveredAire === i;
-                  return <text key={i} x={x} y={chartH - 4} fontSize="9" fill={isCurrent || isHov ? "#34d399" : "rgba(255,255,255,0.25)"} textAnchor="middle" fontWeight={isCurrent || isHov ? "700" : "400"}>{m.mes.replace("/25", "").replace("/26", "")}</text>;
-                })}
-              </svg>
-              <div className="flex gap-4 mt-3 justify-center">
-                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3.5 h-0.5 rounded bg-emerald-400" />Receita real</span>
-                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-3.5 h-0.5 rounded border-b border-dashed border-white/30" />Projeção sem IA</span>
-                <span className="flex items-center gap-1.5 text-xs text-slate-400"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "rgba(167,139,250,0.2)" }} />AIRE (incremental)</span>
-              </div>
-            </div>
-
-            {/* Table: growth comparison */}
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden relative z-10">
-              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider px-4 pt-4 pb-2">Taxa de crescimento — Pré-IA vs Pós-IA</p>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/[0.06]">
-                    {["Período", "Receita", "Cresc. MoM", "Sem IA (proj.)", "AIRE do mês"].map(h => (
-                      <th key={h} className={`py-2 px-4 text-xs text-neutral-500 font-bold uppercase tracking-wider ${h === "Período" ? "text-left" : "text-right"}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {AIRE_TIMELINE.map((m, i) => {
-                    const isCurrent = i === AIRE_TIMELINE.length - 1;
-                    return (
-                      <tr key={i} className={`border-b border-white/[0.025] ${isCurrent ? "bg-emerald-400/[0.03]" : m.label === "Go-live SDR" ? "bg-amber-400/[0.015]" : ""}`}>
-                        <td className="py-2.5 px-4">
-                          <span className={`text-xs font-bold ${isCurrent ? "text-emerald-400" : "text-white"}`}>{m.mes}</span>
-                          {m.label && <span className={`ml-2 text-xs ${m.label === "Go-live SDR" ? "text-amber-400" : m.label === "Hoje" ? "text-emerald-400" : "text-cyan-400"}`}>{m.label}</span>}
-                        </td>
-                        <td className={`py-2.5 px-4 text-right text-xs ${isCurrent ? "font-bold text-emerald-400" : "text-white"}`}>{fmtR(m.receita)}</td>
-                        <td className={`py-2.5 px-4 text-right text-xs font-bold ${m.crescMoM >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{m.crescMoM >= 0 ? "▲" : "▼"} {m.crescMoM >= 0 ? "+" : ""}{m.crescMoM}%</td>
-                        <td className="py-2.5 px-4 text-right text-sm text-slate-300">{fmtR(m.baseline)}</td>
-                        <td className={`py-2.5 px-4 text-right text-xs font-bold ${isCurrent ? "text-purple-400" : "text-purple-400/70"}`}>+{fmtR(m.aire)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
-      })()}
     </div>
   );
 }
